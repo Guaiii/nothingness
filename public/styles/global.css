@@ -1,0 +1,27 @@
+@import url('./header.css');
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --var_background-color: #ebe6da;
+  --var_border-color: #b5b5b5;
+  font-family: 霞鹜文楷;
+}
+
+html {
+  font-size: calc(1rem + 0.25vw);
+  background-color: var(--var_background-color);
+  padding: 1rem;
+  width: 100%;
+  min-height: 100vh;
+}
+
+body {
+  border: 3px double #585656;
+  outline: 1px solid #b5b5b5;
+  min-height: calc(100vh - 2rem);
+  padding: 1rem;
+}

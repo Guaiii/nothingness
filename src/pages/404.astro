@@ -1,0 +1,33 @@
+---
+const mapping = [
+  "世人都晓神仙好，只有功名忘不了",
+  "醉后不知天在水，满船清梦压星河",
+  "假作真时真亦假，无为有处有还无",
+  "生我门庭死我户，看得破时忍不过",
+];
+
+function getRandomItem() {
+  if (!Array.isArray(mapping) || mapping.length === 0) return undefined;
+  const randomIndex = Math.floor(Math.random() * mapping.length);
+  return mapping[randomIndex];
+}
+
+const randomVerse = getRandomItem();
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>未曾相识</title>
+    <link rel="stylesheet" href="/styles/404.css" />
+  </head>
+  <body>
+    <main class="text-center">
+      <p>{randomVerse}</p>
+    </main>
+  </body>
+  <style></style>
+</html>
