@@ -1,0 +1,18 @@
+.main {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--var_block-padding);
+}
+
+.content-common {
+    padding: var( --var_block-padding);
+    border: 1px solid var(--var_border-color);
+}
+
+.left-tech {
+
+}
+
+.right-book {
+
+}

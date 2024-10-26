@@ -1,5 +1,7 @@
 ---
 import Header from '../components/Header/index.astro';
+import Content from '../components/Content/index.astro';
+import Footer from '../components/Footer/index.astro';
 ---
 
 <html lang="zh-CN">
@@ -12,8 +14,11 @@ import Header from '../components/Header/index.astro';
 	<link rel="stylesheet" href="/styles/global.css">
   </head>
   <body>
-	<Header></Header>
-    <slot />
+	<div id="root">
+      <Header />
+      <Content />
+      <Footer />
+    </div>
   </body>
   <style>
   </style>

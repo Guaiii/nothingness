@@ -1,0 +1,4 @@
+.footer {
+    border: 1px solid var(--var_border-color);
+    padding: var(--var_block-padding);
+}

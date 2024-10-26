@@ -1,4 +1,6 @@
 @import url('./header.css');
+@import url('./content.css');
+@import url('./footer.css');
 * {
   padding: 0;
   margin: 0;
@@ -6,8 +8,12 @@
 }
 
 :root {
+  /*整体的背景颜色*/
   --var_background-color: #ebe6da;
+  /*整体的边框颜色*/
   --var_border-color: #b5b5b5;
+  /*区块内容的 padding*/
+  --var_block-padding: .5rem;
   font-family: 霞鹜文楷;
 }
 
@@ -24,4 +30,11 @@ body {
   outline: 1px solid #b5b5b5;
   min-height: calc(100vh - 2rem);
   padding: 1rem;
+}
+
+#root {
+  display: grid;
+  /*grid-template-rows: 1fr 4.35fr 1fr;*/
+  grid-template-rows: auto calc(100vh - 20rem) 1fr;
+  gap: var(--var_block-padding);
 }

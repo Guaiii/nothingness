@@ -1,7 +1,7 @@
 .header {
   display: grid;
   grid-template-columns: 1fr 2fr;
-  gap: .2rem;
+  gap: var(--var_block-padding);
 
   & .right-title {
     /* margin-bottom: 1rem; */
@@ -11,7 +11,7 @@
     & .title {
       font-size: 2.5rem;
       letter-spacing: 2rem;
-      padding: 0.8rem 0;
+      padding: var(--var_block-padding) 0;
     }
 
     & .author {
@@ -32,6 +32,6 @@
   & .left-desc {
     border: 1px solid var(--var_border-color);
     text-align: center;
-    padding: .5rem;
+    padding: var(--var_block-padding);
   }
 }
