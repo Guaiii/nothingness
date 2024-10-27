@@ -1,0 +1,71 @@
+---
+interface Props {
+    content: string;
+}
+
+const {content} = Astro.props
+---
+
+
+<>
+    <a class="button" aria-describedby="tooltip">
+        {content}
+    </a>
+    <div class="tooltip" role="tooltip">{content}</div>
+</>
+
+<script>
+    import {computePosition, flip, shift, offset, autoUpdate } from '@floating-ui/dom'
+
+    const button = document.querySelector('.button') as HTMLAnchorElement;
+    const tooltip = document.querySelector('.tooltip') as HTMLDivElement;
+    if (button && tooltip) {
+        function update() {
+            computePosition(button, tooltip, {
+                placement: 'right',
+                middleware: [offset(5), flip(), shift({padding: 5})]
+            }).then(({x, y}) => {
+                Object.assign(tooltip.style, {
+                    left: `${x}px`,
+                    top: `${y}px`,
+                });
+            });
+        }
+
+
+        const cleanup = autoUpdate(
+            button,
+            tooltip,
+            update,
+        );
+
+        function showTooltip() {
+            tooltip.style.display = 'block';
+            update();
+        }
+
+        function hideTooltip() {
+            tooltip.style.display = 'none';
+            cleanup()
+        }
+
+        // const keyMapping = [
+        //     ['mouseenter', showTooltip],
+        //     ['mouseleave', hideTooltip],
+        //     ['focus', showTooltip],
+        //     ['blur', hideTooltip],
+        // ]
+        const keyMapping = {
+            mouseenter: showTooltip,
+            mouseleave: hideTooltip,
+            focus: showTooltip,
+            blur: showTooltip,
+        }
+        type Keys = keyof typeof keyMapping
+        for (let key in keyMapping) {
+            const listener = keyMapping[key as Keys]
+            button.addEventListener(key, listener);
+        }
+
+    }
+</script>

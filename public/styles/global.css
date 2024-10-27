@@ -1,10 +1,15 @@
 @import url('./header.css');
 @import url('./content.css');
 @import url('./footer.css');
+@import url('./popover.css');
 * {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
+
+ul {
+  list-style-type: none;
 }
 
 :root {
@@ -14,6 +19,9 @@
   --var_border-color: #b5b5b5;
   /*区块内容的 padding*/
   --var_block-padding: .5rem;
+
+  /*底部栏高度*/
+  --var_footer-height:8rem;
   font-family: 霞鹜文楷;
 }
 
@@ -35,6 +43,6 @@ body {
 #root {
   display: grid;
   /*grid-template-rows: 1fr 4.35fr 1fr;*/
-  grid-template-rows: auto calc(100vh - 20rem) 1fr;
+  grid-template-rows: auto calc(100vh - 20rem) var( --var_footer-height);
   gap: var(--var_block-padding);
 }

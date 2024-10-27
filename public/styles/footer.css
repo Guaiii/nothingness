@@ -1,4 +1,17 @@
 .footer {
     border: 1px solid var(--var_border-color);
     padding: var(--var_block-padding);
+    overflow: hidden;
+
+    & .footer-list {
+        writing-mode: vertical-rl;
+
+
+        & .footer-item {
+            height: calc(var(--var_footer-height) - (var(--var_block-padding) * 2));
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    }
 }
