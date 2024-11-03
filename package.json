@@ -15,5 +15,9 @@
     "@floating-ui/dom": "^1.6.11",
     "astro": "^4.15.9",
     "typescript": "^5.6.2"
+  },
+  "devDependencies": {
+    "postcss-preset-env": "^10.0.9",
+    "postcss-utopia": "^1.1.0"
   }
 }

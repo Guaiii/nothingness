@@ -1,0 +1,55 @@
+---
+import HomeLayout from "../layouts/HomeLayout.astro";
+import '../styles/author.css'
+---
+
+
+<HomeLayout>
+    <main class="main u-grid">
+        <h1>谭某人</h1>
+        <div>
+            <p>asdfds</p>
+            <blockquote cite="/">
+                <p id="article">
+                    我是一个很有特色的人，比如 xxx，这是一段自我介绍，我介绍的很快，文字有很多很多，怎么还没有换行
+                </p>
+                <hr class="after-line">
+                <cite>
+
+                </cite>
+            </blockquote>
+        </div>
+    </main>
+</HomeLayout>
+
+
+<script>
+    import {getLineCountAndLastLineWidth} from "./_utils";
+
+    const p = document.querySelector('#article');
+    const hr = document.querySelector('.after-line');
+    if (p && hr) {
+        const intersectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                console.log(entry);
+                const {target,boundingClientRect} = entry
+                if(target === p){
+                    const {left,right} = boundingClientRect
+                    if(left > 50){
+                        const lastTextData = getLineCountAndLastLineWidth(p)
+                        console.log(lastTextData);
+                        const {lastLineWidth,totalHeight} = lastTextData
+                        const allComputedStyles = hr.computedStyleMap()
+                        hr.style.setProperty('width', `${lastLineWidth + 10}px`)
+                        hr.style.setProperty('height', `${totalHeight}px`)
+                        hr.style.setProperty('--var_border-width','1px')
+                    }
+                }
+            });
+        })
+        // console.log(article);
+        intersectionObserver.observe(p)
+    }
+
+
+</script>

@@ -1,48 +1,4 @@
-@import url('./header.css');
-@import url('./content.css');
-@import url('./footer.css');
+@import url('init.css');
 @import url('./popover.css');
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
 
-ul {
-  list-style-type: none;
-}
 
-:root {
-  /*整体的背景颜色*/
-  --var_background-color: #ebe6da;
-  /*整体的边框颜色*/
-  --var_border-color: #b5b5b5;
-  /*区块内容的 padding*/
-  --var_block-padding: .5rem;
-
-  /*底部栏高度*/
-  --var_footer-height:8rem;
-  font-family: 霞鹜文楷;
-}
-
-html {
-  font-size: calc(1rem + 0.25vw);
-  background-color: var(--var_background-color);
-  padding: 1rem;
-  width: 100%;
-  min-height: 100vh;
-}
-
-body {
-  border: 3px double #585656;
-  outline: 1px solid #b5b5b5;
-  min-height: calc(100vh - 2rem);
-  padding: 1rem;
-}
-
-#root {
-  display: grid;
-  /*grid-template-rows: 1fr 4.35fr 1fr;*/
-  grid-template-rows: auto calc(100vh - 20rem) var( --var_footer-height);
-  gap: var(--var_block-padding);
-}

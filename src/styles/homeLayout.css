@@ -1,0 +1,154 @@
+dev.to
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol, ul {
+  list-style: none;
+}
+blockquote, q {
+  quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+
+* {
+  box-sizing: border-box;
+}
+
+/* @link https://utopia.fyi/type/calculator?c=320,18,1.2,1240,20,1.25,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+
+:root {
+
+  --grid-max-width: 100%;
+  --grid-gutter: var(--space-s-l, clamp(1.125rem, 0.6467rem + 2.3913vw, 2.5rem));
+  --grid-columns: 12;
+  /*--step--2: clamp(0.7813rem, 0.7747rem + 0.0326vw, 0.8rem);*/
+  /*--step--1: clamp(0.9375rem, 0.9158rem + 0.1087vw, 1rem);*/
+  /*--step-0: clamp(1.125rem, 1.0815rem + 0.2174vw, 1.25rem);*/
+  /*--step-1: clamp(1.35rem, 1.2761rem + 0.3696vw, 1.5625rem);*/
+  /*--step-2: clamp(1.62rem, 1.5041rem + 0.5793vw, 1.9531rem);*/
+  /*--step-3: clamp(1.944rem, 1.771rem + 0.8651vw, 2.4414rem);*/
+  /*--step-4: clamp(2.3328rem, 2.0827rem + 1.2504vw, 3.0518rem);*/
+  /*--step-5: clamp(2.7994rem, 2.4462rem + 1.7658vw, 3.8147rem);*/
+
+  @utopia typeScale({
+    minWidth: 320,
+    maxWidth: 1240,
+    minFontSize: 18,
+    maxFontSize: 20,
+    minTypeScale: 1.2,
+    maxTypeScale: 1.25,
+    positiveSteps: 5,
+    negativeSteps: 2,
+    prefix: "step",
+    relativeTo: "viewport-width"
+  });
+
+  @utopia spaceScale({
+    minWidth: 320,
+    maxWidth: 1240,
+    minSize: 18,
+    maxSize: 20,
+    positiveSteps: [1.5, 2, 3, 4, 6],
+    negativeSteps: [0.75, 0.5, 0.25],
+    customSizes: ["s-l"],
+    prefix: "space",
+    relativeTo: "viewport-width",
+  });
+
+}
+
+:root {
+  /*整体的背景颜色*/
+  --var_background-color: #ebe6da;
+  /*整体的边框颜色*/
+  --var_border-config: 1px solid #b5b5b5;
+  /*区块内容的 padding*/
+  --var_block-padding: utopia.clamp(5,10);
+  /*所有的间距*/
+  --var_gap: .2rem;
+
+  /*底部栏高度*/
+  --var_footer-height: 8rem;
+  font-family: 霞鹜文楷;
+}
+
+html {
+  margin: calc(var(--grid-gutter) / 2);
+  /*font-size: calc(1rem + 0.25vw);*/
+  /*font-size: utopia.clamp(16, 20);*/
+  background-color: var(--var_background-color);
+  /*min-height: 100vh;*/
+}
+
+body {
+  padding: calc(var(--grid-gutter) / 2);
+  border: 1px solid #525252;
+  outline: utopia.clamp(1,2) solid #525252;
+  outline-offset: 4px;
+}
+
+.tooltip {
+  display: none;
+  width: max-content;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #222;
+  color: white;
+  font-weight: bold;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 90%;
+}
+
+h1 {
+  font-size: utopia.clamp(20,40);
+  letter-spacing: utopia.clamp(10,20);
+}
+
+
+.u-container {
+  /*max-width: var(--grid-max-width);*/
+  /*padding-inline: var(--grid-gutter);*/
+  /*margin-inline: auto;*/
+}
+
+.u-grid {
+  display: grid;
+  gap: var(--grid-gutter);
+}
+

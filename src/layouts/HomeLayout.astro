@@ -1,0 +1,26 @@
+---
+import '../styles/homeLayout.css'
+interface Props {
+    title?: string;
+    metaContent?: string;
+}
+
+const {title = '太虚幻境',metaContent = '虚无、小说、技术(css、js、javascript、typescript、nodejs)、生活。这是一个虚无的世界，你应该能找到自己所追求的'} = Astro.props
+---
+
+
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta name="viewport" content="width=device-width"/>
+    <meta name="generator" content={metaContent}/>
+    <title>{title}</title>
+    <link rel="stylesheet" href="/styles/global.css">
+</head>
+<body>
+<slot />
+</body>
+<style>
+</style>
+</html>
