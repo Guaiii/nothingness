@@ -27,14 +27,15 @@ blockquote {
 
 .after-line {
     --var_border-width: 0px;
-    display: block;
+    --var_blockquote-width:0;
+    --var_blockquote-height:0;
+    display: inline-block;
     position: absolute;
     inset: 0 0 -10px -10px;
     width: 0;
     height: 0;
     margin: 0;
     color: #222222;
-    /*border: 0;*/
     border-top: 0;
     border-right: 0;
     border-left-width: var(--var_border-width);
@@ -44,9 +45,25 @@ blockquote {
     border-bottom-color: #222222;
     border-bottom-style: solid;
     background-color: transparent;
-    transition-property: width,height,border-bottom-width,border-left-width;
-    /*transition-property: width,height;*/
+    transition-property: width,height;
     transition-duration: 2s,1s;
     transition-delay: 1s,0s;
-    /*transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);*/
+
+}
+
+
+@custom-media --header-layout (width  <= 865px);
+@media (--header-layout) {
+    .after-line {
+        display: none;
+    }
+}
+
+@media not (--header-layout) {
+    .after-line {
+        /*display: inline-block;*/
+        width: var(--var_blockquote-width);
+        height: var(--var_blockquote-height);
+    }
+
 }

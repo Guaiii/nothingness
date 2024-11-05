@@ -29,61 +29,15 @@ import '../styles/author.css'
     const p = document.querySelector('#article');
     const hr = document.querySelector('.after-line');
     if (p && hr) {
-        // const intersectionObserver = new IntersectionObserver((entries) => {
-        //     entries.forEach((entry) => {
-        //         console.log(entry);
-        //         const {target,boundingClientRect} = entry
-        //         if(target === p){
-        //             const {left,right} = boundingClientRect
-        //             if(left > 50){
-        //                 const lastTextData = getLineCountAndLastLineWidth(p)
-        //                 console.log(lastTextData);
-        //                 const {lastLineWidth,totalHeight} = lastTextData
-        //                 const allComputedStyles = hr.computedStyleMap()
-        //                 hr.style.setProperty('width', `${lastLineWidth + 10}px`)
-        //                 hr.style.setProperty('height', `${totalHeight}px`)
-        //                 hr.style.setProperty('--var_border-width','1px')
-        //             }
-        //         }
-        //     });
-        // })
-        //
-        // intersectionObserver.observe(p)
-        // const mutationObserver = new MutationObserver((mutations, observer) => {
-        //     mutations.forEach((mutation) => {
-        //         console.log('mutation', mutation);
-        //     })
-        // })
-        // mutationObserver.observe(document.documentElement,{attributes:true,childList:true,subtree:true})
-
-        function debounce(fn:() => void, wait:number) {
-            let timeout;
-            return function(...args) {
-                let _that = this;
-                timeout && clearTimeout(timeout);
-                timeout = setTimeout(() => {
-                    fn.apply(_that, args);
-                }, wait);
-            };
-        }
-
-        const resizeHandler = debounce(() => {
-            const {left,right} = p.getBoundingClientRect()
-            console.log(left);
-            if(left > 50){
-                const lastTextData = getLineCountAndLastLineWidth(p)
-                console.log(lastTextData);
-                const {lastLineWidth,totalHeight} = lastTextData
-                const allComputedStyles = hr.computedStyleMap()
-                hr.style.setProperty('opacity','1');
-                hr.style.setProperty('width', `${lastLineWidth + 10}px`)
-                hr.style.setProperty('height', `${totalHeight}px`)
-                hr.style.setProperty('--var_border-width','1px')
-            }else {
-                hr.style.setProperty('opacity', '0')
-            }
-        },200)
-        window.addEventListener('resize', resizeHandler)
+        const {left,right} = p.getBoundingClientRect()
+        const lastTextData = getLineCountAndLastLineWidth(p)
+        console.log(lastTextData);
+        const {lastLineWidth,totalHeight} = lastTextData
+        const allComputedStyles = hr.computedStyleMap()
+        // hr.style.setProperty('opacity','1');
+        hr.style.setProperty('--var_blockquote-width', `${lastLineWidth + 10}px`)
+        hr.style.setProperty('--var_blockquote-height', `${totalHeight}px`)
+        hr.style.setProperty('--var_border-width','1px')
     }
 
 

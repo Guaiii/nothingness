@@ -17,3 +17,15 @@ export function getLineCountAndLastLineWidth(pElement:Element) {
         lastLineWidth
     };
 }
+
+
+export function debounce(fn:() => void, wait:number) {
+    let timeout;
+    return function(...args) {
+        let _that = this;
+        timeout && clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            fn.apply(_that, args);
+        }, wait);
+    };
+}
