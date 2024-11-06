@@ -28,17 +28,34 @@ import '../styles/author.css'
 
     const p = document.querySelector('#article');
     const hr = document.querySelector('.after-line');
-    if (p && hr) {
-        const {left,right} = p.getBoundingClientRect()
-        const lastTextData = getLineCountAndLastLineWidth(p)
-        console.log(lastTextData);
-        const {lastLineWidth,totalHeight} = lastTextData
-        const allComputedStyles = hr.computedStyleMap()
-        // hr.style.setProperty('opacity','1');
-        hr.style.setProperty('--var_blockquote-width', `${lastLineWidth + 10}px`)
-        hr.style.setProperty('--var_blockquote-height', `${totalHeight}px`)
-        hr.style.setProperty('--var_border-width','1px')
-    }
+    // if (p && hr) {
+    //     const {left,right} = p.getBoundingClientRect()
+    //     const lastTextData = getLineCountAndLastLineWidth(p)
+    //     console.log(lastTextData);
+    //     const {lastLineWidth,totalHeight} = lastTextData
+    //     const allComputedStyles = hr.computedStyleMap()
+    //     // hr.style.setProperty('opacity','1');
+    //     hr.style.setProperty('--var_blockquote-width', `${lastLineWidth + 10}px`)
+    //     hr.style.setProperty('--var_blockquote-height', `${totalHeight}px`)
+    //     hr.style.setProperty('--var_border-width','1px')
+    // }
 
+
+    const resizeObserver = new ResizeObserver((entries, observer) => {
+        entries.forEach(entry => {
+            console.log(entry);
+            const {target} = entry
+            const {left, right} = target.getBoundingClientRect()
+            const lastTextData = getLineCountAndLastLineWidth(p)
+            console.log(lastTextData);
+            const {lastLineWidth, totalHeight} = lastTextData
+            const allComputedStyles = hr.computedStyleMap()
+            // hr.style.setProperty('opacity','1');
+            hr.style.setProperty('--var_blockquote-width', `${lastLineWidth + 10}px`)
+            hr.style.setProperty('--var_blockquote-height', `${totalHeight}px`)
+            hr.style.setProperty('--var_border-width', '1px')
+        })
+    })
+    resizeObserver.observe(p)
 
 </script>
