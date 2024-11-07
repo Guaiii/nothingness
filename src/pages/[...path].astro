@@ -1,0 +1,18 @@
+---
+import {getCollection} from 'astro:content';
+import HomeLayout from "../layouts/HomeLayout.astro";
+// 1. 为每个集合条目生成一个新路径
+export async function getStaticPaths() {
+    const logEntries = await getCollection('log');
+    console.log(logEntries);
+    return logEntries.map(entry => ({
+        params: {slug: entry.slug, path: `${entry.collection}/${entry.slug}`}, props: {entry},
+    }));
+}
+// 2. 当渲染的时候，你可以直接从属性中得到条目
+const {entry} = Astro.props;
+const {Content} = await entry.render();
+---
+<HomeLayout>
+    <Content/>
+</HomeLayout>
