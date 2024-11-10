@@ -27,6 +27,14 @@
     border: var(--var_border-config);
 }
 
+.home-container {
+    min-height: calc(100vh - var(--grid-gutter));
+    padding: calc(var(--grid-gutter) / 2);
+    border: 1px solid #525252;
+    outline: utopia.clamp(1, 2) solid #525252;
+    outline-offset: 4px;
+}
+
 .home-header {
     grid-template-columns: repeat(var(--grid-columns), 1fr);
 
@@ -66,18 +74,23 @@
 
     .main-left {
         grid-column: 1 /  span 8;
+    }
 
-        .tech-list {
-            column-count: 2;
-            line-height: 1.3rem;
+    .tech-list {
+        max-height: utopia.clamp(200, 350);
+        overflow-y: auto;
 
-            & li {
-                width: utopia.clamp(100, 350);
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+        & li {
+            width: auto;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
+    }
+
+
+    h3 {
+        margin-bottom: var(--space-xs-s);
     }
 
     .main-right {
@@ -110,8 +123,9 @@
         border: none;
     }
 
-    .main-left .tech-list.tech-list {
-        column-count: 1;
+    .main-left.main-left, .main-right.main-right {
+        grid-column: 1 / -1;
     }
+
 
 }

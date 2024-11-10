@@ -107,14 +107,32 @@ html {
     font-size: var(--step-0);
     background-color: var(--var_background-color);
     /*min-height: 100vh;*/
+
+    /* 自定义整个滚动条 */
+
+    ::-webkit-scrollbar {
+        width: utopia.clamp(2,4); /* 滚动条宽度 */
+    }
+
+    /* 自定义滚动条轨道 */
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1; /* 轨道颜色 */
+    }
+
+    /* 自定义滚动条的滑块（thumb） */
+
+    ::-webkit-scrollbar-thumb {
+        background: #888; /* 滑块颜色 */
+    }
+
+    /* 当hover或active状态时，自定义滑块的颜色 */
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
 }
 
-body {
-    padding: calc(var(--grid-gutter) / 2);
-    border: 1px solid #525252;
-    outline: utopia.clamp(1, 2) solid #525252;
-    outline-offset: 4px;
-}
 
 .tooltip {
     display: none;
@@ -148,6 +166,6 @@ h2 {
 
 .u-grid {
     display: grid;
-    gap: var(--grid-gutter);
+    gap: calc(var(--grid-gutter) / 2);
 }
 
