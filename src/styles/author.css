@@ -51,6 +51,14 @@ blockquote {
 
 }
 
+.description {
+    max-width: utopia.clamp(100,200);
+    position: absolute;
+    top: 0;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 
 @custom-media --header-layout (width  <= 865px);
 @media (--header-layout) {

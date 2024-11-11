@@ -14,8 +14,8 @@ import '../styles/author.css'
                     我是一个很有特色的人，比如 xxx，这是一段自我介绍，我介绍的很快，文字有很多很多，怎么还没有换行
                 </p>
                 <hr class="after-line">
-                <cite>
-
+                <cite class="description">
+                    来自个人描述1234321432143214321234321432143214321432
                 </cite>
             </blockquote>
         </div>
@@ -28,6 +28,7 @@ import '../styles/author.css'
 
     const p = document.querySelector('#article');
     const hr = document.querySelector('.after-line');
+    const desc = document.querySelector('.description')
     // if (p && hr) {
     //     const {left,right} = p.getBoundingClientRect()
     //     const lastTextData = getLineCountAndLastLineWidth(p)
@@ -54,6 +55,10 @@ import '../styles/author.css'
             hr.style.setProperty('--var_blockquote-width', `${lastLineWidth + 10}px`)
             hr.style.setProperty('--var_blockquote-height', `${totalHeight}px`)
             hr.style.setProperty('--var_border-width', '1px')
+
+            const descWidth = desc.offsetWidth
+            console.log('descWidth',descWidth,desc);
+            desc.style.left = `${-(descWidth + 15)}px`;
         })
     })
     resizeObserver.observe(p)

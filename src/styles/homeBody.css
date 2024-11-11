@@ -63,6 +63,7 @@
 
             .header-title-desc {
                 flex: 1;
+                font-size: utopia.clamp(12,20);
             }
         }
     }
@@ -101,7 +102,7 @@
 @custom-media --header-layout (width  <= 865px);
 @media (--header-layout) {
 
-    body {
+    .home-container {
         outline: 0;
     }
 
