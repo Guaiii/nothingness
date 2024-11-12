@@ -4,8 +4,10 @@ import HomeLayout from "../layouts/HomeLayout.astro";
 // 1. 为每个集合条目生成一个新路径
 export async function getStaticPaths() {
     const logEntries = await getCollection('log');
+    const novelEntries = await getCollection('novel');
+    const techEntries = await getCollection('tech');
     console.log(logEntries);
-    return logEntries.map(entry => ({
+    return logEntries.concat(novelEntries.concat(techEntries)).map(entry => ({
         params: {slug: entry.slug, path: `${entry.collection}/${entry.slug}`}, props: {entry},
     }));
 }
