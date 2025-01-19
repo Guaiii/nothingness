@@ -11,4 +11,6 @@ export default defineConfig({
       alias: [{ find: "@", replacement: "/src" }],
     },
   },
+  site: "https://guaiii.github.io",
+  base: "nothingness",
 });
