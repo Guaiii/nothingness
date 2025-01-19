@@ -28,6 +28,4 @@ export default defineConfig({
       wrap: true,
     },
   },
-  site: "https://guaiii.github.io",
-  base: "nothingness",
 });
