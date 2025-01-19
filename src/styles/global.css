@@ -175,9 +175,8 @@ html {
   /* background-image: url('/public/bg.svg'); */
 
   /* 自定义整个滚动条 */
-
   ::-webkit-scrollbar {
-    width: utopia.clamp(2, 4); /* 滚动条宽度 */
+    width: 0.3rem; /* 滚动条宽度 */
   }
 
   /* 自定义滚动条轨道 */
@@ -189,12 +188,6 @@ html {
   /* 自定义滚动条的滑块（thumb） */
 
   ::-webkit-scrollbar-thumb {
-    background: #888; /* 滑块颜色 */
-  }
-
-  /* 当hover或active状态时，自定义滑块的颜色 */
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: var(--var_pitch-black); /* 滑块颜色 */
   }
 }

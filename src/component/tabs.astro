@@ -1,0 +1,49 @@
+---
+interface Tabs {
+  tabs?: Array<string>;
+}
+
+const { tabs = [] } = Astro.props;
+---
+
+<nav>
+  {
+    tabs.map((el: string, index: number) => {
+      const id = "checked-radio" + index;
+      return (
+        <>
+          <input type="radio" id={id} class="input-radio" />
+          <label for={id} id={id} style="nav-a">
+            {el}
+          </label>
+        </>
+      );
+    })
+  }
+</nav>
+
+<style scoped>
+  nav {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+    padding: 0.5rem;
+    color: var(--var_off-white);
+    background-color: var(--var_pitch-black);
+    outline: var(--var_border-width) solid var(--var_off-white);
+    outline-offset: calc(0px - var(--var_border-width) * 3);
+  }
+
+  .input-radio {
+    display: none;
+  }
+
+  .nav-a {
+    flex: 1;
+  }
+
+  .nav-a:checked {
+    border-radius: var(--var_border-width);
+    background-color: var(--var_red);
+  }
+</style>

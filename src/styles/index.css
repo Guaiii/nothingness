@@ -7,7 +7,7 @@ body {
   border: var(--step-0) solid transparent;
   outline: var(--var_border-width) solid var(--var_pitch-black);
   outline-offset: calc(0px - var(--step-0));
-  background-image: url("border-text.svg");
+  background-image: url("/public/border-text.svg");
   background-repeat: round;
   overflow: hidden;
 }
@@ -108,6 +108,28 @@ main {
   text-align: center;
 }
 
+.tabs nav {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  padding: 0.5rem;
+  color: var(--var_off-white);
+  background-color: var(--var_pitch-black);
+  outline: var(--var_border-width) solid var(--var_off-white);
+  outline-offset: calc(0px - var(--var_border-width) * 3);
+}
+
+nav a {
+  flex: 1;
+  color: var(--var_off-white);
+  text-decoration: none;
+}
+
+nav a:hover {
+  border-radius: var(--var_border-width);
+  background-color: var(--var_red);
+}
+
 .waterfall {
   display: block;
   height: fix-content;
@@ -120,6 +142,10 @@ main {
   line-height: var(--step-4);
   color: var(--var_pitch-black);
   border: var(--var_border-width) solid var(--var_pitch-black);
+}
+
+.waterfall .item:hover {
+  cursor: pointer;
 }
 
 @media (width < 1280px) {
