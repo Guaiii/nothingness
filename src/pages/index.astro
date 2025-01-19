@@ -1,10 +1,72 @@
 ---
-import HomeLayout from "../layouts/HomeLayout.astro";
-import HomeBody from "../layouts/HomeBody.astro";
+import Quote from "@/component/quote.astro";
+import "@/styles/global.css";
+import "@/styles/index.css";
+
+interface Props {
+  title?: string;
+  metaContent?: string;
+}
+
+const {
+  title = "太虚幻境",
+  metaContent = "虚无、小说、技术(css、js、javascript、typescript、nodejs)、生活。这是一个虚无的世界，你应该能找到自己所追求的",
+} = Astro.props;
 ---
 
-
-
-<HomeLayout>
-  <HomeBody />
-</HomeLayout>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={metaContent} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <header>
+      <div class="announcement">
+        <Quote
+          center
+          cite="https://baike.baidu.com/item/%E7%8B%82%E4%BA%BA%E6%97%A5%E8%AE%B0/11577"
+          >《狂人日记》</Quote
+        >
+        <Quote
+          cite="https://baike.baidu.com/item/%E7%8B%82%E4%BA%BA%E6%97%A5%E8%AE%B0/11577#:~:text=%E5%87%A1%E4%BA%8B%E6%80%BB%E9%A1%BB%E7%A0%94%E7%A9%B6%EF%BC%8C%E6%89%8D%E4%BC%9A%E6%98%8E%E7%99%BD%E3%80%82%E5%8F%A4%E6%9D%A5%E6%97%B6%E5%B8%B8%E5%90%83%E4%BA%BA%EF%BC%8C%E6%88%91%E4%B9%9F%E8%BF%98%E8%AE%B0%E5%BE%97%EF%BC%8C%E5%8F%AF%E6%98%AF%E4%B8%8D%E7%94%9A%E6%B8%85%E6%A5%9A%E3%80%82%E6%88%91%E7%BF%BB%E5%BC%80%E5%8E%86%E5%8F%B2%E4%B8%80%E6%9F%A5%EF%BC%8C%E8%BF%99%E5%8E%86%E5%8F%B2%E6%B2%A1%E6%9C%89%E5%B9%B4%E4%BB%A3%EF%BC%8C%E6%AD%AA%E6%AD%AA%E6%96%9C%E6%96%9C%E7%9A%84%E6%AF%8F%E5%8F%B6%20%5B27%5D%E4%B8%8A%E9%83%BD%E5%86%99%E7%9D%80%E2%80%9C%E4%BB%81%E4%B9%89%E9%81%93%E5%BE%B7%E2%80%9D%E5%87%A0%E4%B8%AA%E5%AD%97%E3%80%82%E6%88%91%E6%A8%AA%E7%AB%96%E7%9D%A1%E4%B8%8D%E7%9D%80%EF%BC%8C%E4%BB%94%E7%BB%86%E7%9C%8B%E4%BA%86%E5%8D%8A%E5%A4%9C%EF%BC%8C%E6%89%8D%E4%BB%8E%E5%AD%97%E7%BC%9D%E9%87%8C%E7%9C%8B%E5%87%BA%E5%AD%97%E6%9D%A5%EF%BC%8C%E6%BB%A1%E6%9C%AC%E9%83%BD%E5%86%99%E7%9D%80%E4%B8%A4%E4%B8%AA%E5%AD%97%E6%98%AF%E2%80%9C%E5%90%83%E4%BA%BA%E2%80%9D%EF%BC%81"
+          >凡事总须研究，才会明白。古来时常吃人，我也还记得，可是不甚清楚。我翻开历史一查，这历史没有年代，歪歪斜斜的每叶上都写着“仁义道德”几个字。我横竖睡不着，仔细看了半夜，才从字缝里看出字来，满本都写着两个字是“吃人”！</Quote
+        >
+      </div>
+      <div class="title">
+        <div class="title-content">
+          <h1>太虚幻境</h1>
+          <div>
+            <p>世人都晓神仙好，惟有功名忘不了！</p>
+            <p>古今将相在何方？荒冢一堆草没了。</p>
+          </div>
+        </div>
+        <div class="auth-info">
+          <span>满床清梦</span>
+          <span
+            >吾疾贫富不均，今为汝辈均之。​附者益众，遂攻陷青城县，掠彭山，杀其令</span
+          >
+        </div>
+      </div>
+    </header>
+    <main>
+      <div class="tabs">
+        <Quote center> 历史 | 技术 | 生活</Quote>
+      </div>
+      <ul class="waterfall">
+        {
+          Array(35)
+            .fill("醉后不知天在水，满船清梦压星河")
+            .map((el, i) => <li class="item">{`${el}--${i + 1}`}</li>)
+        }
+      </ul>
+    </main>
+    <footer>
+      <Quote center>
+        "醉后不知天在水，满船清梦压星河"。我没有船，只有床。
+      </Quote>
+    </footer>
+  </body>
+</html>

@@ -1,5 +1,4 @@
 ---
-import HomeLayout from "../layouts/HomeLayout.astro";
 const mapping = [
   "世人都晓神仙好，只有功名忘不了",
   "醉后不知天在水，满船清梦压星河",
@@ -16,35 +15,33 @@ function getRandomItem() {
 const randomVerse = getRandomItem();
 ---
 
-<!--<html lang="zh-CN">-->
-<!--  <head>-->
-<!--    <meta charset="utf-8" />-->
-<!--    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />-->
-<!--    <meta name="viewport" content="width=device-width" />-->
-<!--    <meta name="generator" content={Astro.generator} />-->
-<!--    <title>未曾相识</title>-->
-<!--    <link rel="stylesheet" href="/styles/404.css" />-->
-<!--  </head>-->
-<!--  <style></style>-->
-<!--</html>-->
-
-<HomeLayout title="进入幻境">
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta
+      name="generator"
+      content="虚无、小说、技术(css、js、javascript、typescript、nodejs)、生活。这是一个虚无的世界，你应该能找到自己所追求的"
+    />
+    <title>进入幻境</title>
+  </head>
   <body>
     <main class="text-center">
       <a href="/">{randomVerse}</a>
     </main>
-    <style scoped>
-      * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-      }
-
-      .text-center {
-        height: 100vh;
-        text-align: center;
-        align-content: center;
-      }
-    </style>
   </body>
-</HomeLayout>
+</html>
+<style scoped>
+  * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  .text-center {
+    height: 100vh;
+    text-align: center;
+    align-content: center;
+  }
+</style>

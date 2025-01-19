@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="20" viewBox="0 0 50 10">
+  <style>
+    .art-text {
+      font-family: '楷体', serif; /* 使用楷体 */
+      font-size: 12px;
+      font-weight: bold;
+      fill: #8B0000; /* 深红色 */
+      stroke: #333333; /* 深灰色 */
+      stroke-width: 2;
+      <!-- animation: float 3s infinite ease-in-out; -->
+    }
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-15px);
+      }
+    }
+  </style>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="art-text">吃人</text>
+</svg>

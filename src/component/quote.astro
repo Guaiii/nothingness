@@ -1,0 +1,41 @@
+---
+interface Quote {
+  content: string;
+  cite?: string;
+  isInline?: boolean;
+  center?: boolean;
+}
+const { content, cite = 'www.baidu.com', isInline = false, center = false } = Astro.props;
+---
+
+<p
+  class:list={[
+    "quote",
+    isInline ? "inline" : "block",
+    center ? "center" : null,
+  ]}
+>
+  <q cite={cite}>
+    <slot />
+  </q>
+</p>
+
+<style scoped>
+  .block {
+    display: block;
+    height: fix-content;
+  }
+  .inline {
+    display: inline-block;
+  }
+  .center {
+    text-align: center;
+  }
+  .quote {
+    padding: 0.5rem;
+    color: var(--var_off-white);
+    background-color: var(--var_pitch-black);
+    outline: var(--var_border-width) solid var(--var_off-white);
+    outline-offset: calc(0px - var(--var_border-width) * 3);
+  }
+</style>
