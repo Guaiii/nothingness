@@ -1,11 +1,14 @@
 ---
 interface Quote {
-  content: string;
   cite?: string;
   isInline?: boolean;
   center?: boolean;
 }
-const { content, cite = 'www.baidu.com', isInline = false, center = false } = Astro.props;
+const {
+  cite = "www.baidu.com",
+  isInline = false,
+  center = false,
+} = Astro.props;
 ---
 
 <p
