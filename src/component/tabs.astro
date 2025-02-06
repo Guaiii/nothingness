@@ -1,29 +1,26 @@
 ---
 interface Tabs {
   tabs?: Array<string>;
+  onClick?: () => void;
 }
 
-const { tabs = [] } = Astro.props;
+const { tabs = [], onClick } = Astro.props;
 ---
 
-<nav>
+<nav class="tabs-nav">
   {
     tabs.map((el: string, index: number) => {
-      const id = "checked-radio" + index;
       return (
-        <>
-          <input type="radio" id={id} class="input-radio" />
-          <label for={id} id={id} style="nav-a">
-            {el}
-          </label>
-        </>
+        <a class="nav-item" href="javascript:void(0);">
+          {el}
+        </a>
       );
     })
   }
 </nav>
 
 <style scoped>
-  nav {
+  .tabs-nav {
     display: flex;
     justify-content: space-between;
     text-align: center;
@@ -34,16 +31,33 @@ const { tabs = [] } = Astro.props;
     outline-offset: calc(0px - var(--var_border-width) * 3);
   }
 
-  .input-radio {
-    display: none;
-  }
-
-  .nav-a {
+  .tabs-nav .nav-item {
     flex: 1;
+    color: var(--var_off-white);
+    text-decoration: none;
   }
 
-  .nav-a:checked {
+  .tabs-nav .nav-item.active {
     border-radius: var(--var_border-width);
     background-color: var(--var_red);
   }
 </style>
+
+<script define:vars={{ onClick }}>
+  const clickActive = (event) => {
+    const target = event.target;
+    onClick?.()
+    if (!target) {
+      return;
+    }
+    navItems.forEach((el) => {
+      el.classList.remove("active");
+    });
+    target.classList?.toggle("active");
+  };
+
+  const navItems = document.querySelectorAll(".nav-item");
+  navItems.forEach((el) => {
+    el.addEventListener("click", clickActive);
+  });
+</script>

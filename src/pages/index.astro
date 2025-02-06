@@ -1,5 +1,6 @@
 ---
 import Quote from "@/component/quote.astro";
+import Tabs from "@/component/tabs.astro";
 import "@/styles/global.css";
 import "@/styles/index.css";
 
@@ -53,12 +54,7 @@ const {
     </header>
     <main>
       <div class="tabs">
-        <!-- <Tabs tabs={["历史", "技术", "苟活"]} /> -->
-        <nav>
-          <a href="javascript:void(0);">历史</a>
-          <a href="javascript:void(0);">技术</a>
-          <a href="javascript:void(0);">苟活</a>
-        </nav>
+        <Tabs tabs={["历史", "技术", "苟活"]} />
       </div>
       <ul class="waterfall">
         {
