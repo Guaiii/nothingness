@@ -1,23 +1,69 @@
 ---
+import { getCollection } from "astro:content";
+
 interface Tabs {
   tabs?: Array<string>;
   onClick?: () => void;
 }
 
 const { tabs = [], onClick } = Astro.props;
+
+// 获取各个集合的内容
+const novelEntries = await getCollection("novel");
+const techEntries = await getCollection("tech");
+
+// 创建tab数据映射
+const tabData = {
+  "技术": techEntries,
+  "苟活": novelEntries
+};
 ---
 
 <nav class="tabs-nav">
   {
     tabs.map((el: string, index: number) => {
       return (
-        <a class="nav-item" href="javascript:void(0);">
+        <a class="nav-item" href="javascript:void(0);" data-tab={el} data-index={index}>
           {el}
         </a>
       );
     })
   }
 </nav>
+
+<div class="tab-content">
+  {
+    tabs.map((tabName: string, index: number) => {
+      const entries = tabData[tabName] || [];
+      return (
+        <div class={`tab-panel ${index === 0 ? 'active' : ''}`} data-tab={tabName}>
+          <ul class="content-list">
+            {entries.length > 0 ? (
+              entries.map((entry) => (
+                <li class="content-item">
+                  <a href={`/${entry.collection}/${entry.slug}`} class="content-link">
+                    <h3>{entry.data.title}</h3>
+                    {entry.data.tags && (
+                      <div class="tags">
+                        {entry.data.tags.map((tag: string) => (
+                          <span class="tag">{tag}</span>
+                        ))}
+                      </div>
+                    )}
+                  </a>
+                </li>
+              ))
+            ) : (
+              <li class="content-item empty">
+                <p>暂无内容</p>
+              </li>
+            )}
+          </ul>
+        </div>
+      );
+    })
+  }
+</div>
 
 <style scoped>
   .tabs-nav {
@@ -41,23 +87,161 @@ const { tabs = [], onClick } = Astro.props;
     border-radius: var(--var_border-width);
     background-color: var(--var_red);
   }
+
+  .tab-content {
+    margin-top: 1rem;
+    background-color: transparent;
+  }
+
+  .tab-panel {
+    display: none;
+    background-color: transparent;
+  }
+
+  .tab-panel.active {
+    display: block;
+    background-color: transparent;
+  }
+
+  .content-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    line-height: 0;
+  }
+
+  .content-item {
+    display: inline-block;
+    margin: 0.1rem;
+    padding: 0.5rem;
+    background-color: var(--var_background-color);
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    transition: all 0.3s ease;
+    vertical-align: top;
+    width: auto;
+    max-width: 250px;
+    min-width: 150px;
+  }
+
+  .content-item:hover {
+    background-color: var(--var_off-white);
+    cursor: pointer;
+  }
+
+  .content-link {
+    text-decoration: none;
+    color: var(--var_pitch-black);
+    display: block;
+    line-height: 1.2;
+  }
+
+  .content-item h3 {
+    margin: 0 0 0.3rem 0;
+    font-size: var(--step-0);
+    font-weight: bold;
+    line-height: 1.2;
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.3rem;
+  }
+
+  .tag {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+    padding: 0.1rem 0.3rem;
+    border-radius: 0.1rem;
+    font-size: var(--step--2);
+    line-height: 1;
+  }
+
+  .content-item.empty {
+    text-align: center;
+    color: var(--var_pitch-black);
+    opacity: 0.6;
+    background-color: var(--var_background-color);
+  }
+
+  /* 响应式设计 */
+  @media (width < 1280px) {
+    .content-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .content-item {
+      display: block;
+      max-width: none;
+      min-width: auto;
+      width: 100%;
+      margin: 0;
+    }
+  }
+
+  @media (width < 760px) {
+    .content-item {
+      padding: 0.8rem;
+    }
+
+    .content-item h3 {
+      font-size: var(--step--1);
+    }
+
+    .tag {
+      font-size: var(--step--2);
+      padding: 0.1rem 0.2rem;
+    }
+  }
 </style>
 
 <script define:vars={{ onClick }}>
-  const clickActive = (event) => {
+  const switchTab = (event) => {
     const target = event.target;
-    onClick?.()
+    onClick?.();
     if (!target) {
       return;
     }
+
+    const tabName = target.getAttribute('data-tab');
+    if (!tabName) return;
+
+    // 移除所有nav-item的active类
+    const navItems = document.querySelectorAll(".nav-item");
     navItems.forEach((el) => {
       el.classList.remove("active");
     });
-    target.classList?.toggle("active");
+
+    // 添加active类到当前点击的tab
+    target.classList.add("active");
+
+    // 隐藏所有tab面板
+    const tabPanels = document.querySelectorAll(".tab-panel");
+    tabPanels.forEach((panel) => {
+      panel.classList.remove("active");
+    });
+
+    // 显示对应的tab面板
+    const activePanel = document.querySelector(`.tab-panel[data-tab="${tabName}"]`);
+    if (activePanel) {
+      activePanel.classList.add("active");
+    }
   };
+
+  // 初始化：设置第一个tab为active
+  document.addEventListener('DOMContentLoaded', () => {
+    const firstNavItem = document.querySelector(".nav-item");
+    if (firstNavItem) {
+      firstNavItem.classList.add("active");
+    }
+  });
 
   const navItems = document.querySelectorAll(".nav-item");
   navItems.forEach((el) => {
-    el.addEventListener("click", clickActive);
+    el.addEventListener("click", switchTab);
   });
 </script>

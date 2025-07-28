@@ -9,7 +9,7 @@ export function getLineCountAndLastLineWidth(pElement:Element) {
     // 获取最后一行的宽度
     const lastLineWidth = rects[lineCount - 1].width;
     // 获取整体元素的高度
-    const totalHeight = Array.from(rects).reduce((pre,cur) => pre + cur?.height,0)
+    const totalHeight = Array.from(rects).reduce((pre, cur) => pre + cur.height, 0);
     console.log(totalHeight);
     return {
         lineCount,

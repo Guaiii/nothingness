@@ -7,15 +7,19 @@ body {
   border: var(--step-0) solid transparent;
   outline: var(--var_border-width) solid var(--var_pitch-black);
   outline-offset: calc(0px - var(--step-0));
-  background-image: url("/public/border-text.svg");
-  background-repeat: round;
+  background-image: url("/border-text.svg");
+  background-repeat: repeat;
+  background-size: auto;
   overflow: hidden;
 }
 
 body > header,
-main,
 footer {
   background-color: var(--var_background-color);
+}
+
+main {
+  background-color: transparent;
 }
 
 header {
@@ -106,29 +110,13 @@ main {
   position: sticky;
   top: 0;
   text-align: center;
+  background-color: transparent;
 }
 
-.waterfall {
-  display: block;
-  height: fix-content;
-}
-
-.waterfall .item {
-  display: inline;
-  margin: 0.1rem;
-  padding: 0.5rem;
-  line-height: var(--step-4);
-  color: var(--var_pitch-black);
-  border: var(--var_border-width) solid var(--var_pitch-black);
-}
-
-.waterfall .item:hover {
-  cursor: pointer;
-}
+/* 移除了 waterfall 相关样式，因为现在使用 tabs 组件 */
 
 @media (width < 1280px) {
   header {
-    grid-template-columns: repeat(2, 1fr);
     grid-template-columns: repeat(1, 1fr);
   }
 
@@ -145,14 +133,7 @@ main {
     order: 2;
   }
 
-  .waterfall {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .waterfall .item {
-    line-height: inherit;
-  }
+  /* 移除了 waterfall 相关的响应式样式 */
 }
 
 @media (width < 760px) {

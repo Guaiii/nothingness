@@ -1,6 +1,38 @@
 ---
-title: "cpp1.0"
+title: "C++ 现代特性"
+tags: ["cpp", "编程", "现代C++"]
 ---
 
+# C++ 现代特性
 
-# cpp1.0
+C++11 及之后的版本引入了许多现代化特性，让 C++ 编程变得更加高效和安全。
+
+## 智能指针
+
+```cpp
+#include <memory>
+
+// 使用 unique_ptr
+std::unique_ptr<int> ptr = std::make_unique<int>(42);
+
+// 使用 shared_ptr
+std::shared_ptr<int> shared = std::make_shared<int>(100);
+```
+
+## 自动类型推导
+
+```cpp
+auto x = 42;        // int
+auto y = 3.14;      // double
+auto z = "hello";   // const char*
+```
+
+## Lambda 表达式
+
+```cpp
+auto lambda = [](int a, int b) -> int {
+    return a + b;
+};
+
+int result = lambda(5, 3); // result = 8
+```

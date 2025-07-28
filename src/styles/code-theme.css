@@ -1,0 +1,193 @@
+/* 自定义代码主题 - 符合网站米色调风格 */
+
+/* 代码块容器 */
+pre[class*="language-"] {
+  background-color: #f5f2e8 !important; /* 温暖的米白色背景 */
+  border: 2px solid var(--var_border-color) !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+  margin: 1.5rem 0 !important;
+  overflow-x: auto !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  position: relative !important;
+}
+
+/* 代码文本 */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: var(--var_pitch-black) !important; /* 使用网站的主要文字颜色 */
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace !important;
+  font-size: 0.9em !important;
+  line-height: 1.6 !important;
+  text-shadow: none !important;
+}
+
+/* 语法高亮颜色 */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #8b7355 !important; /* 棕色注释 */
+  font-style: italic !important;
+}
+
+.token.punctuation {
+  color: var(--var_pitch-black) !important;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: var(--var_red) !important; /* 使用网站的红色 */
+  font-weight: 600 !important;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #6b5b3d !important; /* 深棕色字符串 */
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #8b4513 !important; /* 深棕色操作符 */
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #9b1b30 !important; /* 使用网站的深红色关键字 */
+  font-weight: 600 !important;
+}
+
+.token.function,
+.token.class-name {
+  color: #704214 !important; /* 深金色函数名 */
+  font-weight: 600 !important;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #8b4513 !important; /* 深棕色变量 */
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold !important;
+}
+
+.token.italic {
+  font-style: italic !important;
+}
+
+.token.entity {
+  cursor: help !important;
+}
+
+/* 行内代码样式 */
+:not(pre) > code[class*="language-"] {
+  background-color: rgba(181, 181, 181, 0.15) !important; /* 使用网站边框颜色的透明版本 */
+  color: var(--var_pitch-black) !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(181, 181, 181, 0.3) !important;
+  font-size: 0.9em !important;
+}
+
+/* 代码块语言标签 */
+pre[class*="language-"]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: -1px;
+  right: 8px;
+  background-color: var(--var_red);
+  color: var(--var_off-white);
+  padding: 0.2em 0.6em;
+  font-size: 0.75em;
+  border-radius: 0 0 4px 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* 特定语言的标签 */
+pre[class*="language-javascript"]::before {
+  content: "JS";
+  background-color: #f7df1e;
+  color: #000;
+}
+
+pre[class*="language-typescript"]::before {
+  content: "TS";
+  background-color: #3178c6;
+  color: #fff;
+}
+
+pre[class*="language-css"]::before {
+  content: "CSS";
+  background-color: #1572b6;
+  color: #fff;
+}
+
+pre[class*="language-html"]::before {
+  content: "HTML";
+  background-color: #e34f26;
+  color: #fff;
+}
+
+pre[class*="language-json"]::before {
+  content: "JSON";
+  background-color: #000;
+  color: #fff;
+}
+
+pre[class*="language-bash"]::before,
+pre[class*="language-shell"]::before {
+  content: "BASH";
+  background-color: #4eaa25;
+  color: #fff;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  pre[class*="language-"] {
+    padding: 1rem !important;
+    margin: 1rem 0 !important;
+    border-radius: 6px !important;
+  }
+  
+  code[class*="language-"],
+  pre[class*="language-"] {
+    font-size: 0.85em !important;
+  }
+}
+
+/* 滚动条样式 */
+pre[class*="language-"]::-webkit-scrollbar {
+  height: 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+  background: rgba(181, 181, 181, 0.1);
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+  background: var(--var_border-color);
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+  background: var(--var_pitch-black);
+}

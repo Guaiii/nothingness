@@ -1,13 +1,15 @@
 ---
 import { getCollection } from "astro:content";
+import "@/styles/global.css";
+import "@/styles/code-theme.css";
+
 // 1. 为每个集合条目生成一个新路径
 export async function getStaticPaths() {
-  const logEntries = await getCollection("log");
   const novelEntries = await getCollection("novel");
   const techEntries = await getCollection("tech");
-  // @ts-ignore hide error
-  return logEntries.concat(novelEntries.concat(techEntries)).map((entry) => ({
-    params: { slug: entry.slug, path: `${entry.collection}/${entry.slug}` },
+  const allEntries = [...novelEntries, ...techEntries];
+  return allEntries.map((entry) => ({
+    params: { path: `${entry.collection}/${entry.slug}` },
     props: { entry },
   }));
 }
@@ -16,4 +18,146 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
 
-<Content />
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{entry.data.title} - 太虚幻境</title>
+    <meta name="description" content={entry.data.title} />
+  </head>
+  <body>
+    <main class="article-content">
+      <header class="article-header">
+        <h1>{entry.data.title}</h1>
+        {entry.data.tags && (
+          <div class="article-tags">
+            {entry.data.tags.map((tag: string) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )}
+        <nav class="article-nav">
+          <a href="/" class="back-link">← 返回首页</a>
+        </nav>
+      </header>
+      <article>
+        <Content />
+      </article>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: var(--var_pitch-black);
+    background-color: var(--var_background-color);
+    background-image: url('/border-text.svg');
+    margin: 0;
+    padding: 2rem;
+  }
+
+  .article-content {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: var(--var_background-color);
+    padding: 2rem;
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .article-header {
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .article-header h1 {
+    font-size: var(--step-3);
+    margin: 0 0 1rem 0;
+    color: var(--var_pitch-black);
+  }
+
+  .article-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .tag {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.2rem;
+    font-size: var(--step--1);
+  }
+
+  .article-nav {
+    margin-top: 1rem;
+  }
+
+  .back-link {
+    color: var(--var_red);
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  article {
+    font-size: var(--step-0);
+    line-height: 1.8;
+  }
+
+  article h1, article h2, article h3, article h4, article h5, article h6 {
+    margin: 2rem 0 1rem 0;
+    color: var(--var_pitch-black);
+  }
+
+  article h1 { font-size: var(--step-2); }
+  article h2 { font-size: var(--step-1); }
+  article h3 { font-size: var(--step-0); }
+
+  article p {
+    margin: 1rem 0;
+  }
+
+  /* 代码样式已移至 code-theme.css */
+
+  article blockquote {
+    border-left: 4px solid var(--var_red);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: var(--var_pitch-black);
+    opacity: 0.8;
+  }
+
+  article ul, article ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+  }
+
+  article li {
+    margin: 0.5rem 0;
+  }
+
+  @media (width < 768px) {
+    body {
+      padding: 1rem;
+    }
+
+    .article-content {
+      padding: 1rem;
+    }
+
+    .article-header h1 {
+      font-size: var(--step-2);
+    }
+  }
+</style>

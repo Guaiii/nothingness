@@ -54,15 +54,8 @@ const {
     </header>
     <main>
       <div class="tabs">
-        <Tabs tabs={["历史", "技术", "苟活"]} />
+        <Tabs tabs={["技术", "苟活"]} />
       </div>
-      <ul class="waterfall">
-        {
-          Array(35)
-            .fill("醉后不知天在水，满船清梦压星河")
-            .map((el, i) => <li class="item">{`${el}--${i + 1}`}</li>)
-        }
-      </ul>
     </main>
     <footer>
       <Quote center>
