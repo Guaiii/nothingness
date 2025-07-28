@@ -13,7 +13,7 @@ const novelEntries = await getCollection("novel");
 const techEntries = await getCollection("tech");
 
 // 创建tab数据映射
-const tabData = {
+const tabData: Record<string, any[]> = {
   "技术": techEntries,
   "苟活": novelEntries
 };
@@ -39,14 +39,14 @@ const tabData = {
         <div class={`tab-panel ${index === 0 ? 'active' : ''}`} data-tab={tabName}>
           <ul class="content-list">
             {entries.length > 0 ? (
-              entries.map((entry) => (
+              entries.map((entry: any) => (
                 <li class="content-item">
                   <a href={`/${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">
                         {entry.data.tags.map((tag: string) => (
-                          <span class="tag">{tag}</span>
+                          <a href={`/tags/${tag}`} class="tag">{tag}</a>
                         ))}
                       </div>
                     )}
@@ -157,6 +157,14 @@ const tabData = {
     border-radius: 0.1rem;
     font-size: var(--step--2);
     line-height: 1;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+  }
+
+  .tag:hover {
+    background-color: var(--var_pitch-black);
+    transform: translateY(-1px);
   }
 
   .content-item.empty {

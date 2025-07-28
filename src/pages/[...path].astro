@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import Search from "@/component/search.astro";
 import "@/styles/global.css";
 import "@/styles/code-theme.css";
 
@@ -33,12 +34,15 @@ const { Content } = await entry.render();
         {entry.data.tags && (
           <div class="article-tags">
             {entry.data.tags.map((tag: string) => (
-              <span class="tag">{tag}</span>
+              <a href={`/tags/${tag}`} class="tag">{tag}</a>
             ))}
           </div>
         )}
         <nav class="article-nav">
           <a href="/" class="back-link">← 返回首页</a>
+          <div class="article-search">
+            <Search />
+          </div>
         </nav>
       </header>
       <article>
@@ -93,10 +97,25 @@ const { Content } = await entry.render();
     padding: 0.2rem 0.5rem;
     border-radius: 0.2rem;
     font-size: var(--step--1);
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+  }
+
+  .tag:hover {
+    background-color: var(--var_pitch-black);
+    transform: translateY(-1px);
   }
 
   .article-nav {
     margin-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .article-search {
+    z-index: 10;
   }
 
   .back-link {

@@ -1,0 +1,347 @@
+---
+import { getCollection } from "astro:content";
+import "@/styles/global.css";
+import "@/styles/index.css";
+import Quote from "@component/quote.astro";
+import Search from "@/component/search.astro";
+
+export async function getStaticPaths() {
+  const novelEntries = await getCollection("novel");
+  const techEntries = await getCollection("tech");
+  const allEntries = [...novelEntries, ...techEntries];
+  
+  // 收集所有标签
+  const allTags = new Set();
+  allEntries.forEach(entry => {
+    if (entry.data.tags) {
+      entry.data.tags.forEach(tag => allTags.add(tag));
+    }
+  });
+  
+  // 为每个标签生成路径
+  return Array.from(allTags).map(tag => ({
+    params: { tag },
+    props: { tag, allEntries }
+  }));
+}
+
+const { tag, allEntries } = Astro.props;
+const tagString = tag as string;
+
+// 过滤包含当前标签的文章
+const filteredEntries = allEntries.filter((entry: any) => 
+  entry.data.tags && entry.data.tags.includes(tagString)
+);
+
+// 按集合分组
+const techEntries = filteredEntries.filter((entry: { collection: string; }) => entry.collection === 'tech');
+const novelEntries = filteredEntries.filter((entry: { collection: string; }) => entry.collection === 'novel');
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <title>标签: {tagString} - 太虚幻境</title>
+    <meta name="description" content={`包含标签 "${tagString}" 的所有文章`} />
+  </head>
+  <body>
+    <header>
+      <div class="announcement">
+        <div class="tag-header">
+          <h1>标签: <span class="tag-name">{tagString}</span></h1>
+          <p>共找到 {filteredEntries.length} 篇文章</p>
+        </div>
+      </div>
+      <div class="title">
+        <div class="title-content">
+          <h1>太虚幻境</h1>
+          <div>
+            <p>世人都晓神仙好，惟有功名忘不了！</p>
+            <p>古今将相在何方？荒冢一堆草没了。</p>
+          </div>
+        </div>
+        <div class="auth-info">
+          <span>满床清梦</span>
+          <span>吾疾贫富不均，今为汝辈均之。​附者益众，遂攻陷青城县，掠彭山，杀其令</span>
+        </div>
+      </div>
+    </header>
+    <main>
+      <nav class="breadcrumb">
+        <a href="/" class="back-link">← 返回首页</a>
+        <div class="tag-search">
+          <Search />
+        </div>
+      </nav>
+      
+      <div class="filtered-content">
+        {techEntries.length > 0 && (
+          <section class="content-section">
+            <h2 class="section-title">技术文章</h2>
+            <ul class="content-list">
+              {techEntries.map((entry: any) => (
+                <li class="content-item">
+                  <a href={`/${entry.collection}/${entry.slug}`} class="content-link">
+                    <h3>{entry.data.title}</h3>
+                    {entry.data.tags && (
+                      <div class="tags">
+                        {entry.data.tags.map((entryTag: string) => (
+                          <span class={`tag ${entryTag === tagString ? 'active' : ''}`}>
+                            {entryTag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        
+        {novelEntries.length > 0 && (
+          <section class="content-section">
+            <h2 class="section-title">生活随笔</h2>
+            <ul class="content-list">
+              {novelEntries.map((entry: any) => (
+                <li class="content-item">
+                  <a href={`/${entry.collection}/${entry.slug}`} class="content-link">
+                    <h3>{entry.data.title}</h3>
+                    {entry.data.tags && (
+                      <div class="tags">
+                        {entry.data.tags.map((entryTag: string) => (
+                          <span class={`tag ${entryTag === tagString ? 'active' : ''}`}>
+                            {entryTag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        
+        {filteredEntries.length === 0 && (
+          <div class="empty-state">
+            <p>没有找到包含标签 "{tagString}" 的文章</p>
+          </div>
+        )}
+      </div>
+    </main>
+    <footer>
+      <Quote center>
+        "醉后不知天在水，满船清梦压星河"。我没有船，只有床。
+      </Quote>
+    </footer>
+  </body>
+</html>
+
+<style>
+  body {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: max-content 1fr max-content;
+    gap: var(--step-0);
+    padding: var(--step-0);
+    border: var(--step-0) solid transparent;
+    outline: var(--var_border-width) solid var(--var_pitch-black);
+    outline-offset: calc(0px - var(--step-0));
+    background-image: url("/border-text.svg");
+    background-repeat: repeat;
+    background-size: auto;
+    overflow: hidden;
+  }
+
+  body > header,
+  footer {
+    background-color: var(--var_background-color);
+  }
+
+  main {
+    background-color: transparent;
+    overflow: auto;
+    padding: var(--step-0);
+  }
+
+  .tag-header {
+    padding: var(--step-0);
+    text-align: center;
+  }
+
+  .tag-header h1 {
+    font-size: var(--step-2);
+    color: var(--var_pitch-black);
+    margin-bottom: var(--step--1);
+  }
+
+  .tag-name {
+    color: var(--var_red);
+    font-weight: bold;
+  }
+
+  .tag-header p {
+    font-size: var(--step--1);
+    color: var(--var_pitch-black);
+    opacity: 0.8;
+  }
+
+  .breadcrumb {
+    margin-bottom: var(--step-0);
+    padding-bottom: var(--step--1);
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .tag-search {
+    z-index: 10;
+  }
+
+  .back-link {
+    color: var(--var_red);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: var(--step--1);
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .filtered-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--step-1);
+  }
+
+  .content-section {
+    background-color: var(--var_background-color);
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    padding: var(--step-0);
+  }
+
+  .section-title {
+    font-size: var(--step-1);
+    color: var(--var_pitch-black);
+    margin-bottom: var(--step-0);
+    padding-bottom: var(--step--1);
+    border-bottom: var(--var_border-width) solid var(--var_border-color);
+  }
+
+  .content-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--step-0);
+  }
+
+  .content-item {
+    background-color: var(--var_off-white);
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    transition: all 0.2s ease;
+  }
+
+  .content-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .content-link {
+    display: block;
+    padding: var(--step-0);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .content-item h3 {
+    font-size: var(--step-0);
+    color: var(--var_pitch-black);
+    margin-bottom: var(--step--1);
+    line-height: 1.4;
+  }
+
+  .tags {
+    display: flex;
+    gap: 0.3rem;
+    flex-wrap: wrap;
+    margin-top: 0.3rem;
+  }
+
+  .tag {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+    padding: 0.1rem 0.3rem;
+    border-radius: 0.1rem;
+    font-size: var(--step--2);
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tag.active {
+    background-color: var(--var_pitch-black);
+    color: var(--var_off-white);
+    font-weight: bold;
+  }
+
+  .tag:not(.active):hover {
+    opacity: 0.8;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--step-2);
+    background-color: var(--var_background-color);
+    border: var(--var_border-width) solid var(--var_pitch-black);
+  }
+
+  .empty-state p {
+    font-size: var(--step-0);
+    color: var(--var_pitch-black);
+    opacity: 0.6;
+  }
+
+  .footer-quote {
+    text-align: center;
+    padding: var(--step-0);
+    font-style: italic;
+    color: var(--var_pitch-black);
+    opacity: 0.8;
+  }
+
+  /* 响应式设计 */
+  @media (width < 1280px) {
+    .content-list {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (width < 760px) {
+    body {
+      padding: 0;
+      gap: 0.5rem;
+    }
+
+    main {
+      padding: var(--step--1);
+    }
+
+    .content-item {
+      padding: 0.8rem;
+    }
+
+    .content-item h3 {
+      font-size: var(--step--1);
+    }
+
+    .tag {
+      font-size: var(--step--2);
+      padding: 0.1rem 0.2rem;
+    }
+  }
+</style>
