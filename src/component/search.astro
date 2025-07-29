@@ -10,7 +10,17 @@ const allEntries = [...novelEntries, ...techEntries];
 <div class="search-container">
   <div class="search-icon" id="search-toggle">
     <!-- 满床清梦 -->
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
       <circle cx="11" cy="11" r="8"></circle>
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
@@ -28,8 +38,27 @@ const allEntries = [...novelEntries, ...techEntries];
 
 <style>
   .search-container {
-    display: inline-block;
+    width: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.5rem;
     position: relative;
+
+    flex-basis: max-width;
+    border-right: var(--var_border-width) solid var(--var_off-white);
+  }
+
+  @media (width < 1400px) {
+    .search-container {
+      border-right: 0px solid var(--var_off-white);
+    }
+  }
+
+    @media (width < 1280px) {
+    .search-container {
+      border-right: var(--var_border-width) solid var(--var_off-white);
+    }
   }
 
   .search-icon {
@@ -322,80 +351,83 @@ const allEntries = [...novelEntries, ...techEntries];
 
 <script define:vars={{ allEntries }}>
   // 搜索功能实现
-  document.addEventListener('DOMContentLoaded', () => {
-    const searchToggle = document.getElementById('search-toggle');
-    const searchPanel = document.getElementById('search-panel');
-    const searchInput = document.getElementById('search-input');
-    const closeSearch = document.getElementById('close-search');
-    const searchResults = document.getElementById('search-results');
-    
+  document.addEventListener("DOMContentLoaded", () => {
+    const searchToggle = document.getElementById("search-toggle");
+    const searchPanel = document.getElementById("search-panel");
+    const searchInput = document.getElementById("search-input");
+    const closeSearch = document.getElementById("close-search");
+    const searchResults = document.getElementById("search-results");
+
     // 将内容数据转换为可搜索的格式
-    const searchableContent = allEntries.map(entry => ({
+    const searchableContent = allEntries.map((entry) => ({
       title: entry.data.title,
       tags: entry.data.tags || [],
       collection: entry.collection,
       slug: entry.slug,
-      url: `/${entry.collection}/${entry.slug}`
+      url: `/${entry.collection}/${entry.slug}`,
     }));
 
     // 打开搜索面板
-    searchToggle.addEventListener('click', () => {
-      searchPanel.classList.add('active');
+    searchToggle.addEventListener("click", () => {
+      searchPanel.classList.add("active");
       searchInput.focus();
       // 防止滚动
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     });
 
     // 关闭搜索面板
-    closeSearch.addEventListener('click', () => {
-      searchPanel.classList.remove('active');
+    closeSearch.addEventListener("click", () => {
+      searchPanel.classList.remove("active");
       // 恢复滚动
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     });
 
     // 点击外部区域关闭
-    searchPanel.addEventListener('click', (e) => {
+    searchPanel.addEventListener("click", (e) => {
       if (e.target === searchPanel) {
-        searchPanel.classList.remove('active');
-        document.body.style.overflow = '';
+        searchPanel.classList.remove("active");
+        document.body.style.overflow = "";
       }
     });
 
     // ESC键关闭
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && searchPanel.classList.contains('active')) {
-        searchPanel.classList.remove('active');
-        document.body.style.overflow = '';
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && searchPanel.classList.contains("active")) {
+        searchPanel.classList.remove("active");
+        document.body.style.overflow = "";
       }
     });
 
     // 搜索功能
-    searchInput.addEventListener('input', debounce(() => {
-      const query = searchInput.value.toLowerCase().trim();
-      
-      if (query.length < 1) {
-        searchResults.innerHTML = '';
-        return;
-      }
+    searchInput.addEventListener(
+      "input",
+      debounce(() => {
+        const query = searchInput.value.toLowerCase().trim();
 
-      // 执行搜索
-      const results = searchableContent.filter(item => {
-        // 搜索标题
-        if (item.title.toLowerCase().includes(query)) {
-          return true;
-        }
-        
-        // 搜索标签
-        if (item.tags.some(tag => tag.toLowerCase().includes(query))) {
-          return true;
+        if (query.length < 1) {
+          searchResults.innerHTML = "";
+          return;
         }
 
-        return false;
-      });
+        // 执行搜索
+        const results = searchableContent.filter((item) => {
+          // 搜索标题
+          if (item.title.toLowerCase().includes(query)) {
+            return true;
+          }
 
-      // 显示结果
-      displayResults(results, query);
-    }, 300));
+          // 搜索标签
+          if (item.tags.some((tag) => tag.toLowerCase().includes(query))) {
+            return true;
+          }
+
+          return false;
+        });
+
+        // 显示结果
+        displayResults(results, query);
+      }, 300),
+    );
 
     // 显示搜索结果
     function displayResults(results, query) {
@@ -418,14 +450,15 @@ const allEntries = [...novelEntries, ...techEntries];
         </div>
       `;
 
-      const resultsHtml = results.map(item => {
-        // 将集合名称转换为中文显示
-        const collectionName = item.collection === 'tech' ? '技术' : '苟活';
-        
-        // 高亮搜索关键词
-        const highlightedTitle = highlightText(item.title, query);
-        
-        return `
+      const resultsHtml = results
+        .map((item) => {
+          // 将集合名称转换为中文显示
+          const collectionName = item.collection === "tech" ? "技术" : "苟活";
+
+          // 高亮搜索关键词
+          const highlightedTitle = highlightText(item.title, query);
+
+          return `
           <div class="search-result-item">
             <div class="collection" style="padding: 0.5rem 0.4rem;">${collectionName}</div>
             <a href="${item.url}" style="text-decoration: none; color: #fff; transition: color 0.2s ease-in-out;">
@@ -433,27 +466,32 @@ const allEntries = [...novelEntries, ...techEntries];
             </a>
           </div>
         `;
-      }).join('');
+        })
+        .join("");
 
-      searchResults.innerHTML = headerHtml + `<div class="search-results-grid">${resultsHtml}</div>`;
+      searchResults.innerHTML =
+        headerHtml + `<div class="search-results-grid">${resultsHtml}</div>`;
     }
 
     // 高亮文本中的搜索关键词
     function highlightText(text, query) {
       if (!query) return text;
-      const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
-      return text.replace(regex, '<mark style="background-color: var(--var_red); color: var(--var_off-white); padding: 0.1rem 0.2rem; border-radius: 0.1rem;">$1</mark>');
+      const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
+      return text.replace(
+        regex,
+        '<mark style="background-color: var(--var_red); color: var(--var_off-white); padding: 0.1rem 0.2rem; border-radius: 0.1rem;">$1</mark>',
+      );
     }
 
     // 转义正则表达式特殊字符
     function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     }
 
     // 防抖函数
     function debounce(func, wait) {
       let timeout;
-      return function(...args) {
+      return function (...args) {
         const context = this;
         clearTimeout(timeout);
         timeout = setTimeout(() => {
