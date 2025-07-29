@@ -100,6 +100,7 @@ header::after {
 .desc {
   flex: 1;
 }
+
 /* 
 .auth-info > *:nth-child(1) {
   flex-basis: max-width;
