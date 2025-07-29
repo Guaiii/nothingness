@@ -14,7 +14,7 @@ export async function getStaticPaths() {
   const allTags = new Set();
   allEntries.forEach(entry => {
     if (entry.data.tags) {
-      entry.data.tags.forEach(tag => allTags.add(tag));
+      entry.data.tags.forEach((tag: unknown) => allTags.add(tag));
     }
   });
   
