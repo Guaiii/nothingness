@@ -27,6 +27,7 @@ export async function getStaticPaths() {
 
 const { tag, allEntries } = Astro.props;
 const tagString = tag as string;
+const baseUrl = import.meta.env.BASE_URL;
 
 // 过滤包含当前标签的文章
 const filteredEntries = allEntries.filter((entry: any) => 
@@ -42,7 +43,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
 <html lang="zh-CN">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href={`${baseUrl}favicon.svg`} />
     <meta name="viewport" content="width=device-width" />
     <title>标签: {tagString} - 太虚幻境</title>
     <meta name="description" content={`包含标签 "${tagString}" 的所有文章`} />
@@ -71,7 +72,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
     </header>
     <main>
       <nav class="breadcrumb">
-        <a href="/" class="back-link">← 返回首页</a>
+        <a href={baseUrl} class="back-link">← 返回首页</a>
         <div class="tag-search">
           <Search />
         </div>
@@ -84,7 +85,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
             <ul class="content-list">
               {techEntries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`/${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`${baseUrl}${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">
@@ -108,7 +109,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
             <ul class="content-list">
               {novelEntries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`/${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`${baseUrl}${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">
@@ -151,7 +152,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
     border: var(--step-0) solid transparent;
     outline: var(--var_border-width) solid var(--var_pitch-black);
     outline-offset: calc(0px - var(--step-0));
-    background-image: url("/border-text.svg");
+    background-image: url("../../../public/border-text.svg");
     background-repeat: repeat;
     background-size: auto;
     overflow: hidden;
