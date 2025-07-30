@@ -85,7 +85,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
             <ul class="content-list">
               {techEntries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`${baseUrl}${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`${baseUrl}/${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">
@@ -109,7 +109,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
             <ul class="content-list">
               {novelEntries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`${baseUrl}${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`${baseUrl}/${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">

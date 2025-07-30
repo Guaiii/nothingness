@@ -4,7 +4,11 @@ import { getCollection } from "astro:content";
 // 获取所有内容集合
 const novelEntries = await getCollection("novel");
 const techEntries = await getCollection("tech");
-const allEntries = [...novelEntries, ...techEntries];
+const baseUrl = import.meta.env.BASE_URL;
+const allEntries = [...novelEntries, ...techEntries].map((el) => ({
+  ...el,
+  baseUrl,
+}));
 ---
 
 <div class="search-container">
@@ -55,7 +59,7 @@ const allEntries = [...novelEntries, ...techEntries];
     }
   }
 
-    @media (width < 1280px) {
+  @media (width < 1280px) {
     .search-container {
       border-right: var(--var_border-width) solid var(--var_off-white);
     }
@@ -364,9 +368,8 @@ const allEntries = [...novelEntries, ...techEntries];
       tags: entry.data.tags || [],
       collection: entry.collection,
       slug: entry.slug,
-      url: `/${entry.collection}/${entry.slug}`,
+      url: `${entry.baseUrl}/${entry.collection}/${entry.slug}`,
     }));
-
     // 打开搜索面板
     searchToggle.addEventListener("click", () => {
       searchPanel.classList.add("active");
@@ -426,7 +429,7 @@ const allEntries = [...novelEntries, ...techEntries];
 
         // 显示结果
         displayResults(results, query);
-      }, 300),
+      }, 300)
     );
 
     // 显示搜索结果
@@ -479,7 +482,7 @@ const allEntries = [...novelEntries, ...techEntries];
       const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
       return text.replace(
         regex,
-        '<mark style="background-color: var(--var_red); color: var(--var_off-white); padding: 0.1rem 0.2rem; border-radius: 0.1rem;">$1</mark>',
+        '<mark style="background-color: var(--var_red); color: var(--var_off-white); padding: 0.1rem 0.2rem; border-radius: 0.1rem;">$1</mark>'
       );
     }
 

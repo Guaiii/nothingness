@@ -10,7 +10,7 @@ export async function getStaticPaths() {
   const techEntries = await getCollection("tech");
   const allEntries = [...novelEntries, ...techEntries];
   return allEntries.map((entry) => ({
-    params: { path: `${entry.collection}/${entry.slug}` },
+    params: { path: `/${entry.collection}/${entry.slug}` },
     props: { entry },
   }));
 }
@@ -35,7 +35,7 @@ const baseUrl = import.meta.env.BASE_URL;
         {entry.data.tags && (
           <div class="article-tags">
             {entry.data.tags.map((tag: string) => (
-              <a href={`${baseUrl}tags/${tag}`} class="tag">{tag}</a>
+              <a href={`${baseUrl}/tags/${tag}`} class="tag">{tag}</a>
             ))}
           </div>
         )}
