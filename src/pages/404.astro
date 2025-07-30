@@ -1,9 +1,14 @@
 ---
+import Quote from "@/component/quote.astro";
+import "../styles/index.css";
+
 const mapping = [
   "世人都晓神仙好，只有功名忘不了",
   "醉后不知天在水，满船清梦压星河",
   "假作真时真亦假，无为有处有还无",
   "生我门庭死我户，看得破时忍不过",
+  "好了歌了好，好便是了，了便是好",
+  "机关算尽太聪明，反算了卿卿性命",
 ];
 
 function getRandomItem() {
@@ -25,24 +30,163 @@ const baseUrl = import.meta.env.BASE_URL;
       name="generator"
       content="虚无、小说、技术(css、js、javascript、typescript、nodejs)、生活。这是一个虚无的世界，你应该能找到自己所追求的"
     />
-    <title>进入幻境</title>
+    <title>迷失幻境 - 太虚幻境</title>
   </head>
   <body>
-    <main class="text-center">
-      <a href={baseUrl}>{randomVerse}</a>
+    <header>
+      <!-- <div class="announcement"></div> -->
+      <div class="title">
+        <div class="title-content">
+          <h1>迷失幻境</h1>
+          <div class="title-desc">
+            <p style="text-align: center;">此页已入太虚幻境，无迹可寻</p>
+            <p>或许是缘分未到，或许是路径已断</p>
+          </div>
+        </div>
+      </div>
+      <Quote center> {randomVerse} </Quote>
+    </header>
+    <main>
+      <div class="error-content">
+        <div class="error-message">
+          <h2>页面走失在虚无中</h2>
+          <ul>
+            <li>被时间的洪流冲走</li>
+            <li>隐匿在太虚幻境深处</li>
+            <li>从未在此世界存在过</li>
+            <li>正在另一个平行宇宙中等待</li>
+          </ul>
+        </div>
+
+        <div class="navigation-options">
+          <div class="nav-buttons">
+            <a href={baseUrl} class="nav-button primary"> 返回太虚幻境 </a>
+            <button onclick="history.back()" class="nav-button secondary">
+              回到来路
+            </button>
+          </div>
+        </div>
+      </div>
     </main>
   </body>
 </html>
-<style scoped>
-  * {
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+
+<style>
+  header {
+    grid-template-columns: repeat(1, 1fr);
   }
 
-  .text-center {
-    height: 100vh;
+  .title {
+    order: 0;
+  }
+
+  .error-content {
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
     text-align: center;
-    align-content: center;
+  }
+
+  .error-message {
+    margin-bottom: 3rem;
+  }
+
+  .error-message h2 {
+    font-size: var(--step-2);
+    color: var(--var_red);
+    margin-bottom: 1rem;
+  }
+
+  .error-message p {
+    font-size: var(--step-0);
+    color: var(--var_pitch-black);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .error-message ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .error-message li {
+    font-size: var(--step--1);
+    color: black;
+    margin: 0.8rem 0;
+    padding: 0.5rem;
+    background-color: rgba(181, 181, 181, 0.1);
+    border-left: 3px solid var(--var_red);
+    border-radius: 0.2rem;
+    opacity: 0.8;
+  }
+
+  .navigation-options h3 {
+    font-size: var(--step-1);
+    color: var(--var_pitch-black);
+    margin-bottom: 1.5rem;
+  }
+
+  .nav-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .nav-button {
+    padding: 0.8rem 1.5rem;
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 0.3rem;
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .nav-button.primary {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+  }
+
+  .nav-button.primary:hover {
+    background-color: var(--var_pitch-black);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .nav-button.secondary {
+    background-color: var(--var_background-color);
+    color: var(--var_pitch-black);
+  }
+
+  .nav-button.secondary:hover {
+    background-color: var(--var_pitch-black);
+    color: var(--var_off-white);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  @media (width < 768px) {
+    .error-content {
+      padding: 1rem;
+    }
+
+    .nav-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .nav-button {
+      width: 100%;
+      max-width: 250px;
+    }
+
+    .error-message h2 {
+      font-size: var(--step-1);
+    }
   }
 </style>

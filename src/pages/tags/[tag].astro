@@ -2,7 +2,7 @@
 import { getCollection } from "astro:content";
 import Quote from "@component/quote.astro";
 import Search from "@/component/search.astro";
-import "../../styles/global.css";
+// import "../../styles/global.css";
 import "../../styles/index.css";
 
 export async function getStaticPaths() {
@@ -42,8 +42,8 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
+    <link rel="icon" type="image/svg+xml" href={`${baseUrl}/favicon.svg`} />
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href={`${baseUrl}favicon.svg`} />
     <meta name="viewport" content="width=device-width" />
     <title>标签: {tagString} - 太虚幻境</title>
     <meta name="description" content={`包含标签 "${tagString}" 的所有文章`} />
@@ -73,9 +73,9 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
     <main>
       <nav class="breadcrumb">
         <a href={baseUrl} class="back-link">← 返回首页</a>
-        <div class="tag-search">
+        <!-- <div class="tag-search">
           <Search />
-        </div>
+        </div> -->
       </nav>
       
       <div class="filtered-content">
@@ -85,7 +85,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
             <ul class="content-list">
               {techEntries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`${baseUrl}${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`${baseUrl}/${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">
@@ -109,7 +109,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
             <ul class="content-list">
               {novelEntries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`${baseUrl}${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`${baseUrl}/${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">
@@ -152,7 +152,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
     border: var(--step-0) solid transparent;
     outline: var(--var_border-width) solid var(--var_pitch-black);
     outline-offset: calc(0px - var(--step-0));
-    background-image: url("../../../public/border-text.svg");
+    background-image: url("../../styles/border-text.svg");
     background-repeat: repeat;
     background-size: auto;
     overflow: hidden;

@@ -42,12 +42,12 @@ const tabData: Record<string, any[]> = {
             {entries.length > 0 ? (
               entries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`${baseUrl}${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`${baseUrl}/${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">
                         {entry.data.tags.map((tag: string) => (
-                          <a href={`${baseUrl}tags/${tag}`} class="tag">{tag}</a>
+                          <a href={`${baseUrl}/tags/${tag}`} class="tag">{tag}</a>
                         ))}
                       </div>
                     )}
