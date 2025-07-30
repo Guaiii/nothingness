@@ -15,5 +15,5 @@ export default defineConfig({
     },
   },
   site: "https://guaiii.github.io",
-  base: "/nothingness/",
+  base: "/nothingness",
 });
