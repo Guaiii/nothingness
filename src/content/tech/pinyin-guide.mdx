@@ -1,0 +1,289 @@
+---
+title: "拼音注音功能使用指南"
+tags: ["拼音", "中文", "教学"]
+---
+
+import Pinyin from '@/component/pinyin.astro';
+
+# 拼音注音功能使用指南
+
+这个功能专为中文学习和教学设计，可以为汉字添加拼音标注，类似小学语文课本的注音效果。
+
+## 基础语法
+
+使用 `<Pinyin>` 组件来为汉字添加拼音：
+
+```jsx
+<Pinyin text="汉字" pinyin="han zi" />
+```
+
+### 参数说明
+
+- **text**: 要标注的中文文本
+- **pinyin**: 对应的拼音，用空格分隔每个字的拼音
+- **yinbiao**: 音标属性 (可选) - 用于指定每个字的声调
+- **tones**: 声调显示模式 (可选)
+  - `"auto"` (默认): 自动转换数字声调为声调符号
+  - `"symbol"`: 强制显示声调符号
+  - `"number"`: 强制显示数字声调
+
+### 音标属性 (yinbiao)
+
+`yinbiao` 属性支持多种输入方式来指定声调：
+
+#### 数字方式
+```jsx
+<Pinyin text="汉字" pinyin="han zi" yinbiao="4 4" />
+```
+
+#### 中文声调名称
+```jsx
+<Pinyin text="汉字" pinyin="han zi" yinbiao="去声 去声" />
+<Pinyin text="汉字" pinyin="han zi" yinbiao="四声 四声" />
+```
+
+#### 符号方式
+```jsx
+<Pinyin text="汉字" pinyin="han zi" yinbiao="` `" />
+<Pinyin text="汉字" pinyin="han zi" yinbiao="\\ \\" />
+```
+
+#### 英文声调名称
+```jsx
+<Pinyin text="汉字" pinyin="han zi" yinbiao="falling falling" />
+```
+
+#### 支持的音标符号
+
+| 声调 | 数字 | 中文名称 | 符号 | 英文名称 | 简化符号 |
+|------|------|----------|------|----------|----------|
+| 一声 | `1` | `阴平` `一声` | `¯` | `flat` | `-` |
+| 二声 | `2` | `阳平` `二声` | `´` | `rising` | `/` |
+| 三声 | `3` | `上声` `三声` | `ˇ` | `falling-rising` | `v` |
+| 四声 | `4` | `去声` `四声` | `` ` `` | `falling` | `\` |
+| 轻声 | `0` | `轻声` | `·` | `neutral` | `.` |
+
+### 声调系统
+
+支持完整的汉语四声系统：
+
+- **一声 (阴平)**: 用数字 `1` 或声调符号 `ā` 表示，显示为<span style="color: #d32f2f;">红色</span>
+- **二声 (阳平)**: 用数字 `2` 或声调符号 `á` 表示，显示为<span style="color: #f57c00;">橙色</span>
+- **三声 (上声)**: 用数字 `3` 或声调符号 `ǎ` 表示，显示为<span style="color: #388e3c;">绿色</span>
+- **四声 (去声)**: 用数字 `4` 或声调符号 `à` 表示，显示为<span style="color: #1976d2;">蓝色</span>
+- **轻声**: 用数字 `0` 表示，显示为<span style="color: #757575;">灰色</span>
+
+## 使用示例
+
+### 音标属性演示
+
+#### 使用数字音标
+
+<Pinyin text="汉字" pinyin="han zi" yinbiao="4 4" />
+
+<Pinyin text="你好世界" pinyin="ni hao shi jie" yinbiao="3 3 4 4" />
+
+#### 使用中文声调名称
+
+<Pinyin text="妈麻马骂" pinyin="ma ma ma ma" yinbiao="阴平 阳平 上声 去声" />
+
+<Pinyin text="春夏秋冬" pinyin="chun xia qiu dong" yinbiao="一声 四声 一声 一声" />
+
+#### 使用符号音标
+
+<Pinyin text="东西南北" pinyin="dong xi nan bei" yinbiao="- - / /" />
+
+<Pinyin text="天地人和" pinyin="tian di ren he" yinbiao="- ` / /" />
+
+#### 使用英文声调名称
+
+<Pinyin text="学习中文" pinyin="xue xi zhong wen" yinbiao="falling rising flat rising" />
+
+#### 混合使用不同音标方式
+
+<Pinyin text="饕餮" pinyin="tao tie" yinbiao="1 去声" />
+
+<Pinyin text="囍" pinyin="xi" yinbiao="上声" />
+
+### 声调演示
+
+#### 四声练习
+
+<Pinyin text="妈麻马骂" pinyin="ma1 ma2 ma3 ma4" />
+
+<Pinyin text="汤糖躺烫" pinyin="tang1 tang2 tang3 tang4" />
+
+#### 不同声调模式
+
+数字声调模式：
+<Pinyin text="你好世界" pinyin="ni3 hao3 shi4 jie4" tones="number" />
+
+声调符号模式：
+<Pinyin text="你好世界" pinyin="nǐ hǎo shì jiè" tones="symbol" />
+
+自动转换模式（默认）：
+<Pinyin text="你好世界" pinyin="ni3 hao3 shi4 jie4" />
+
+### 单个词语
+
+<Pinyin text="饕餮" pinyin="tao1 tie4" />
+
+<Pinyin text="龘" pinyin="da2" />
+
+<Pinyin text="囍" pinyin="xi3" />
+
+### 常用词汇
+
+<Pinyin text="你好" pinyin="ni3 hao3" />
+
+<Pinyin text="谢谢" pinyin="xie4 xie4" />
+
+<Pinyin text="再见" pinyin="zai4 jian4" />
+
+### 句子标注
+
+<Pinyin text="今天天气很好" pinyin="jin1 tian1 tian1 qi4 hen3 hao3" />
+
+<Pinyin text="我爱学习中文" pinyin="wo3 ai4 xue2 xi2 zhong1 wen2" />
+
+### 轻声示例
+
+<Pinyin text="桌子椅子" pinyin="zhuo1 zi0 yi3 zi0" />
+
+<Pinyin text="走了吃的" pinyin="zou3 le0 chi1 de0" />
+
+## 古诗词示例
+
+### 静夜思 - 李白
+
+<Pinyin text="床前明月光" pinyin="chuang qian ming yue guang" />
+
+<Pinyin text="疑是地上霜" pinyin="yi shi di shang shuang" />
+
+<Pinyin text="举头望明月" pinyin="ju tou wang ming yue" />
+
+<Pinyin text="低头思故乡" pinyin="di tou si gu xiang" />
+
+### 春晓 - 孟浩然
+
+<Pinyin text="春眠不觉晓" pinyin="chun mian bu jue xiao" />
+
+<Pinyin text="处处闻啼鸟" pinyin="chu chu wen ti niao" />
+
+<Pinyin text="夜来风雨声" pinyin="ye lai feng yu sheng" />
+
+<Pinyin text="花落知多少" pinyin="hua luo zhi duo shao" />
+
+## 成语学习
+
+### 四字成语
+
+<Pinyin text="一心一意" pinyin="yi xin yi yi" />
+
+<Pinyin text="三心二意" pinyin="san xin er yi" />
+
+<Pinyin text="四面八方" pinyin="si mian ba fang" />
+
+<Pinyin text="五光十色" pinyin="wu guang shi se" />
+
+### 复杂成语
+
+<Pinyin text="鹤立鸡群" pinyin="he li ji qun" />
+
+<Pinyin text="画蛇添足" pinyin="hua she tian zu" />
+
+<Pinyin text="守株待兔" pinyin="shou zhu dai tu" />
+
+<Pinyin text="亡羊补牢" pinyin="wang yang bu lao" />
+
+## 地名标注
+
+### 中国城市
+
+<Pinyin text="北京" pinyin="bei jing" />
+
+<Pinyin text="上海" pinyin="shang hai" />
+
+<Pinyin text="广州" pinyin="guang zhou" />
+
+<Pinyin text="深圳" pinyin="shen zhen" />
+
+### 著名景点
+
+<Pinyin text="故宫" pinyin="gu gong" />
+
+<Pinyin text="天安门" pinyin="tian an men" />
+
+<Pinyin text="长城" pinyin="chang cheng" />
+
+<Pinyin text="兵马俑" pinyin="bing ma yong" />
+
+## 人名标注
+
+### 历史人物
+
+<Pinyin text="孔子" pinyin="kong zi" />
+
+<Pinyin text="老子" pinyin="lao zi" />
+
+<Pinyin text="孟子" pinyin="meng zi" />
+
+<Pinyin text="庄子" pinyin="zhuang zi" />
+
+### 现代人名
+
+<Pinyin text="李明" pinyin="li ming" />
+
+<Pinyin text="王小红" pinyin="wang xiao hong" />
+
+<Pinyin text="张伟" pinyin="zhang wei" />
+
+## 技术特点
+
+### 样式设计
+
+- 拼音使用红色显示，与网站主题色一致
+- 字体大小为汉字的60%，确保清晰可读
+- 支持响应式设计，移动端自动调整
+- 使用标准的HTML `<ruby>` 标签，语义化良好
+
+### 浏览器兼容性
+
+- 支持所有现代浏览器
+- 在不支持ruby标签的旧浏览器中会降级显示
+- 打印友好，黑白打印时拼音显示为灰色
+
+### 使用建议
+
+1. **拼音准确性**: 请确保拼音的准确性，建议参考权威字典
+2. **空格分隔**: 每个汉字对应一个拼音，用空格分隔
+3. **声调标记**: 可以使用数字或声调符号标记声调
+4. **适度使用**: 避免过度使用，保持文档的可读性
+
+## 高级用法
+
+### 声调标注
+
+<Pinyin text="妈麻马骂" pinyin="mā má mǎ mà" />
+
+<Pinyin text="声调练习" pinyin="shēng diào liàn xí" />
+
+### 多音字处理
+
+根据语境选择正确的读音：
+
+<Pinyin text="银行" pinyin="yín háng" /> (金融机构)
+
+<Pinyin text="行走" pinyin="xíng zǒu" /> (步行)
+
+### 轻声标注
+
+<Pinyin text="桌子" pinyin="zhuō zi" />
+
+<Pinyin text="椅子" pinyin="yǐ zi" />
+
+## 总结
+
+拼音注音功能为中文学习和教学提供了强大的支持，无论是学习汉字发音、古诗词朗读，还是制作教学材料，都能发挥重要作用。
+
+通过简单的语法，就能为任何中文文本添加专业的拼音标注，让中文学习变得更加直观和有效。

@@ -1,0 +1,238 @@
+---
+title: "MDX 语法样式展示"
+tags: ["MDX", "样式", "测试"]
+---
+
+import Pinyin from '@/component/pinyin.astro';
+
+# MDX 语法样式展示
+
+这是一个展示所有 MDX 语法样式的测试文档，基于网站的米色调风格设计。
+
+## 文本样式
+
+### 基础文本格式
+
+这是一段普通的文本。**这是粗体文本**，*这是斜体文本*，~~这是删除线文本~~，<u>这是下划线文本</u>。
+
+你也可以使用 ==高亮文本== 来强调重要内容。
+
+### 链接
+
+这是一个[内部链接](/tech/AI-START)，这是一个[外部链接](https://github.com)。
+
+## 标题层级
+
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+
+## 引用块
+
+> 这是一个简单的引用块。
+> 
+> 引用块可以包含多个段落，也可以包含其他格式的文本，比如**粗体**和*斜体*。
+
+> 这是另一个引用块
+> 
+> > 这是嵌套的引用块
+> > 
+> > 嵌套引用可以用来表示对话或者多层次的引用关系。
+
+## 列表
+
+### 无序列表
+
+- 第一项
+- 第二项
+  - 嵌套项目 1
+  - 嵌套项目 2
+    - 深层嵌套项目
+- 第三项
+
+### 有序列表
+
+1. 第一步
+2. 第二步
+   1. 子步骤 A
+   2. 子步骤 B
+3. 第三步
+
+### 任务列表
+
+- [x] 已完成的任务
+- [ ] 未完成的任务
+- [x] 另一个已完成的任务
+- [ ] 待办事项
+
+## 代码
+
+### 行内代码
+
+使用 `console.log()` 来输出信息，或者使用 `npm install` 来安装包。
+
+### 代码块
+
+```javascript
+// JavaScript 代码示例
+function greet(name) {
+  console.log(`Hello, ${name}!`);
+}
+
+greet("World");
+```
+
+```css
+/* CSS 代码示例 */
+.example {
+  color: var(--var_red);
+  background-color: var(--var_off-white);
+  padding: 1rem;
+  border-radius: 8px;
+}
+```
+
+```bash
+# Bash 命令示例
+npm install
+npm run dev
+git add .
+git commit -m "Add new feature"
+```
+
+## 表格
+
+| 功能 | 描述 | 状态 |
+|------|------|------|
+| 标题解析 | 自动生成目录 | ✅ 完成 |
+| 语法高亮 | 代码块高亮 | ✅ 完成 |
+| 响应式设计 | 移动端适配 | ✅ 完成 |
+| 搜索功能 | 全文搜索 | 🚧 进行中 |
+
+## 分割线
+
+---
+
+## 特殊元素
+
+### 键盘按键
+
+按 <kbd>Ctrl</kbd> + <kbd>C</kbd> 复制，按 <kbd>Ctrl</kbd> + <kbd>V</kbd> 粘贴。
+
+### 缩写
+
+<abbr title="HyperText Markup Language">HTML</abbr> 是网页的标记语言。
+
+### 上标和下标
+
+水的化学式是 H<sub>2</sub>O，爱因斯坦的质能方程是 E=mc<sup>2</sup>。
+
+## 详情/摘要
+
+<details>
+<summary>点击展开更多信息</summary>
+
+这里是隐藏的内容。你可以在这里放置详细的说明、代码示例或者其他不想立即显示的信息。
+
+```javascript
+// 隐藏的代码示例
+const secret = "这是隐藏的代码";
+console.log(secret);
+```
+
+</details>
+
+## 警告框
+
+<div class="warning">
+⚠️ **警告**: 这是一个警告信息，用于提醒用户注意重要事项。
+</div>
+
+<div class="note">
+📝 **注意**: 这是一个提示信息，用于补充说明。
+</div>
+
+<div class="tip">
+💡 **提示**: 这是一个小贴士，用于分享有用的技巧。
+</div>
+
+<div class="important">
+❗ **重要**: 这是重要信息，需要特别关注。
+</div>
+
+## 图片
+
+![示例图片](https://via.placeholder.com/600x300/9b1b30/f5f5dc?text=示例图片)
+
+<figure>
+  <img src="https://via.placeholder.com/400x200/ebe6da/333333?text=带说明的图片" alt="带说明的图片" />
+  <figcaption>这是图片的说明文字</figcaption>
+</figure>
+
+## 数学公式（纯文本显示）
+
+由于项目暂未配置数学公式渲染，这里使用文本形式展示：
+
+行内公式：E = mc²
+
+块级公式：
+```
+∑(i=1 to n) x_i = x_1 + x_2 + ⋯ + x_n
+```
+
+如需支持LaTeX数学公式，可以安装 `remark-math` 和 `rehype-katex` 插件。
+
+## 拼音注音功能
+
+这是一个自定义的拼音注音组件，可以为中文汉字添加拼音标注：
+
+### 基础用法
+
+<Pinyin text="饕餮" pinyin="tao tie" yinbiao="1 4" />
+
+<Pinyin text="你好世界" pinyin="ni hao shi jie" yinbiao="3 3 4 4" />
+
+### 音标属性示例
+
+使用数字音标：<Pinyin text="汉字" pinyin="han zi" yinbiao="4 4" />
+
+使用中文声调：<Pinyin text="春天" pinyin="chun tian" yinbiao="一声 一声" />
+
+使用符号音标：<Pinyin text="学习" pinyin="xue xi" yinbiao="\\ /" />
+
+### 复杂示例
+
+学习中文：<Pinyin text="中华人民共和国" pinyin="zhong hua ren min gong he guo" yinbiao="1 2 2 2 4 2 2" />
+
+古诗词：<Pinyin text="床前明月光" pinyin="chuang qian ming yue guang" yinbiao="2 2 2 4 1" />
+
+### 使用方法
+
+在MDX文件中导入组件后，使用以下语法：
+
+```jsx
+<Pinyin text="汉字" pinyin="han zi" />
+<Pinyin text="汉字" pinyin="han zi" yinbiao="4 4" />
+```
+
+- `text`: 要标注的中文文本
+- `pinyin`: 对应的拼音，用空格分隔每个字的拼音
+- `yinbiao`: 音标属性（可选），支持多种声调表示方式：
+  - 数字：`"1 2 3 4 0"`
+  - 中文：`"阴平 阳平 上声 去声 轻声"`
+  - 符号：`"- / v \\ ."`
+  - 英文：`"flat rising falling-rising falling neutral"`
+
+## 总结
+
+这个文档展示了所有主要的 MDX 语法元素，每个元素都有对应的样式设计，符合网站的整体风格：
+
+- 使用米色调配色方案
+- 红色作为强调色
+- 清晰的层次结构
+- 良好的可读性
+- 响应式设计
+- **新增拼音注音功能**
+
+所有样式都在 `mdx-theme.css` 中定义，拼音组件在 `src/component/pinyin.astro` 中实现，可以根据需要进行调整和扩展。
