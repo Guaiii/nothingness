@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
 import Search from "@/component/search.astro";
+import TOCResponsive from "@/component/toc-responsive.astro";
 import "../styles/global.css";
 import "../styles/code-theme.css";
 import "../styles/mdx-theme.css";
@@ -17,7 +18,7 @@ export async function getStaticPaths() {
 }
 // 2. 当渲染的时候，你可以直接从属性中得到条目
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content, headings } = await entry.render();
 const baseUrl = import.meta.env.BASE_URL;
 ---
 
@@ -54,6 +55,7 @@ const baseUrl = import.meta.env.BASE_URL;
           </div> -->
         </nav>
       </header>
+      <TOCResponsive headings={headings} />
       <article>
         <Content />
       </article>
@@ -80,7 +82,10 @@ const baseUrl = import.meta.env.BASE_URL;
     padding: 2rem;
     border: var(--var_border-width) solid var(--var_pitch-black);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
   }
+
+  /* 文章内容始终居中，不受目录影响 */
 
   .article-header {
     border-bottom: var(--var_border-width) solid var(--var_pitch-black);
