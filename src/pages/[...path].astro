@@ -33,20 +33,22 @@ const baseUrl = import.meta.env.BASE_URL;
   <body>
     <main class="article-content">
       <header class="article-header">
-        <h1>{entry.data.title}</h1>
-        {
-          entry.data.tags && (
-            <div class="article-tags">
-              {entry.data.tags.map((tag: string) => (
-                <a href={`${baseUrl}/tags/${tag}`} class="tag">
-                  {tag}
-                </a>
-              ))}
-            </div>
-          )
-        }
+        <!-- <h1>{entry.data.title}</h1> -->
         <nav class="article-nav">
           <a href={baseUrl} class="back-link">← 返回首页</a>
+          <div>
+            {
+              entry.data.tags && (
+                <div class="article-tags">
+                  {entry.data.tags.map((tag: string) => (
+                    <a href={`${baseUrl}/tags/${tag}`} class="tag">
+                      {tag}
+                    </a>
+                  ))}
+                </div>
+              )
+            }
+          </div>
           <!-- <div class="article-search">
             <Search />
           </div> -->
@@ -96,7 +98,7 @@ const baseUrl = import.meta.env.BASE_URL;
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
-    margin-bottom: 1rem;
+    /* margin-bottom: 1rem; */
   }
 
   .tag {
