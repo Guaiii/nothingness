@@ -1,0 +1,336 @@
+---
+export interface Props {
+  text: string;
+  pinyin: string;
+  yinbiao?: string; // 音标属性，用数字或符号指定声调
+  tones?: 'number' | 'symbol' | 'auto'; // 声调显示模式
+}
+
+const { text, pinyin, yinbiao, tones = 'auto' } = Astro.props;
+
+// 声调转换映射表
+const toneMap: Record<string, Record<string, string>> = {
+  'a': { '1': 'ā', '2': 'á', '3': 'ǎ', '4': 'à', '0': 'a' },
+  'o': { '1': 'ō', '2': 'ó', '3': 'ǒ', '4': 'ò', '0': 'o' },
+  'e': { '1': 'ē', '2': 'é', '3': 'ě', '4': 'è', '0': 'e' },
+  'i': { '1': 'ī', '2': 'í', '3': 'ǐ', '4': 'ì', '0': 'i' },
+  'u': { '1': 'ū', '2': 'ú', '3': 'ǔ', '4': 'ù', '0': 'u' },
+  'ü': { '1': 'ǖ', '2': 'ǘ', '3': 'ǚ', '4': 'ǜ', '0': 'ü' },
+  'v': { '1': 'ǖ', '2': 'ǘ', '3': 'ǚ', '4': 'ǜ', '0': 'ü' }, // v作为ü的替代
+};
+
+// 音标符号映射表 - 支持多种输入方式
+const yinbiaoMap: Record<string, string> = {
+  // 数字声调
+  '1': '1', '2': '2', '3': '3', '4': '4', '0': '0',
+  
+  // 中文声调名称
+  '阴平': '1', '一声': '1', 
+  '阳平': '2', '二声': '2',
+  '上声': '3', '三声': '3', 
+  '去声': '4', '四声': '4',
+  '轻声': '0',
+  
+  // 符号表示
+  '¯': '1',  // 一声符号
+  '´': '2',  // 二声符号  
+  'ˇ': '3',  // 三声符号
+  '`': '4',  // 四声符号
+  '·': '0',  // 轻声符号
+  
+  // 英文声调名称
+  'flat': '1', 'rising': '2', 'falling-rising': '3', 'falling': '4', 'neutral': '0',
+  
+  // 简化符号
+  '-': '1', '/': '2', 'v': '3', '\\': '4', '.': '0'
+};
+
+// 声调名称映射
+const toneNames: Record<string, string> = {
+  '1': '阴平',
+  '2': '阳平', 
+  '3': '上声',
+  '4': '去声',
+  '0': '轻声'
+};
+
+// 转换数字声调为声调符号
+function convertTones(pinyinText: string): string {
+  // 检查是否包含数字声调
+  const hasNumberTone = /[0-4]$/.test(pinyinText);
+  if (!hasNumberTone) return pinyinText;
+  
+  const tone = pinyinText.slice(-1);
+  const syllable = pinyinText.slice(0, -1).toLowerCase();
+  
+  // 声调标注规则：
+  // 1. 有a标a
+  // 2. 有o或e标o或e  
+  // 3. iu标u
+  // 4. 其他情况标第一个元音
+  
+  let targetVowel = '';
+  let targetIndex = -1;
+  
+  if (syllable.includes('a')) {
+    targetVowel = 'a';
+    targetIndex = syllable.indexOf('a');
+  } else if (syllable.includes('o')) {
+    targetVowel = 'o';
+    targetIndex = syllable.indexOf('o');
+  } else if (syllable.includes('e')) {
+    targetVowel = 'e';
+    targetIndex = syllable.indexOf('e');
+  } else if (syllable.includes('iu')) {
+    targetVowel = 'u';
+    targetIndex = syllable.indexOf('u');
+  } else if (syllable.includes('ui')) {
+    targetVowel = 'i';
+    targetIndex = syllable.indexOf('i');
+  } else {
+    // 找第一个元音
+    const vowels = ['i', 'u', 'ü', 'v'];
+    for (const vowel of vowels) {
+      const index = syllable.indexOf(vowel);
+      if (index !== -1) {
+        targetVowel = vowel;
+        targetIndex = index;
+        break;
+      }
+    }
+  }
+  
+  if (targetVowel && targetIndex !== -1 && toneMap[targetVowel] && toneMap[targetVowel][tone]) {
+    const chars = Array.from(syllable);
+    chars[targetIndex] = toneMap[targetVowel][tone];
+    return chars.join('');
+  }
+  
+  return pinyinText;
+}
+
+// 获取声调信息
+function getToneInfo(pinyinText: string): { syllable: string; tone: string; toneName: string } {
+  const hasNumberTone = /[0-4]$/.test(pinyinText);
+  if (hasNumberTone) {
+    const tone = pinyinText.slice(-1);
+    const syllable = pinyinText.slice(0, -1);
+    return {
+      syllable: convertTones(pinyinText),
+      tone,
+      toneName: toneNames[tone] || ''
+    };
+  }
+  
+  // 检查是否已有声调符号
+  const symbolTone = detectToneFromSymbol(pinyinText);
+  return {
+    syllable: pinyinText,
+    tone: symbolTone,
+    toneName: toneNames[symbolTone] || ''
+  };
+}
+
+// 从声调符号检测声调
+function detectToneFromSymbol(text: string): string {
+  const toneSymbols: Record<string, string> = {
+    'ā': '1', 'á': '2', 'ǎ': '3', 'à': '4',
+    'ō': '1', 'ó': '2', 'ǒ': '3', 'ò': '4',
+    'ē': '1', 'é': '2', 'ě': '3', 'è': '4',
+    'ī': '1', 'í': '2', 'ǐ': '3', 'ì': '4',
+    'ū': '1', 'ú': '2', 'ǔ': '3', 'ù': '4',
+    'ǖ': '1', 'ǘ': '2', 'ǚ': '3', 'ǜ': '4'
+  };
+  
+  for (const char of text) {
+    if (toneSymbols[char]) {
+      return toneSymbols[char];
+    }
+  }
+  return '0'; // 轻声或无声调
+}
+
+// 解析音标属性
+function parseYinbiao(yinbiaoStr: string): string[] {
+  if (!yinbiaoStr) return [];
+  
+  // 支持多种分隔符：空格、逗号、分号等
+  const parts = yinbiaoStr.split(/[\s,;，；]+/).filter(p => p.trim());
+  
+  return parts.map(part => {
+    const trimmed = part.trim();
+    // 查找映射表中的对应值
+    return yinbiaoMap[trimmed] || trimmed;
+  });
+}
+
+// 应用音标到拼音
+function applyYinbiaoToPinyin(pinyinText: string, tone: string): string {
+  if (!tone || tone === '0') {
+    return pinyinText; // 轻声或无声调
+  }
+  
+  // 移除原有的数字声调
+  const cleanPinyin = pinyinText.replace(/[0-4]$/, '');
+  
+  // 应用新的声调
+  return convertTones(cleanPinyin + tone);
+}
+
+// 将中文和拼音按字符分割
+const textChars = Array.from(text);
+const pinyinParts = pinyin.split(' ').filter(p => p.trim());
+
+// 解析音标属性
+const yinbiaoTones = yinbiao ? parseYinbiao(yinbiao) : [];
+
+// 处理拼音声调
+const processedPinyin = pinyinParts.map((p, index) => {
+  let finalPinyin = p;
+  let finalTone = '';
+  
+  // 如果有音标属性，优先使用音标
+  if (yinbiaoTones[index]) {
+    finalTone = yinbiaoTones[index];
+    finalPinyin = applyYinbiaoToPinyin(p, finalTone);
+  } else {
+    // 否则使用原有逻辑
+    const toneInfo = getToneInfo(p);
+    finalPinyin = toneInfo.syllable;
+    finalTone = toneInfo.tone;
+  }
+  
+  if (tones === 'number') {
+    // 显示数字声调
+    return {
+      syllable: finalPinyin.replace(/[0-4]$/, ''),
+      tone: finalTone,
+      display: finalTone ? `${finalPinyin.replace(/[0-4]$/, '')}${finalTone}` : finalPinyin
+    };
+  } else if (tones === 'symbol') {
+    // 显示声调符号
+    return {
+      syllable: finalPinyin,
+      tone: finalTone,
+      display: finalPinyin
+    };
+  } else {
+    // 自动模式：如果输入是数字声调则转换为符号，否则保持原样
+    return {
+      syllable: finalPinyin,
+      tone: finalTone,
+      display: finalPinyin
+    };
+  }
+});
+
+// 确保拼音数量与汉字数量匹配
+const maxLength = Math.max(textChars.length, processedPinyin.length);
+const paddedText = [...textChars];
+const paddedPinyin = [...processedPinyin];
+
+// 如果拼音不够，用空对象填充
+while (paddedPinyin.length < maxLength) {
+  paddedPinyin.push({ syllable: '', tone: '', display: '' });
+}
+
+// 如果汉字不够，用空字符串填充
+while (paddedText.length < maxLength) {
+  paddedText.push('');
+}
+---
+
+<ruby class="pinyin-ruby">
+  {paddedText.map((char, index) => {
+    const pinyinInfo = paddedPinyin[index];
+    return (
+      <ruby class="pinyin-char" data-tone={pinyinInfo.tone}>
+        <rt class="pinyin-annotation" title={pinyinInfo.tone ? `${pinyinInfo.tone}声 (${toneNames[pinyinInfo.tone]})` : ''}>
+          {pinyinInfo.display}
+        </rt>
+        {char}
+      </ruby>
+    );
+  })}
+</ruby>
+
+<style>
+  .pinyin-ruby {
+    display: inline-block;
+    font-family: inherit;
+    line-height: 1.8;
+  }
+
+  .pinyin-char {
+    display: inline-block;
+    text-align: center;
+    margin: 0 0.1em;
+    position: relative;
+  }
+
+  .pinyin-annotation {
+    display: block;
+    font-size: 0.6em;
+    color: var(--var_red);
+    font-weight: 500;
+    line-height: 1.2;
+    margin-bottom: 0.2em;
+    text-align: center;
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    letter-spacing: 0.05em;
+    cursor: help;
+    transition: all 0.2s ease;
+  }
+
+  /* 声调颜色区分 */
+  .pinyin-char[data-tone="1"] .pinyin-annotation {
+    color: #d32f2f; /* 一声 - 深红色 (阴平) */
+  }
+
+  .pinyin-char[data-tone="2"] .pinyin-annotation {
+    color: #f57c00; /* 二声 - 橙色 (阳平) */
+  }
+
+  .pinyin-char[data-tone="3"] .pinyin-annotation {
+    color: #388e3c; /* 三声 - 绿色 (上声) */
+  }
+
+  .pinyin-char[data-tone="4"] .pinyin-annotation {
+    color: #1976d2; /* 四声 - 蓝色 (去声) */
+  }
+
+  .pinyin-char[data-tone="0"] .pinyin-annotation {
+    color: #757575; /* 轻声 - 灰色 */
+    font-size: 0.5em;
+  }
+
+  /* 悬停效果 */
+  .pinyin-char:hover .pinyin-annotation {
+    transform: scale(1.1);
+    font-weight: 600;
+  }
+
+  /* 确保拼音在汉字上方 */
+  ruby {
+    ruby-position: over;
+  }
+
+  /* 移动端优化 */
+  @media (max-width: 768px) {
+    .pinyin-annotation {
+      font-size: 0.55em;
+      margin-bottom: 0.15em;
+    }
+    
+    .pinyin-char {
+      margin: 0 0.05em;
+    }
+  }
+
+  /* 打印样式 */
+  @media print {
+    .pinyin-annotation {
+      color: #666;
+    }
+  }
+</style>

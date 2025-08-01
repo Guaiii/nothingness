@@ -3,6 +3,8 @@ title: "MDX 语法样式展示"
 tags: ["MDX", "样式", "测试"]
 ---
 
+import Pinyin from '@/component/pinyin.astro';
+
 # MDX 语法样式展示
 
 这是一个展示所有 MDX 语法样式的测试文档，基于网站的米色调风格设计。
@@ -181,6 +183,47 @@ console.log(secret);
 
 如需支持LaTeX数学公式，可以安装 `remark-math` 和 `rehype-katex` 插件。
 
+## 拼音注音功能
+
+这是一个自定义的拼音注音组件，可以为中文汉字添加拼音标注：
+
+### 基础用法
+
+<Pinyin text="饕餮" pinyin="tao tie" yinbiao="1 4" />
+
+<Pinyin text="你好世界" pinyin="ni hao shi jie" yinbiao="3 3 4 4" />
+
+### 音标属性示例
+
+使用数字音标：<Pinyin text="汉字" pinyin="han zi" yinbiao="4 4" />
+
+使用中文声调：<Pinyin text="春天" pinyin="chun tian" yinbiao="一声 一声" />
+
+使用符号音标：<Pinyin text="学习" pinyin="xue xi" yinbiao="\\ /" />
+
+### 复杂示例
+
+学习中文：<Pinyin text="中华人民共和国" pinyin="zhong hua ren min gong he guo" yinbiao="1 2 2 2 4 2 2" />
+
+古诗词：<Pinyin text="床前明月光" pinyin="chuang qian ming yue guang" yinbiao="2 2 2 4 1" />
+
+### 使用方法
+
+在MDX文件中导入组件后，使用以下语法：
+
+```jsx
+<Pinyin text="汉字" pinyin="han zi" />
+<Pinyin text="汉字" pinyin="han zi" yinbiao="4 4" />
+```
+
+- `text`: 要标注的中文文本
+- `pinyin`: 对应的拼音，用空格分隔每个字的拼音
+- `yinbiao`: 音标属性（可选），支持多种声调表示方式：
+  - 数字：`"1 2 3 4 0"`
+  - 中文：`"阴平 阳平 上声 去声 轻声"`
+  - 符号：`"- / v \\ ."`
+  - 英文：`"flat rising falling-rising falling neutral"`
+
 ## 总结
 
 这个文档展示了所有主要的 MDX 语法元素，每个元素都有对应的样式设计，符合网站的整体风格：
@@ -190,5 +233,6 @@ console.log(secret);
 - 清晰的层次结构
 - 良好的可读性
 - 响应式设计
+- **新增拼音注音功能**
 
-所有样式都在 `mdx-theme.css` 中定义，可以根据需要进行调整和扩展。
+所有样式都在 `mdx-theme.css` 中定义，拼音组件在 `src/component/pinyin.astro` 中实现，可以根据需要进行调整和扩展。
