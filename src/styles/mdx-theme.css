@@ -1,0 +1,659 @@
+/* MDX 文章内容样式 - 符合网站米色调风格 */
+
+/* 基础文章容器 */
+article {
+  font-size: var(--step-0);
+  line-height: 1.8;
+  color: var(--var_pitch-black);
+}
+
+/* 标题样式 */
+article h1,
+article h2,
+article h3,
+article h4,
+article h5,
+article h6 {
+  margin: 2.5rem 0 1.5rem 0;
+  color: var(--var_pitch-black);
+  font-weight: 700;
+  line-height: 1.3;
+  scroll-margin-top: 2rem; /* 为锚点导航留出空间 */
+}
+
+article h1 {
+  font-size: var(--step-3);
+  border-bottom: 3px solid var(--var_red);
+  padding-bottom: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+article h2 {
+  font-size: var(--step-2);
+  border-bottom: 2px solid var(--var_border-color);
+  padding-bottom: 0.3rem;
+  position: relative;
+}
+
+article h2::before {
+  content: "▎";
+  color: var(--var_red);
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+article h3 {
+  font-size: var(--step-1);
+  color: var(--var_red);
+  position: relative;
+}
+
+article h3::before {
+  content: "◆ ";
+  color: var(--var_red);
+  font-size: 0.8em;
+  margin-right: 0.3rem;
+}
+
+article h4 {
+  font-size: var(--step-0);
+  color: var(--var_pitch-black);
+  font-weight: 600;
+}
+
+article h5,
+article h6 {
+  font-size: var(--step--1);
+  color: var(--var_pitch-black);
+  font-weight: 600;
+}
+
+/* 段落样式 */
+article p {
+  margin: 1.5rem 0;
+  text-align: justify;
+  text-justify: inter-ideograph;
+}
+
+/* 强调文本 */
+article strong,
+article b {
+  font-weight: 700;
+  color: var(--var_red);
+}
+
+article em,
+article i {
+  font-style: italic;
+  color: var(--var_pitch-black);
+  background-color: rgba(155, 27, 48, 0.1);
+  padding: 0.1em 0.2em;
+  border-radius: 3px;
+}
+
+/* 删除线和下划线 */
+article del,
+article s {
+  text-decoration: line-through;
+  color: #8b7355;
+  opacity: 0.7;
+}
+
+article u {
+  text-decoration: underline;
+  text-decoration-color: var(--var_red);
+  text-underline-offset: 3px;
+}
+
+/* 标记文本 */
+article mark {
+  background-color: rgba(155, 27, 48, 0.2);
+  color: var(--var_pitch-black);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  border: 1px solid rgba(155, 27, 48, 0.3);
+}
+
+/* 行内代码样式 */
+article code {
+  background-color: rgba(155, 27, 48, 0.1);
+  color: var(--var_red);
+  padding: 0.2em 0.5em;
+  border-radius: 4px;
+  border: 1px solid rgba(155, 27, 48, 0.2);
+  font-size: 0.9em;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-weight: 600;
+}
+
+/* 代码块中的代码不应用行内样式 */
+article pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-weight: normal;
+}
+
+/* 链接样式 */
+article a {
+  color: var(--var_red);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+article a:hover {
+  border-bottom-color: var(--var_red);
+  background-color: rgba(155, 27, 48, 0.05);
+}
+
+article a:visited {
+  color: #7a1525;
+}
+
+/* 外部链接图标 */
+article a[href^="http"]:not([href*="localhost"]):not([href*="127.0.0.1"])::after {
+  content: " ↗";
+  font-size: 0.8em;
+  color: var(--var_red);
+  opacity: 0.7;
+}
+
+/* 引用块样式 */
+article blockquote {
+  border-left: 4px solid var(--var_red);
+  background-color: var(--var_off-white);
+  padding: 1.5rem 2rem;
+  margin: 2rem 0;
+  font-style: italic;
+  color: var(--var_pitch-black);
+  border-radius: 0 8px 8px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+article blockquote::before {
+  content: '"';
+  font-size: 3rem;
+  color: var(--var_red);
+  position: absolute;
+  top: -0.5rem;
+  left: 1rem;
+  opacity: 0.3;
+  font-family: serif;
+}
+
+article blockquote p {
+  margin: 0.5rem 0;
+}
+
+article blockquote p:first-child {
+  margin-top: 0;
+}
+
+article blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* 嵌套引用 */
+article blockquote blockquote {
+  border-left-color: var(--var_border-color);
+  background-color: rgba(245, 245, 220, 0.5);
+  margin: 1rem 0;
+}
+
+/* 列表样式 */
+article ul,
+article ol {
+  margin: 1.5rem 0;
+  padding-left: 2rem;
+}
+
+article ul {
+  list-style: none;
+}
+
+article ul li {
+  position: relative;
+  margin: 0.8rem 0;
+  padding-left: 1rem;
+}
+
+article ul li::before {
+  content: "▸";
+  color: var(--var_red);
+  font-weight: bold;
+  position: absolute;
+  left: -0.5rem;
+}
+
+article ol {
+  list-style: none;
+  counter-reset: ordered-list;
+}
+
+article ol li {
+  position: relative;
+  margin: 0.8rem 0;
+  padding-left: 1.5rem;
+  counter-increment: ordered-list;
+}
+
+article ol li::before {
+  content: counter(ordered-list) ".";
+  color: var(--var_red);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  min-width: 1.2rem;
+}
+
+/* 嵌套列表 */
+article ul ul,
+article ol ol,
+article ul ol,
+article ol ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+article ul ul li::before {
+  content: "◦";
+}
+
+article ul ul ul li::before {
+  content: "▪";
+}
+
+/* 任务列表 */
+article ul li input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 2px solid var(--var_border-color);
+  border-radius: 3px;
+  background-color: var(--var_off-white);
+  margin-right: 0.8rem;
+  margin-top: 0.1rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+article ul li input[type="checkbox"]:hover {
+  border-color: var(--var_red);
+  box-shadow: 0 0 0 2px rgba(155, 27, 48, 0.1);
+}
+
+article ul li input[type="checkbox"]:checked {
+  background-color: var(--var_red);
+  border-color: var(--var_red);
+}
+
+article ul li input[type="checkbox"]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--var_off-white);
+  font-size: 0.9rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+article ul li:has(input[type="checkbox"]) {
+  padding-left: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.8rem 0;
+}
+
+article ul li:has(input[type="checkbox"])::before {
+  display: none;
+}
+
+/* 已完成任务的样式 */
+article ul li:has(input[type="checkbox"]:checked) {
+  opacity: 0.8;
+}
+
+article ul li:has(input[type="checkbox"]:checked) > * {
+  text-decoration: line-through;
+  color: var(--var_pitch-black);
+  opacity: 0.7;
+}
+
+/* 任务列表文本容器 */
+article ul li:has(input[type="checkbox"]) > *:not(input) {
+  flex: 1;
+  margin: 0;
+}
+
+/* 水平分割线 */
+article hr {
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--var_red), transparent);
+  margin: 3rem 0;
+  position: relative;
+}
+
+article hr::after {
+  content: "❋";
+  position: absolute;
+  top: -0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--var_background-color);
+  color: var(--var_red);
+  padding: 0 1rem;
+  font-size: 1.2rem;
+}
+
+/* 表格样式 */
+article table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  background-color: var(--var_off-white);
+  border: 2px solid var(--var_border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+article table th,
+article table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--var_border-color);
+}
+
+article table th {
+  background-color: var(--var_red);
+  color: var(--var_off-white);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: var(--step--1);
+}
+
+article table tr:nth-child(even) {
+  background-color: rgba(245, 245, 220, 0.5);
+}
+
+article table tr:hover {
+  background-color: rgba(155, 27, 48, 0.05);
+}
+
+article table tr:last-child td {
+  border-bottom: none;
+}
+
+/* 图片样式 */
+article img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid var(--var_border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin: 2rem 0;
+  display: block;
+}
+
+/* 图片居中 */
+article p img {
+  display: block;
+  margin: 2rem auto;
+}
+
+/* 图片说明 */
+article figure {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+article figcaption {
+  font-size: var(--step--1);
+  color: var(--var_pitch-black);
+  opacity: 0.8;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* 键盘按键样式 */
+article kbd {
+  background-color: var(--var_off-white);
+  border: 2px solid var(--var_border-color);
+  border-radius: 4px;
+  padding: 0.2em 0.4em;
+  font-family: monospace;
+  font-size: 0.9em;
+  color: var(--var_pitch-black);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+}
+
+/* 缩写样式 */
+article abbr {
+  text-decoration: underline dotted;
+  text-decoration-color: var(--var_red);
+  cursor: help;
+}
+
+/* 上标和下标 */
+article sup,
+article sub {
+  font-size: 0.75em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+article sup {
+  top: -0.5em;
+}
+
+article sub {
+  bottom: -0.25em;
+}
+
+/* 详情/摘要样式 */
+article details {
+  background-color: var(--var_off-white);
+  border: 2px solid var(--var_border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 2rem 0;
+}
+
+article summary {
+  font-weight: 600;
+  color: var(--var_red);
+  cursor: pointer;
+  padding: 0.5rem;
+  margin: -0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+article summary:hover {
+  background-color: rgba(155, 27, 48, 0.1);
+}
+
+article details[open] summary {
+  border-bottom: 1px solid var(--var_border-color);
+  margin-bottom: 1rem;
+}
+
+/* 警告框样式 */
+article .warning,
+article .note,
+article .tip,
+article .important {
+  padding: 1.5rem;
+  margin: 2rem 0;
+  border-radius: 8px;
+  border-left: 4px solid;
+  position: relative;
+}
+
+article .warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  border-left-color: #ffc107;
+  color: var(--var_pitch-black);
+}
+
+article .note {
+  background-color: rgba(13, 110, 253, 0.1);
+  border-left-color: #0d6efd;
+  color: var(--var_pitch-black);
+}
+
+article .tip {
+  background-color: rgba(25, 135, 84, 0.1);
+  border-left-color: #198754;
+  color: var(--var_pitch-black);
+}
+
+article .important {
+  background-color: rgba(155, 27, 48, 0.1);
+  border-left-color: var(--var_red);
+  color: var(--var_pitch-black);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  article {
+    font-size: var(--step--1);
+  }
+
+  article h1 {
+    font-size: var(--step-2);
+  }
+
+  article h2 {
+    font-size: var(--step-1);
+  }
+
+  article h3 {
+    font-size: var(--step-0);
+  }
+
+  article blockquote {
+    padding: 1rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  article ul,
+  article ol {
+    padding-left: 1.5rem;
+  }
+
+  article table {
+    font-size: var(--step--1);
+  }
+
+  article table th,
+  article table td {
+    padding: 0.5rem;
+  }
+
+  /* 表格水平滚动 */
+  article table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  article table thead,
+  article table tbody,
+  article table tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  /* 移动端任务列表优化 */
+  article ul li input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.6rem;
+  }
+
+  article ul li input[type="checkbox"]:checked::after {
+    font-size: 0.8rem;
+  }
+
+  article ul li:has(input[type="checkbox"]) {
+    gap: 0.4rem;
+    margin: 0.6rem 0;
+  }
+}
+
+/* 打印样式 */
+@media print {
+  article {
+    color: black;
+    background: white;
+  }
+
+  article a {
+    color: black;
+    text-decoration: underline;
+  }
+
+  article blockquote {
+    background: #f5f5f5;
+    border-left: 4px solid #333;
+  }
+
+  article table {
+    border: 1px solid #333;
+  }
+
+  article table th {
+    background: #f5f5f5;
+    color: black;
+  }
+}
+
+/* 选中文本样式 */
+article ::selection {
+  background-color: rgba(155, 27, 48, 0.2);
+  color: var(--var_pitch-black);
+}
+
+/* 焦点样式 */
+article a:focus,
+article summary:focus {
+  outline: 2px solid var(--var_red);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* 滚动条样式 */
+article *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+article *::-webkit-scrollbar-track {
+  background: rgba(181, 181, 181, 0.1);
+  border-radius: 4px;
+}
+
+article *::-webkit-scrollbar-thumb {
+  background: var(--var_border-color);
+  border-radius: 4px;
+}
+
+article *::-webkit-scrollbar-thumb:hover {
+  background: var(--var_pitch-black);
+}
