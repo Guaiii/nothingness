@@ -99,21 +99,18 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
     transform: rotate(180deg);
   }
 
-  /* 桌面端左侧固定目录 */
+  /* 桌面端左侧目录 - 根据内容定位 */
   .toc {
-    position: fixed;
-    left: calc(50% - 400px - 300px); /* 文章中心左侧300px */
-    top: 50%;
-    transform: translateY(-50%);
-    width: 280px;
-    max-height: 70vh;
+    position: relative;
+    width: 100%;
+    max-width: 280px;
     background-color: var(--var_off-white);
     border: 2px solid var(--var_pitch-black);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     overflow: hidden;
     transition: all 0.3s ease;
-    z-index: 1000;
+    box-sizing: border-box;
   }
 
   .toc-header {
@@ -155,7 +152,7 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
     list-style: none;
     margin: 0;
     padding: 1rem;
-    max-height: calc(70vh - 120px);
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
   }
 
@@ -231,8 +228,10 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
   }
 
   .toc-text {
-    flex: 1;
-  }
+  flex: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 
   /* 进度条 */
   .toc-progress {
@@ -250,21 +249,23 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
 
   /* 遮罩层 */
   .toc-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
 
   .toc-overlay.active {
-    opacity: 1;
-  }
+  opacity: 1;
+  pointer-events: auto;
+}
 
   /* 滚动条样式 */
   .toc-list::-webkit-scrollbar {
@@ -286,7 +287,7 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
   }
 
   /* 当屏幕宽度不足以同时显示文章和目录时，隐藏左侧目录 */
-  @media (max-width: 1600px) {
+  @media (max-width: 1199px) {
     .toc {
       display: none;
     }
@@ -365,7 +366,7 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
   }
 
   /* 大屏幕时显示左侧目录，小屏幕时使用折叠模式 */
-  @media (min-width: 1601px) {
+  @media (min-width: 1200px) {
     .toc-toggle {
       display: none;
     }
@@ -442,7 +443,7 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
     // 点击目录链接后关闭移动端目录
     tocLinks.forEach(link => {
       link.addEventListener('click', () => {
-        if (window.innerWidth <= 1600) {
+        if (window.innerWidth <= 1199) {
           setTimeout(closeToc, 300); // 延迟关闭，让滚动动画完成
         }
       });
