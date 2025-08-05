@@ -1,0 +1,517 @@
+---
+export interface Props {
+  novel: {
+    data: {
+      title: string;
+      author?: string;
+      description?: string;
+      status?: string;
+      chapters?: Array<{
+        title: string;
+        slug: string;
+        order: number;
+      }>;
+    };
+    slug: string;
+  };
+  currentChapter?: string;
+}
+
+const { novel, currentChapter } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<div class="novel-toc-container">
+  <!-- 移动端顶部折叠按钮 -->
+  <button class="novel-toc-toggle" id="novel-toc-toggle" aria-label="切换小说目录">
+    <span class="toc-toggle-icon">📚</span>
+    <span class="toc-toggle-text">目录</span>
+    <span class="toc-toggle-arrow">▼</span>
+  </button>
+
+  <!-- 小说目录内容 -->
+  <nav class="novel-toc-nav" id="novel-toc-nav" aria-label="小说目录">
+    <!-- 目录头部 -->
+    <div class="novel-toc-header">
+      <h3 class="novel-toc-title">📚 小说目录</h3>
+      <button class="novel-toc-close" id="novel-toc-close" aria-label="关闭目录">✕</button>
+    </div>
+
+    <!-- 小说信息 -->
+    <div class="novel-info">
+    <h2 class="novel-title">{novel.data.title}</h2>
+    {novel.data.author && (
+      <p class="novel-author">作者：{novel.data.author}</p>
+    )}
+    {novel.data.status && (
+      <span class={`novel-status status-${novel.data.status}`}>
+        {novel.data.status}
+      </span>
+    )}
+    {novel.data.description && (
+      <p class="novel-description">{novel.data.description}</p>
+    )}
+  </div>
+
+  <!-- 章节目录 -->
+  <nav class="novel-chapters" aria-label="小说章节目录">
+    <h3 class="chapters-title">📚 章节目录</h3>
+    
+    {novel.data.chapters && novel.data.chapters.length > 0 ? (
+      <ul class="chapters-list">
+        {novel.data.chapters
+          .sort((a, b) => a.order - b.order)
+          .map((chapter) => (
+            <li class="chapter-item">
+              <a 
+                href={`${baseUrl}/novel/${novel.slug}/${chapter.slug}`}
+                class={`chapter-link ${currentChapter === chapter.slug ? 'active' : ''}`}
+                data-chapter={chapter.slug}
+              >
+                <span class="chapter-number">{chapter.order.toString().padStart(2, '0')}</span>
+                <span class="chapter-title">{chapter.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    ) : (
+      <div class="no-chapters">
+        <p>暂无章节</p>
+      </div>
+    )}
+  </nav>
+
+    <!-- 返回小说列表 -->
+    <div class="novel-actions">
+      <a href={`${baseUrl}/#novels`} class="back-to-list">
+        ← 返回小说列表
+      </a>
+    </div>
+  </nav>
+
+  <!-- 遮罩层（移动端） -->
+  <div class="novel-toc-overlay" id="novel-toc-overlay"></div>
+</div>
+
+<style scoped>
+  .novel-toc-container {
+    position: relative;
+    z-index: 100;
+  }
+
+  /* 移动端顶部折叠按钮 */
+  .novel-toc-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background-color: rgba(235, 230, 218, 0.95);
+    color: var(--var_pitch-black);
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 6px;
+    padding: 0.4rem 0.8rem;
+    font-size: var(--step--1);
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 1002; /* 确保按钮在遮罩层之上 */
+    align-items: center;
+    gap: 0.4rem;
+    backdrop-filter: blur(8px);
+    pointer-events: auto; /* 确保按钮可以接收点击事件 */
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .novel-toc-toggle:hover {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .toc-toggle-icon {
+    font-size: 1rem;
+  }
+
+  .toc-toggle-text {
+    font-weight: 600;
+  }
+
+  .toc-toggle-arrow {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+  }
+
+  .novel-toc-toggle.active .toc-toggle-arrow {
+    transform: rotate(180deg);
+  }
+
+  .novel-toc-toggle.active {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-1px) scale(0.95);
+  }
+
+  /* 小说目录导航 */
+  .novel-toc-nav {
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: var(--var_background-color);
+    border-right: var(--var_border-width) solid var(--var_pitch-black);
+    color: var(--var_pitch-black);
+  }
+
+  /* 目录头部 */
+  .novel-toc-header {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+  }
+
+  .novel-toc-title {
+    font-size: var(--step-1);
+    font-weight: bold;
+    color: var(--var_pitch-black);
+    margin: 0;
+  }
+
+  .novel-toc-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--var_pitch-black);
+    padding: 0.2rem;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+  }
+
+  .novel-toc-close:hover {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+  }
+
+  /* 遮罩层 */
+  .novel-toc-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* 默认不拦截点击事件 */
+  }
+
+  .novel-toc-overlay.active {
+    opacity: 1;
+    pointer-events: auto; /* 激活时才拦截点击事件 */
+  }
+
+  .novel-info {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+  }
+
+  .novel-title {
+    font-size: var(--step-2);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--var_pitch-black);
+  }
+
+  .novel-author {
+    font-size: var(--step--1);
+    color: var(--var_red);
+    margin-bottom: 0.5rem;
+  }
+
+  .novel-status {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .status-连载中 {
+    background: var(--var_red);
+    color: var(--var_off-white);
+  }
+
+  .status-已完结 {
+    background: var(--var_pitch-black);
+    color: var(--var_off-white);
+  }
+
+  .status-暂停 {
+    background: var(--var_border-color);
+    color: var(--var_pitch-black);
+  }
+
+  .novel-description {
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--var_pitch-black);
+    opacity: 0.8;
+  }
+
+  .chapters-title {
+    font-size: var(--step-1);
+    margin-bottom: 1rem;
+    color: var(--var_pitch-black);
+  }
+
+  .chapters-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .chapter-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .chapter-link {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    text-decoration: none;
+    color: var(--var_pitch-black);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    border: var(--var_border-width) solid transparent;
+  }
+
+  .chapter-link:hover {
+    background: var(--var_off-white);
+    color: var(--var_pitch-black);
+    border-color: var(--var_pitch-black);
+  }
+
+  .chapter-link.active {
+    background: var(--var_red);
+    color: var(--var_off-white);
+    font-weight: bold;
+    border-color: var(--var_red);
+  }
+
+  .chapter-number {
+    display: inline-block;
+    width: 2rem;
+    text-align: center;
+    font-family: monospace;
+    font-size: 0.8rem;
+    margin-right: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .chapter-title {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .no-chapters {
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+  }
+
+  .novel-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: var(--var_border-width) solid var(--var_pitch-black);
+  }
+
+  .back-to-list {
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    color: var(--var_pitch-black);
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: var(--step--1);
+  }
+
+  .back-to-list:hover {
+    background: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+  }
+
+  /* 移动端适配 */
+  @media (max-width: 768px) {
+    .novel-toc-toggle {
+      display: flex;
+    }
+
+    .novel-toc-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 85%;
+      max-width: 320px;
+      height: 100vh;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      pointer-events: auto; /* 确保目录面板可以接收点击事件 */
+    }
+
+    .novel-toc-nav.active {
+      transform: translateX(0);
+    }
+
+    .novel-toc-header {
+      display: flex;
+    }
+
+    .novel-toc-overlay {
+      display: block;
+    }
+
+    .novel-title {
+      font-size: var(--step-1);
+    }
+
+    .chapter-link {
+      padding: 0.6rem;
+    }
+
+    .chapter-title {
+      font-size: var(--step--1);
+    }
+
+    .novel-info {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+    }
+
+    .chapters-title {
+      font-size: var(--step-0);
+    }
+  }
+
+  /* 桌面端样式 */
+  @media (min-width: 769px) {
+    .novel-toc-toggle {
+      display: none;
+    }
+
+    .novel-toc-nav {
+      position: static;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .novel-toc-header {
+      display: none;
+    }
+
+    .novel-toc-overlay {
+      display: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  // 小说目录响应式功能
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('novel-toc-toggle');
+    const closeBtn = document.getElementById('novel-toc-close');
+    const tocNav = document.getElementById('novel-toc-nav');
+    const overlay = document.getElementById('novel-toc-overlay');
+    const chapterLinks = document.querySelectorAll('.chapter-link');
+
+    // 切换目录显示/隐藏
+    function toggleToc() {
+      const isActive = tocNav.classList.contains('active');
+      
+      if (isActive) {
+        closeToc();
+      } else {
+        openToc();
+      }
+    }
+
+    // 打开目录
+    function openToc() {
+      tocNav.classList.add('active');
+      overlay.classList.add('active');
+      toggleBtn.classList.add('active');
+      document.body.style.overflow = 'hidden'; // 防止背景滚动
+    }
+
+    // 关闭目录
+    function closeToc() {
+      tocNav.classList.remove('active');
+      overlay.classList.remove('active');
+      toggleBtn.classList.remove('active');
+      document.body.style.overflow = ''; // 恢复滚动
+    }
+
+    // 事件监听
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', toggleToc);
+    }
+
+    if (closeBtn) {
+      closeBtn.addEventListener('click', closeToc);
+    }
+
+    if (overlay) {
+      overlay.addEventListener('click', closeToc);
+    }
+
+    // 章节导航功能
+    chapterLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        // 移除其他链接的活跃状态
+        chapterLinks.forEach(function(l) { l.classList.remove('active'); });
+        // 添加当前链接的活跃状态
+        this.classList.add('active');
+        
+        // 在移动端点击章节链接后关闭目录
+        if (window.innerWidth <= 768) {
+          closeToc();
+        }
+      });
+    });
+
+    // 监听窗口大小变化
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768) {
+        // 桌面端时确保目录是打开状态且移除移动端样式
+        tocNav.classList.remove('active');
+        overlay.classList.remove('active');
+        toggleBtn.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // ESC键关闭目录
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && tocNav.classList.contains('active')) {
+        closeToc();
+      }
+    });
+  });
+</script>

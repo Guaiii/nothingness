@@ -1,0 +1,268 @@
+---
+import { getCollection } from "astro:content";
+import NovelTOC from "@/component/novel-toc.astro";
+import Search from "@/component/search.astro";
+import "../../../styles/global.css";
+import "../../../styles/mdx-theme.css";
+
+// 生成所有小说的路径
+export async function getStaticPaths() {
+  const novelEntries = await getCollection("novel");
+  
+  // 只获取标记为小说的条目
+  const novels = novelEntries.filter(entry => entry.data.isNovel);
+  
+  return novels.map((novel) => ({
+    params: { novelSlug: novel.slug },
+    props: { novel },
+  }));
+}
+
+const { novel } = Astro.props;
+const { Content } = await novel.render();
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href={`${baseUrl}/favicon.svg`} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{novel.data.title} - 太虚幻境</title>
+    <meta name="description" content={novel.data.description || novel.data.title} />
+  </head>
+  <body>
+    <div class="novel-layout">
+      <!-- 左侧小说目录 -->
+      <aside class="novel-sidebar">
+        <NovelTOC novel={novel} />
+      </aside>
+
+      <!-- 右侧小说内容 -->
+      <main class="novel-content">
+
+        <article class="novel-article">
+          <div class="novel-meta">
+            <h1 class="novel-title">{novel.data.title}</h1>
+            {novel.data.author && (
+              <p class="novel-author">作者：{novel.data.author}</p>
+            )}
+            {novel.data.status && (
+              <span class={`novel-status status-${novel.data.status}`}>
+                {novel.data.status}
+              </span>
+            )}
+          </div>
+
+          <div class="novel-body">
+            <Content />
+          </div>
+
+          {novel.data.chapters && novel.data.chapters.length > 0 && (
+            <div class="chapter-navigation">
+              <h3>开始阅读</h3>
+              <a 
+                href={`${baseUrl}/novel/${novel.slug}/${novel.data.chapters[0].slug}`}
+                class="start-reading-btn"
+              >
+                开始阅读第一章
+              </a>
+            </div>
+          )}
+        </article>
+      </main>
+    </div>
+  </body>
+</html>
+
+<style>
+  .novel-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--var_background-color);
+    position: relative;
+  }
+
+  .novel-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .novel-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--var_background-color);
+    color: var(--var_pitch-black);
+  }
+
+  .novel-header {
+    padding: 1rem 2rem;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+    background: var(--var_background-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    pointer-events: auto; /* 确保头部导航可以接收点击事件 */
+  }
+
+  .novel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .back-link {
+    color: var(--var_pitch-black);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .back-link:hover {
+    background: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+  }
+
+  .novel-article {
+    flex: 1;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .novel-meta {
+    margin-bottom: 3rem;
+    text-align: center;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+    padding-bottom: 2rem;
+  }
+
+  .novel-title {
+    font-size: var(--step-4);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--var_pitch-black);
+  }
+
+  .novel-author {
+    font-size: var(--step-1);
+    color: var(--var_red);
+    margin-bottom: 1rem;
+  }
+
+  .novel-status {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .status-连载中 {
+    background: var(--var_red);
+    color: var(--var_off-white);
+  }
+
+  .status-已完结 {
+    background: var(--var_pitch-black);
+    color: var(--var_off-white);
+  }
+
+  .status-暂停 {
+    background: var(--var_border-color);
+    color: var(--var_pitch-black);
+  }
+
+  .novel-body {
+    line-height: 1.8;
+    font-size: var(--step-0);
+  }
+
+  .chapter-navigation {
+    margin-top: 3rem;
+    padding: 2rem;
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 8px;
+    text-align: center;
+    background: var(--var_off-white);
+    position: relative;
+    z-index: 10;
+    pointer-events: auto; /* 确保章节导航可以接收点击事件 */
+  }
+
+  .chapter-navigation h3 {
+    margin-bottom: 1rem;
+    color: var(--var_pitch-black);
+    font-size: var(--step-1);
+  }
+
+  .start-reading-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: var(--var_red);
+    color: var(--var_off-white);
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    border: var(--var_border-width) solid var(--var_red);
+  }
+
+  .start-reading-btn:hover {
+    background: var(--var_pitch-black);
+    border-color: var(--var_pitch-black);
+    transform: translateY(-2px);
+  }
+
+  /* 移动端适配 */
+  @media (max-width: 768px) {
+    .novel-layout {
+      flex-direction: column;
+    }
+
+    .novel-sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+      order: 2;
+    }
+
+    .novel-content {
+      order: 1;
+      padding-top: 4rem; /* 为顶部目录按钮留出空间 */
+    }
+
+    .novel-article {
+      padding: 1rem;
+    }
+
+    .novel-title {
+      font-size: var(--step-3);
+    }
+
+    .novel-header {
+      padding: 1rem;
+      padding-top: 4.5rem; /* 避免与目录按钮重叠 */
+    }
+
+    .novel-nav {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .back-link {
+      font-size: var(--step--1);
+      padding: 0.4rem 0.8rem;
+    }
+  }
+</style>
