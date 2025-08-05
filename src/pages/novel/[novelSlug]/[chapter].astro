@@ -1,0 +1,357 @@
+---
+import { getCollection } from "astro:content";
+import NovelTOC from "@/component/novel-toc.astro";
+import Search from "@/component/search.astro";
+import "../../../styles/global.css";
+import "../../../styles/mdx-theme.css";
+
+// 生成所有章节的路径
+export async function getStaticPaths() {
+  const novelEntries = await getCollection("novel");
+  
+  // 只获取标记为小说的条目
+  const novels = novelEntries.filter(entry => entry.data.isNovel);
+  
+  const paths = [];
+  
+  for (const novel of novels) {
+    if (novel.data.chapters) {
+      for (const chapter of novel.data.chapters) {
+        paths.push({
+          params: { 
+            novelSlug: novel.slug,
+            chapter: chapter.slug 
+          },
+          props: { 
+            novel,
+            currentChapter: chapter,
+            allChapters: novel.data.chapters
+          },
+        });
+      }
+    }
+  }
+  
+  return paths;
+}
+
+const { novel, currentChapter, allChapters } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+
+// 找到当前章节的索引
+const currentIndex = allChapters.findIndex(ch => ch.slug === currentChapter.slug);
+const prevChapter = currentIndex > 0 ? allChapters[currentIndex - 1] : null;
+const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href={`${baseUrl}/favicon.svg`} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{currentChapter.title} - {novel.data.title} - 太虚幻境</title>
+    <meta name="description" content={`${novel.data.title} ${currentChapter.title}`} />
+  </head>
+  <body>
+    <div class="novel-layout">
+      <!-- 左侧小说目录 -->
+      <aside class="novel-sidebar">
+        <NovelTOC novel={novel} currentChapter={currentChapter.slug} />
+      </aside>
+
+      <!-- 右侧章节内容 -->
+      <main class="novel-content">
+
+        <article class="chapter-article">
+          <h1 class="chapter-title">{currentChapter.title}</h1>
+
+          <div class="chapter-content">
+            <!-- 这里应该是章节的实际内容，目前显示占位内容 -->
+            <div class="placeholder-content">
+              <p>这里是 <strong>{currentChapter.title}</strong> 的内容。</p>
+              <p>在实际应用中，你需要为每个章节创建单独的 MDX 文件，或者在小说的 MDX 文件中包含所有章节内容，然后根据章节 slug 来显示对应的内容。</p>
+              <p>建议的实现方式：</p>
+              <ol>
+                <li>为每个章节创建单独的 MDX 文件，放在 <code>src/content/chapters/</code> 目录下</li>
+                <li>或者在小说文件中使用特殊的章节分隔符来组织内容</li>
+                <li>然后在这个页面中根据 chapter slug 来渲染对应的内容</li>
+              </ol>
+              <p>当前章节信息：</p>
+              <ul>
+                <li>小说：{novel.data.title}</li>
+                <li>章节：{currentChapter.title}</li>
+                <li>章节编号：{currentChapter.order}</li>
+                <li>章节 slug：{currentChapter.slug}</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- 章节导航 -->
+          <nav class="chapter-navigation">
+            <div class="nav-buttons">
+              {prevChapter ? (
+                <a 
+                  href={`${baseUrl}/novel/${novel.slug}/${prevChapter.slug}`}
+                  class="nav-btn prev-btn"
+                >
+                  ← 上一章
+                </a>
+              ) : (
+                <span class="nav-btn disabled">已是第一章</span>
+              )}
+              {nextChapter ? (
+                <a 
+                  href={`${baseUrl}/novel/${novel.slug}/${nextChapter.slug}`}
+                  class="nav-btn next-btn"
+                >
+                  下一章 →
+                </a>
+              ) : (
+                <span class="nav-btn disabled">已是最后一章</span>
+              )}
+            </div>
+          </nav>
+        </article>
+      </main>
+    </div>
+  </body>
+</html>
+
+<style>
+  .novel-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--var_background-color);
+    position: relative;
+  }
+
+  .novel-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .novel-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--var_background-color);
+    color: var(--var_pitch-black);
+  }
+
+  .novel-header {
+    padding: 1rem 2rem;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+    background: var(--var_background-color);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    pointer-events: auto; /* 确保头部导航可以接收点击事件 */
+  }
+
+  .novel-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .back-link, .novel-link {
+    color: var(--var_pitch-black);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .back-link:hover, .novel-link:hover {
+    background: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+  }
+
+  .chapter-article {
+    flex: 1;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .chapter-meta {
+    margin-bottom: 3rem;
+    text-align: center;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+    padding-bottom: 2rem;
+  }
+
+  .chapter-title {
+    font-size: var(--step-3);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--var_pitch-black);
+  }
+
+  .chapter-info {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    font-size: var(--step--1);
+    color: var(--var_red);
+  }
+
+  .chapter-number {
+    font-weight: bold;
+  }
+
+  .chapter-content {
+    line-height: 1.8;
+    font-size: var(--step-0);
+    margin-bottom: 3rem;
+  }
+
+  .placeholder-content {
+    padding: 2rem;
+    border: 1px dashed #666;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .placeholder-content code {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2rem 0.4rem;
+    border-radius: 3px;
+    font-family: monospace;
+  }
+
+  .chapter-navigation {
+    border-top: var(--var_border-width) solid var(--var_pitch-black);
+    padding-top: 2rem;
+    position: relative;
+    z-index: 10;
+    pointer-events: auto; /* 确保章节导航可以接收点击事件 */
+  }
+
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .nav-btn {
+    padding: 1rem;
+    text-decoration: none;
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    text-align: center;
+    display: block;
+  }
+
+  .prev-btn {
+    color: var(--var_pitch-black);
+    flex: 1;
+    text-align: left;
+  }
+
+  .toc-btn {
+    color: var(--var_off-white);
+    background: var(--var_red);
+    border-color: var(--var_red);
+    font-weight: bold;
+    flex: 0 0 auto;
+    min-width: 80px;
+  }
+
+  .next-btn {
+    color: var(--var_pitch-black);
+    flex: 1;
+    text-align: right;
+  }
+
+  .nav-btn:hover:not(.disabled) {
+    background: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+  }
+
+  .toc-btn:hover {
+    background: var(--var_pitch-black);
+    border-color: var(--var_pitch-black);
+  }
+
+  .nav-btn.disabled {
+    color: var(--var_border-color);
+    border-color: var(--var_border-color);
+    cursor: not-allowed;
+  }
+
+  /* 移动端适配 */
+  @media (max-width: 768px) {
+    .novel-layout {
+      flex-direction: column;
+    }
+
+    .novel-sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+      order: 2;
+    }
+
+    .novel-content {
+      order: 1;
+      padding-top: 4rem; /* 为顶部目录按钮留出空间 */
+    }
+
+    .chapter-article {
+      padding: 1rem;
+    }
+
+    .chapter-title {
+      font-size: var(--step-2);
+    }
+
+    .novel-header {
+      padding: 1rem;
+      padding-top: 4.5rem; /* 避免与目录按钮重叠 */
+    }
+
+    .novel-nav {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .back-link, .novel-link {
+      font-size: var(--step--1);
+      padding: 0.4rem 0.8rem;
+    }
+
+    .nav-buttons {
+      /* flex-direction: column; */
+      gap: 0.5rem;
+    }
+
+    .prev-btn, .next-btn, .toc-btn {
+      flex: none;
+      text-align: center;
+    }
+
+    .nav-btn {
+      padding: 0.8rem;
+      font-size: var(--step--1);
+    }
+
+    .chapter-info {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>

@@ -6,6 +6,17 @@ const novelCollection = defineCollection({
     schema: z.object({
         title: z.string(),
         tags: z.string().array().optional(),
+        author: z.string().optional(),
+        description: z.string().optional(),
+        isNovel: z.boolean().optional(), // 标识是否为小说
+        novelSlug: z.string().optional(), // 小说的主标识符
+        chapters: z.array(z.object({
+            title: z.string(),
+            slug: z.string(),
+            order: z.number(),
+        })).optional(),
+        publishDate: z.date().optional(),
+        status: z.enum(['连载中', '已完结', '暂停']).optional(),
     }),
 });
 const techCollection = defineCollection({
