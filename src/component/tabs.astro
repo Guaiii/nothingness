@@ -7,7 +7,11 @@ interface Tabs {
 }
 
 const { tabs = [], onClick } = Astro.props;
-const baseUrl = import.meta.env.BASE_URL;
+
+// 初始激活标签：根据 URL 参数或本地缓存恢复
+const urlTabParam = Astro.url.searchParams.get('tab');
+const paramToName: Record<string, string> = { tech: '技术', novel: '小说' };
+const initialTabName = (urlTabParam && paramToName[urlTabParam]) || '技术';
 
 // 获取各个集合的内容
 const novelEntries = await getCollection("novel");
@@ -40,13 +44,13 @@ const tabData: Record<string, any[]> = {
     tabs.map((tabName: string, index: number) => {
       const entries = tabData[tabName] || [];
       return (
-        <div class={`tab-panel ${index === 0 ? 'active' : ''}`} data-tab={tabName}>
+        <div class={`tab-panel ${tabName === initialTabName ? 'active' : ''}`} data-tab={tabName}>
           <ul class="content-list">
             {entries.length > 0 ? (
               entries.map((entry: any) => (
                 <li class="content-item">
                   <a 
-                    href={entry.data.isNovel ? `${baseUrl}/novel/${entry.slug}` : `${baseUrl}/${entry.collection}/${entry.slug}`} 
+                    href={entry.data.isNovel ? `/novel/${entry.slug}` : `/${entry.collection}/${entry.slug}`} 
                     class="content-link"
                   >
                     <div class="content-header">
@@ -66,7 +70,7 @@ const tabData: Record<string, any[]> = {
                     {entry.data.tags && (
                       <div class="tags">
                         {entry.data.tags.map((tag: string) => (
-                          <a href={`${baseUrl}/tags/${tag}`} class="tag">{tag}</a>
+                          <a href={`/tags/${tag}`} class="tag">{tag}</a>
                         ))}
                       </div>
                     )}
@@ -121,6 +125,12 @@ const tabData: Record<string, any[]> = {
   .tab-panel.active {
     display: block;
     background-color: transparent;
+    animation: fadeIn 200ms ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .content-list {
@@ -278,7 +288,11 @@ const tabData: Record<string, any[]> = {
   }
 </style>
 
-<script define:vars={{ onClick }}>
+<script is:inline define:vars={{ onClick, initialTabName }}>
+  /**
+   * 切换标签页并同步状态（URL 参数与本地缓存）
+   * @param {MouseEvent} event 点击事件
+   */
   const switchTab = (event) => {
     const target = event.target;
     onClick?.();
@@ -309,14 +323,45 @@ const tabData: Record<string, any[]> = {
     if (activePanel) {
       activePanel.classList.add("active");
     }
+
+    // 状态持久化：localStorage
+    try {
+      localStorage.setItem('homeTab', tabName);
+    } catch {}
+
+    // URL 可分享：tab 参数（tech/novel）
+    const nameToParam = { '技术': 'tech', '小说': 'novel' };
+    const tabParam = nameToParam[tabName] || 'tech';
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tabParam);
+    history.replaceState(null, '', url.toString());
   };
 
-  // 初始化：设置第一个tab为active
+  /**
+   * 初始化：根据本地缓存或服务端初始值激活标签
+   */
   document.addEventListener('DOMContentLoaded', () => {
-    const firstNavItem = document.querySelector(".nav-item");
-    if (firstNavItem) {
-      firstNavItem.classList.add("active");
-    }
+    const saved = (() => {
+      try { return localStorage.getItem('homeTab'); } catch { return null; }
+    })();
+    const activeName = saved || initialTabName;
+
+    const navItems = Array.from(document.querySelectorAll('.nav-item'));
+    navItems.forEach((el) => el.classList.remove('active'));
+    const targetNav = navItems.find((el) => el.getAttribute('data-tab') === activeName) || navItems[0];
+    targetNav?.classList.add('active');
+
+    const panels = Array.from(document.querySelectorAll('.tab-panel'));
+    panels.forEach((p) => p.classList.remove('active'));
+    const targetPanel = document.querySelector(`.tab-panel[data-tab="${activeName}"]`) || panels[0];
+    targetPanel?.classList.add('active');
+
+    // 同步 URL 参数
+    const nameToParam = { '技术': 'tech', '小说': 'novel' };
+    const tabParam = nameToParam[activeName] || 'tech';
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', tabParam);
+    history.replaceState(null, '', url.toString());
   });
 
   const navItems = document.querySelectorAll(".nav-item");

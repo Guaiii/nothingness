@@ -1,10 +1,13 @@
 ---
 import { getCollection } from "astro:content";
 import Quote from "@component/quote.astro";
-import Search from "@/component/search.astro";
 // import "../../styles/global.css";
 import "../../styles/index.css";
 
+/**
+ * 为所有标签生成静态路径
+ * @returns 标签参数与用于页面渲染的全部条目集合
+ */
 export async function getStaticPaths() {
   const novelEntries = await getCollection("novel");
   const techEntries = await getCollection("tech");
@@ -27,7 +30,6 @@ export async function getStaticPaths() {
 
 const { tag, allEntries } = Astro.props;
 const tagString = tag as string;
-const baseUrl = import.meta.env.BASE_URL;
 
 // 过滤包含当前标签的文章
 const filteredEntries = allEntries.filter((entry: any) => 
@@ -42,7 +44,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
 <!DOCTYPE html>
 <html lang="zh-CN">
   <head>
-    <link rel="icon" type="image/svg+xml" href={`${baseUrl}/favicon.svg`} />
+    <link rel="icon" type="image/svg+xml" href={`/favicon.svg`} />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>标签: {tagString} - 太虚幻境</title>
@@ -72,7 +74,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
     </header>
     <main>
       <nav class="breadcrumb">
-        <a href={baseUrl} class="back-link">← 返回首页</a>
+        <a href="/" class="back-link">← 返回首页</a>
         <!-- <div class="tag-search">
           <Search />
         </div> -->
@@ -85,7 +87,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
             <ul class="content-list">
               {techEntries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`${baseUrl}/${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`/${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">
@@ -109,7 +111,7 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
             <ul class="content-list">
               {novelEntries.map((entry: any) => (
                 <li class="content-item">
-                  <a href={`${baseUrl}/${entry.collection}/${entry.slug}`} class="content-link">
+                  <a href={`/${entry.collection}/${entry.slug}`} class="content-link">
                     <h3>{entry.data.title}</h3>
                     {entry.data.tags && (
                       <div class="tags">

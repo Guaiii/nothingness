@@ -1,4 +1,4 @@
-@import url('./global.css');
+@import url("./global.css");
 
 body {
   height: 100vh;
@@ -15,7 +15,7 @@ body {
   overflow: hidden;
 }
 
-body>header,
+body > header,
 footer {
   background-color: var(--var_background-color);
 }
@@ -74,7 +74,7 @@ header::after {
   margin-bottom: var(--step--2);
 }
 
-.title-content>h1 {
+.title-content > h1 {
   font-size: var(--step-3);
   letter-spacing: var(--step--2);
   text-align: center;
@@ -95,7 +95,9 @@ header::after {
 }
 
 .auth-info span {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: calc(var(--step--2) - 1px);
 }
 
@@ -108,7 +110,6 @@ header::after {
   flex-basis: max-width;
   border-right: var(--var_border-width) solid var(--var_off-white);
 } */
-
 
 main {
   position: relative;
@@ -124,8 +125,14 @@ main {
 
 /* 移除了 waterfall 相关样式，因为现在使用 tabs 组件 */
 
-@media (width < 1280px) {
+/* 响应式样式 - 屏幕宽度在1280px到1400px之间 */
+@media screen and (min-width: 1280px) and (max-width: 1400px) {
+  .auth-info {
+    height: 55% !important;
+  }
+}
 
+@media (width < 1280px) {
   .auth-info {
     justify-content: center;
   }
