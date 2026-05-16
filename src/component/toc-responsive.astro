@@ -297,7 +297,7 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
     }
   }
 
-  /* 移动端样式 */
+  /* 移动端样式 - 最大宽度 768px */
   @media (max-width: 768px) {
     .toc-toggle {
       display: flex;
@@ -343,7 +343,7 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
     }
   }
 
-  /* 超小屏幕优化 */
+  /* 超小屏幕优化 - 最大宽度 480px */
   @media (max-width: 480px) {
     .toc-toggle {
       top: 0.5rem;
@@ -365,15 +365,16 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
     }
   }
 
-  /* 大屏幕时显示左侧目录，小屏幕时使用折叠模式 */
+  /* 大屏幕优化 - 最小宽度 1200px */
   @media (min-width: 1200px) {
     .toc-toggle {
       display: none;
     }
   }
 
-  @media (max-width: 1600px) {
-    .toc.active {
+  /* 超大屏幕样式 - 最小宽度 1600px */
+  @media (min-width: 1600px) {
+    .toc {
       display: block;
       position: fixed;
       top: 0;

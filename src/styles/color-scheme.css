@@ -1,0 +1,163 @@
+/**
+ * Nothingness 项目完整配色方案
+ * 基于项目现有设计提取和扩展
+ * 
+ * 设计理念：温暖的米色调，配合深红色作为强调色
+ */
+
+:root {
+  /* ==================== 主色 (Primary) ==================== */
+  /* 主要红色 - 品牌色 */
+  --color-primary: #9b1b30;
+  --color-primary-rgb: 155, 27, 48;
+  --color-primary-hsl: 350, 70%, 36%;
+  
+  /* 主色变体 - 更浅 */
+  --color-primary-lightest: #f5e6e9;
+  --color-primary-lighter: #e84d64;
+  --color-primary-light: #c92a42;
+  
+  /* 主色变体 - 更深 */
+  --color-primary-dark: #7a1525;
+  --color-primary-darker: #5a0f1b;
+  --color-primary-darkest: #3a0911;
+
+  /* ==================== 背景色 (Background) ==================== */
+  /* 主背景 - 温暖的米色 */
+  --color-background: #ebe6da;
+  --color-background-rgb: 235, 230, 218;
+  --color-background-hsl: 42, 30%, 89%;
+  
+  /* 背景变体 - 更浅 */
+  --color-background-lightest: #faf8f5;
+  --color-background-lighter: #f5f2ec;
+  --color-background-light: #f0ece3;
+  
+  /* 背景变体 - 更深 */
+  --color-background-dark: #d4cfc4;
+  --color-background-darker: #bdb8ac;
+  --color-background-darkest: #a69f91;
+
+  /* ==================== 米白色 (Off-White) ==================== */
+  /* 辅助背景色 */
+  --color-off-white: #f5f5dc;
+  --color-off-white-rgb: 245, 245, 220;
+  --color-off-white-hsl: 60, 56%, 91%;
+  
+  /* 米白色变体 - 更浅 */
+  --color-off-white-lightest: #ffffff;
+  --color-off-white-lighter: #fafaf0;
+  --color-off-white-light: #f7f7e8;
+  
+  /* 米白色变体 - 更深 */
+  --color-off-white-dark: #e8e8c8;
+  --color-off-white-darker: #d0d0b0;
+  --color-off-white-darkest: #b8b898;
+
+  /* ==================== 墨黑色 (Pitch Black) ==================== */
+  /* 主要文字颜色 */
+  --color-text: #333333;
+  --color-text-rgb: 51, 51, 51;
+  --color-text-hsl: 0, 0%, 20%;
+  
+  /* 文字色变体 - 更浅 */
+  --color-text-lightest: #666666;
+  --color-text-lighter: #555555;
+  --color-text-light: #444444;
+  
+  /* 文字色变体 - 更深 */
+  --color-text-dark: #1a1a1a;
+  --color-text-darker: #0d0d0d;
+  --color-text-darkest: #000000;
+
+  /* ==================== 边框色 (Border) ==================== */
+  --color-border: #b5b5b5;
+  --color-border-rgb: 181, 181, 181;
+  --color-border-hsl: 0, 0%, 71%;
+  
+  /* 边框色变体 - 更浅 */
+  --color-border-lightest: #e0e0e0;
+  --color-border-lighter: #cccccc;
+  --color-border-light: #b8b8b8;
+  
+  /* 边框色变体 - 更深 */
+  --color-border-dark: #8a8a8a;
+  --color-border-darker: #666666;
+  --color-border-darkest: #404040;
+
+  /* ==================== 中性色/棕色系 (Neutral/Brown) ==================== */
+  /* 用于注释、次要文字等 */
+  --color-brown: #8b7355;
+  --color-brown-rgb: 139, 115, 85;
+  --color-brown-hsl: 32, 24%, 44%;
+  
+  --color-brown-dark: #6b5b3d;
+  --color-brown-darker: #8b4513;
+  --color-gold: #704214;
+
+  /* ==================== 语义色 (Semantic Colors) ==================== */
+  /* 成功 */
+  --color-success: #198754;
+  --color-success-bg: rgba(25, 135, 84, 0.1);
+  --color-success-border: #198754;
+  
+  /* 警告 */
+  --color-warning: #ffc107;
+  --color-warning-bg: rgba(255, 193, 7, 0.1);
+  --color-warning-border: #ffc107;
+  
+  /* 信息 */
+  --color-info: #0d6efd;
+  --color-info-bg: rgba(13, 110, 253, 0.1);
+  --color-info-border: #0d6efd;
+  
+  /* 重要/危险 */
+  --color-important: #9b1b30;
+  --color-important-bg: rgba(155, 27, 48, 0.1);
+  --color-important-border: #9b1b30;
+
+  /* ==================== 拼音声调颜色 ==================== */
+  --color-tone-1: #d32f2f;  /* 一声 - 深红色 (阴平) */
+  --color-tone-2: #f57c00;  /* 二声 - 橙色 (阳平) */
+  --color-tone-3: #388e3c;  /* 三声 - 绿色 (上声) */
+  --color-tone-4: #1976d2;  /* 四声 - 蓝色 (去声) */
+  --color-tone-0: #757575;  /* 轻声 - 灰色 */
+
+  /* ==================== 代码语言标签颜色 ==================== */
+  --color-lang-js: #f7df1e;
+  --color-lang-js-text: #000000;
+  
+  --color-lang-ts: #3178c6;
+  --color-lang-ts-text: #ffffff;
+  
+  --color-lang-css: #1572b6;
+  --color-lang-css-text: #ffffff;
+  
+  --color-lang-html: #e34f26;
+  --color-lang-html-text: #ffffff;
+  
+  --color-lang-json: #000000;
+  --color-lang-json-text: #ffffff;
+  
+  --color-lang-bash: #4eaa25;
+  --color-lang-bash-text: #ffffff;
+
+  /* ==================== 透明度和叠加层 ==================== */
+  --overlay-dark: rgba(0, 0, 0, 0.9);
+  --overlay-light: rgba(0, 0, 0, 0.5);
+  --overlay-lighter: rgba(0, 0, 0, 0.05);
+  
+  /* 主色的透明版本 */
+  --color-primary-alpha-10: rgba(155, 27, 48, 0.1);
+  --color-primary-alpha-20: rgba(155, 27, 48, 0.2);
+  --color-primary-alpha-30: rgba(155, 27, 48, 0.3);
+
+  /* ==================== 向后兼容 - 保留旧变量名 ==================== */
+  /* 这些变量名保持向后兼容，新代码应使用上面更有语义的变量名 */
+  --var_background-color: var(--color-background);
+  --var_border-color: var(--color-border);
+  --var_off-white: var(--color-off-white);
+  --var_red: var(--color-primary);
+  --var_pitch-black: var(--color-text);
+  --var_border-width: 0.1rem;
+}

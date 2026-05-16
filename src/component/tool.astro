@@ -1,0 +1,186 @@
+---
+interface ToolProps {
+  title?: string;
+  description?: string;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
+  class?: string;
+}
+
+const {
+  title = "",
+  description = "",
+  collapsible = false,
+  defaultOpen = true,
+  class: className = "",
+} = Astro.props;
+---
+
+<div class:list={["tool-container", className]}>
+  {(title || description) && (
+    <div class="tool-header">
+      {title && <h3 class="tool-title">{title}</h3>}
+      {description && <p class="tool-description">{description}</p>}
+      {collapsible && (
+        <button
+          class="tool-toggle"
+          aria-expanded={defaultOpen}
+          aria-label={defaultOpen ? "折叠工具" : "展开工具"}
+        >
+          <span class="toggle-icon">{defaultOpen ? "▼" : "▶"}</span>
+        </button>
+      )}
+    </div>
+  )}
+  
+  <div class="tool-content" data-collapsible={collapsible} data-open={defaultOpen}>
+    <slot />
+  </div>
+</div>
+
+<script>
+  // 折叠/展开功能
+  document.querySelectorAll('.tool-toggle').forEach(button => {
+    button.addEventListener('click', () => {
+      const content = button.closest('.tool-container')?.querySelector('.tool-content');
+      if (!content) return;
+      
+      const isOpen = content.getAttribute('data-open') === 'true';
+      content.setAttribute('data-open', (!isOpen).toString());
+      button.setAttribute('aria-expanded', (!isOpen).toString());
+      button.querySelector('.toggle-icon')!.textContent = !isOpen ? '▼' : '▶';
+    });
+  });
+</script>
+
+<style scoped>
+  .tool-container {
+    margin: 1.5rem 0;
+    border: var(--var_border-width) solid var(--var_border-color);
+    background-color: var(--var_off-white);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.3s ease;
+  }
+
+  .tool-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--var_pitch-black);
+    color: var(--var_off-white);
+    border-bottom: var(--var_border-width) solid var(--var_border-color);
+    position: relative;
+  }
+
+  .tool-title {
+    font-size: var(--step-1);
+    font-weight: 600;
+    margin: 0;
+    color: var(--var_off-white);
+    flex: 1;
+  }
+
+  .tool-description {
+    font-size: var(--step--1);
+    color: var(--var_border-color);
+    margin: 0;
+    flex: 2;
+  }
+
+  .tool-toggle {
+    background: transparent;
+    border: var(--var_border-width) solid var(--var_off-white);
+    color: var(--var_off-white);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2rem;
+    min-height: 2rem;
+  }
+
+  .tool-toggle:hover {
+    background-color: var(--var_red);
+    border-color: var(--var_red);
+    color: var(--var_off-white);
+  }
+
+  .toggle-icon {
+    font-size: var(--step--1);
+    line-height: 1;
+  }
+
+  .tool-content {
+    padding: 1.25rem;
+    background-color: var(--var_background-color);
+    transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+  }
+
+  .tool-content[data-collapsible="true"][data-open="false"] {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+  }
+
+  .tool-content[data-collapsible="true"][data-open="true"] {
+    max-height: 5000px;
+    opacity: 1;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .tool-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+    }
+
+    .tool-title {
+      font-size: var(--step-0);
+      width: 100%;
+    }
+
+    .tool-description {
+      font-size: var(--step--2);
+      width: 100%;
+    }
+
+    .tool-toggle {
+      position: absolute;
+      top: 0.75rem;
+      right: 1rem;
+    }
+
+    .tool-content {
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .tool-container {
+      margin: 1rem 0;
+      border-radius: 0.25rem;
+    }
+
+    .tool-header {
+      padding: 0.5rem 0.75rem;
+    }
+
+    .tool-content {
+      padding: 0.75rem;
+    }
+  }
+</style>

@@ -1,0 +1,184 @@
+---
+title: "工具嵌入演示 - Tool Component Showcase"
+description: "演示如何在文章中使用通用 Tool 组件嵌入交互式工具"
+date: 2024-05-16
+tags: ["tool", "demo", "astro", "mdx"]
+---
+
+# 工具嵌入功能演示
+
+这个页面展示了如何在 MDX 文章中使用通用 Tool 组件来嵌入交互式小工具。
+
+## 基本用法
+
+### 1. 直接使用 Tool 组件
+
+最简单的用法，只提供标题和描述：
+
+```astro
+import Tool from '../../component/tool.astro';
+import Calculator from '../../component/tools/calculator.astro';
+
+<Tool title="简单计算器" description="一个基础的四则运算计算器">
+  <Calculator />
+</Tool>
+```
+
+效果如下：
+
+import Tool from '../../component/tool.astro';
+import Calculator from '../../component/tools/calculator.astro';
+
+<Tool title="简单计算器" description="一个基础的四则运算计算器">
+  <Calculator />
+</Tool>
+
+### 2. 可折叠的工具
+
+使用 `collapsible` 和 `defaultOpen` 属性创建可折叠的工具面板：
+
+```astro
+<Tool 
+  title="可折叠计算器" 
+  description="点击右上角按钮可以折叠/展开" 
+  collapsible 
+  defaultOpen={false}
+>
+  <Calculator />
+</Tool>
+```
+
+效果如下：
+
+<Tool 
+  title="可折叠计算器" 
+  description="点击右上角按钮可以折叠/展开" 
+  collapsible 
+  defaultOpen={false}
+>
+  <Calculator />
+</Tool>
+
+### 3. 自定义样式
+
+你可以通过 `class` 属性传递自定义 CSS 类名：
+
+```astro
+<Tool 
+  title="自定义样式的工具" 
+  description="通过 class 属性自定义样式"
+  class="my-custom-tool"
+>
+  <div style="padding: 2rem; text-align: center;">
+    <h3>自定义内容</h3>
+    <p>这里可以放任何内容</p>
+  </div>
+</Tool>
+```
+
+### 4. 不带标题的工具
+
+如果不需要标题和描述，可以不传递这些属性：
+
+```astro
+<Tool>
+  <Calculator />
+</Tool>
+```
+
+效果如下：
+
+<Tool>
+  <Calculator />
+</Tool>
+
+## 组件的 Props
+
+Tool 组件支持以下属性：
+
+| 属性 | 类型 | 默认值 | 说明 |
+|------|------|--------|------|
+| `title` | `string` | `""` | 工具的标题 |
+| `description` | `string` | `""` | 工具的描述文字 |
+| `collapsible` | `boolean` | `false` | 是否可折叠 |
+| `defaultOpen` | `boolean` | `true` | 初始状态是否展开 |
+| `class` | `string` | `""` | 自定义 CSS 类名 |
+
+## 创建新工具
+
+要创建一个新的工具组件，只需要：
+
+1. 在 `src/component/tools/` 目录下创建新的 `.astro` 文件
+2. 编写你的工具组件
+3. 使用 Tool 组件包裹你的工具
+
+示例：
+
+```astro
+---
+// src/component/tools/my-tool.astro
+---
+
+<div class="my-tool">
+  <!-- 你的工具内容 -->
+</div>
+
+<style scoped>
+  .my-tool {
+    /* 你的样式 */
+  }
+</style>
+```
+
+然后在 MDX 中使用：
+
+```astro
+import Tool from '../../component/tool.astro';
+import MyTool from '../../component/tools/my-tool.astro';
+
+<Tool title="我的工具" description="工具描述">
+  <MyTool />
+</Tool>
+```
+
+## 样式定制
+
+Tool 组件使用了项目统一的 CSS 变量：
+
+- `--var_background-color`: 背景色 `#ebe6da`
+- `--var_border-color`: 边框颜色 `#b5b5b5`
+- `--var_off-white`: 米白色 `#f5f5dc`
+- `--var_red`: 主题红色 `#9b1b30`
+- `--var_pitch-black`: 墨黑色 `#333333`
+- `--var_border-width`: 边框宽度 `0.1rem`
+
+这些变量确保了工具组件与整个网站的视觉风格保持一致。
+
+## 响应式设计
+
+Tool 组件和示例计算器都支持响应式设计：
+
+- **桌面端**: 完整布局，宽松的间距
+- **平板端** (≤768px): 调整布局和字体大小
+- **移动端** (≤480px): 紧凑布局，优化触摸操作
+
+## 键盘支持
+
+计算器工具支持完整的键盘操作：
+
+- 数字键 `0-9`: 输入数字
+- 运算符 `+`, `-`, `*`, `/`: 四则运算
+- `Enter` 或 `=`: 计算结果
+- `Escape`: 清除
+- `Backspace`: 退格
+
+## 注意事项
+
+1. **样式隔离**: Tool 组件使用 Astro 的 `scoped` 样式，不会影响其他组件
+2. **客户端脚本**: 工具中的交互功能使用 `<script>` 标签，会在客户端执行
+3. **可访问性**: 折叠按钮支持 `aria-expanded` 和 `aria-label` 属性
+4. **性能**: 工具组件按需加载，不会影响页面初始加载速度
+
+## 总结
+
+通用 Tool 组件提供了一个灵活、可复用的方式来在文章中嵌入交互式工具。通过统一的视觉风格和简单的 API，你可以轻松地创建和展示各种小工具。

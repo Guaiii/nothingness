@@ -99,7 +99,7 @@ function convertTones(pinyinText: string): string {
       }
     }
   }
-  
+
   if (targetVowel && targetIndex !== -1 && toneMap[targetVowel] && toneMap[targetVowel][tone]) {
     const chars = Array.from(syllable);
     chars[targetIndex] = toneMap[targetVowel][tone];

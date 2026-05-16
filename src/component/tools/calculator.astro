@@ -1,0 +1,317 @@
+---
+// 计算器工具组件 - 演示如何接入 Tool 容器
+// 这个组件可以直接在 MDX 中使用，也可以被 Tool 组件包裹
+---
+
+<div class="calculator-tool">
+  <div class="calculator-display">
+    <input 
+      type="text" 
+      class="calculator-input" 
+      id="calc-display" 
+      value="0" 
+      readonly 
+      aria-label="计算器显示"
+    />
+  </div>
+  
+  <div class="calculator-buttons">
+    <button class="calc-btn operator" data-action="clear">C</button>
+    <button class="calc-btn operator" data-action="backspace">⌫</button>
+    <button class="calc-btn operator" data-action="percentage">%</button>
+    <button class="calc-btn operator" data-action="divide">÷</button>
+    
+    <button class="calc-btn number" data-value="7">7</button>
+    <button class="calc-btn number" data-value="8">8</button>
+    <button class="calc-btn number" data-value="9">9</button>
+    <button class="calc-btn operator" data-action="multiply">×</button>
+    
+    <button class="calc-btn number" data-value="4">4</button>
+    <button class="calc-btn number" data-value="5">5</button>
+    <button class="calc-btn number" data-value="6">6</button>
+    <button class="calc-btn operator" data-action="subtract">−</button>
+    
+    <button class="calc-btn number" data-value="1">1</button>
+    <button class="calc-btn number" data-value="2">2</button>
+    <button class="calc-btn number" data-value="3">3</button>
+    <button class="calc-btn operator" data-action="add">+</button>
+    
+    <button class="calc-btn number zero" data-value="0">0</button>
+    <button class="calc-btn number" data-value=".">.</button>
+    <button class="calc-btn equals" data-action="equals">=</button>
+  </div>
+</div>
+
+<script>
+  class Calculator {
+    private display: HTMLInputElement;
+    private currentValue: string = '0';
+    private previousValue: string = '';
+    private operator: string = '';
+    private waitingForOperand: boolean = false;
+
+    constructor() {
+      this.display = document.getElementById('calc-display') as HTMLInputElement;
+      this.init();
+    }
+
+    init() {
+      document.querySelectorAll('.calc-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.target as HTMLElement;
+          
+          if (target.classList.contains('number')) {
+            const value = target.getAttribute('data-value') || '';
+            this.inputNumber(value);
+          } else if (target.classList.contains('operator')) {
+            const action = target.getAttribute('data-action') || '';
+            this.handleOperator(action);
+          } else if (target.classList.contains('equals')) {
+            this.calculate();
+          }
+          
+          this.updateDisplay();
+        });
+      });
+
+      // 键盘支持
+      document.addEventListener('keydown', (e) => {
+        const key = e.key;
+        
+        if (/[0-9.]/.test(key)) {
+          this.inputNumber(key);
+        } else if (['+', '-', '*', '/'].includes(key)) {
+          this.handleOperator(this.getOperatorAction(key));
+        } else if (key === 'Enter' || key === '=') {
+          this.calculate();
+        } else if (key === 'Escape') {
+          this.handleOperator('clear');
+        } else if (key === 'Backspace') {
+          this.handleOperator('backspace');
+        }
+        
+        this.updateDisplay();
+      });
+    }
+
+    inputNumber(num: string) {
+      if (this.waitingForOperand) {
+        this.currentValue = num;
+        this.waitingForOperand = false;
+      } else {
+        this.currentValue = this.currentValue === '0' ? num : this.currentValue + num;
+      }
+    }
+
+    handleOperator(action: string) {
+      switch (action) {
+        case 'clear':
+          this.currentValue = '0';
+          this.previousValue = '';
+          this.operator = '';
+          this.waitingForOperand = false;
+          break;
+        
+        case 'backspace':
+          this.currentValue = this.currentValue.slice(0, -1) || '0';
+          break;
+        
+        case 'percentage':
+          this.currentValue = (parseFloat(this.currentValue) / 100).toString();
+          break;
+        
+        case 'add':
+        case 'subtract':
+        case 'multiply':
+        case 'divide':
+          if (this.previousValue && this.operator && !this.waitingForOperand) {
+            this.calculate();
+          }
+          this.previousValue = this.currentValue;
+          this.operator = action;
+          this.waitingForOperand = true;
+          break;
+      }
+    }
+
+    calculate() {
+      if (!this.operator || !this.previousValue) return;
+      
+      const prev = parseFloat(this.previousValue);
+      const current = parseFloat(this.currentValue);
+      let result: number;
+
+      switch (this.operator) {
+        case 'add':
+          result = prev + current;
+          break;
+        case 'subtract':
+          result = prev - current;
+          break;
+        case 'multiply':
+          result = prev * current;
+          break;
+        case 'divide':
+          result = current !== 0 ? prev / current : 0;
+          break;
+        default:
+          return;
+      }
+
+      this.currentValue = result.toString();
+      this.previousValue = '';
+      this.operator = '';
+      this.waitingForOperand = true;
+    }
+
+    getOperatorAction(key: string): string {
+      const map: Record<string, string> = {
+        '+': 'add',
+        '-': 'subtract',
+        '*': 'multiply',
+        '/': 'divide'
+      };
+      return map[key] || '';
+    }
+
+    updateDisplay() {
+      this.display.value = this.currentValue;
+    }
+  }
+
+  // 初始化计算器
+  new Calculator();
+</script>
+
+<style scoped>
+  .calculator-tool {
+    max-width: 320px;
+    margin: 0 auto;
+    padding: 1rem;
+    background-color: var(--var_pitch-black);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .calculator-display {
+    margin-bottom: 1rem;
+  }
+
+  .calculator-input {
+    width: 100%;
+    padding: 1rem;
+    font-size: var(--step-2);
+    text-align: right;
+    border: var(--var_border-width) solid var(--var_border-color);
+    border-radius: 0.25rem;
+    background-color: var(--var_off-white);
+    color: var(--var_pitch-black);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .calculator-input:focus {
+    outline: 2px solid var(--var_red);
+    outline-offset: 2px;
+  }
+
+  .calculator-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+  }
+
+  .calc-btn {
+    padding: 1rem;
+    font-size: var(--step-0);
+    font-weight: 600;
+    border: var(--var_border-width) solid var(--var_border-color);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    background-color: var(--var_background-color);
+    color: var(--var_pitch-black);
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .calc-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .calc-btn:active {
+    transform: translateY(0);
+  }
+
+  .calc-btn.number {
+    background-color: var(--var_off-white);
+  }
+
+  .calc-btn.number:hover {
+    background-color: var(--var_background-color);
+  }
+
+  .calc-btn.operator {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+  }
+
+  .calc-btn.operator:hover {
+    background-color: #7a1526;
+    border-color: #7a1526;
+  }
+
+  .calc-btn.equals {
+    background-color: var(--var_pitch-black);
+    color: var(--var_off-white);
+    border-color: var(--var_off-white);
+  }
+
+  .calc-btn.equals:hover {
+    background-color: var(--var_red);
+    border-color: var(--var_red);
+  }
+
+  .calc-btn.zero {
+    grid-column: span 2;
+  }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .calculator-tool {
+      max-width: 100%;
+      padding: 0.75rem;
+    }
+
+    .calc-btn {
+      padding: 0.75rem;
+      min-height: 2.5rem;
+      font-size: var(--step--1);
+    }
+
+    .calculator-input {
+      font-size: var(--step-1);
+      padding: 0.75rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .calculator-tool {
+      padding: 0.5rem;
+    }
+
+    .calculator-buttons {
+      gap: 0.35rem;
+    }
+
+    .calc-btn {
+      padding: 0.6rem;
+      min-height: 2.2rem;
+      font-size: var(--step--1);
+    }
+  }
+</style>

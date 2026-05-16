@@ -8,10 +8,23 @@ interface Tabs {
 
 const { tabs = [], onClick } = Astro.props;
 
+// 标签配置常量 - 消除魔术字符串
+const TAB_CONFIG = {
+  TECH: { name: '技术', param: 'tech' },
+  NOVEL: { name: '小说', param: 'novel' },
+} as const;
+
+// 创建映射对象
+const PARAM_TO_NAME: Record<string, string> = Object.fromEntries(
+  Object.values(TAB_CONFIG).map(({ param, name }) => [param, name])
+);
+const NAME_TO_PARAM: Record<string, string> = Object.fromEntries(
+  Object.values(TAB_CONFIG).map(({ param, name }) => [name, param])
+);
+
 // 初始激活标签：根据 URL 参数或本地缓存恢复
 const urlTabParam = Astro.url.searchParams.get('tab');
-const paramToName: Record<string, string> = { tech: '技术', novel: '小说' };
-const initialTabName = (urlTabParam && paramToName[urlTabParam]) || '技术';
+const initialTabName = (urlTabParam && PARAM_TO_NAME[urlTabParam]) || TAB_CONFIG.TECH.name;
 
 // 获取各个集合的内容
 const novelEntries = await getCollection("novel");
@@ -22,8 +35,8 @@ const actualNovels = novelEntries.filter(entry => entry.data.isNovel);
 
 // 创建tab数据映射
 const tabData: Record<string, any[]> = {
-  "技术": techEntries,
-  "小说": actualNovels
+  [TAB_CONFIG.TECH.name]: techEntries,
+  [TAB_CONFIG.NOVEL.name]: actualNovels
 };
 ---
 
@@ -287,38 +300,37 @@ const tabData: Record<string, any[]> = {
     }
   }
 </style>
-
-<script is:inline define:vars={{ onClick, initialTabName }}>
+<script is:inline define:vars={{ onClick, initialTabName, NAME_TO_PARAM: JSON.stringify(NAME_TO_PARAM) }}>
   /**
    * 切换标签页并同步状态（URL 参数与本地缓存）
-   * @param {MouseEvent} event 点击事件
+   * @param {string} tabName - 标签名称
+   * @param {boolean} isInit - 是否为初始化调用
    */
-  const switchTab = (event) => {
-    const target = event.target;
-    onClick?.();
-    if (!target) {
-      return;
+  const switchTab = (tabName, isInit = false) => {
+    if (!tabName) return;
+    
+    // 如果不是初始化调用，触发 onClick 回调
+    if (!isInit) {
+      onClick?.();
     }
 
-    const tabName = target.getAttribute('data-tab');
-    if (!tabName) return;
-
-    // 移除所有nav-item的active类
+    // 移除所有 nav-item 的 active 类
     const navItems = document.querySelectorAll(".nav-item");
     navItems.forEach((el) => {
       el.classList.remove("active");
     });
 
-    // 添加active类到当前点击的tab
-    target.classList.add("active");
+    // 添加 active 类到当前点击的 tab
+    const targetNav = Array.from(navItems).find(el => el.getAttribute('data-tab') === tabName);
+    targetNav?.classList.add("active");
 
-    // 隐藏所有tab面板
+    // 隐藏所有 tab 面板
     const tabPanels = document.querySelectorAll(".tab-panel");
     tabPanels.forEach((panel) => {
       panel.classList.remove("active");
     });
 
-    // 显示对应的tab面板
+    // 显示对应的 tab 面板
     const activePanel = document.querySelector(`.tab-panel[data-tab="${tabName}"]`);
     if (activePanel) {
       activePanel.classList.add("active");
@@ -330,7 +342,7 @@ const tabData: Record<string, any[]> = {
     } catch {}
 
     // URL 可分享：tab 参数（tech/novel）
-    const nameToParam = { '技术': 'tech', '小说': 'novel' };
+    const nameToParam = JSON.parse(NAME_TO_PARAM);
     const tabParam = nameToParam[tabName] || 'tech';
     const url = new URL(window.location.href);
     url.searchParams.set('tab', tabParam);
@@ -345,27 +357,17 @@ const tabData: Record<string, any[]> = {
       try { return localStorage.getItem('homeTab'); } catch { return null; }
     })();
     const activeName = saved || initialTabName;
-
-    const navItems = Array.from(document.querySelectorAll('.nav-item'));
-    navItems.forEach((el) => el.classList.remove('active'));
-    const targetNav = navItems.find((el) => el.getAttribute('data-tab') === activeName) || navItems[0];
-    targetNav?.classList.add('active');
-
-    const panels = Array.from(document.querySelectorAll('.tab-panel'));
-    panels.forEach((p) => p.classList.remove('active'));
-    const targetPanel = document.querySelector(`.tab-panel[data-tab="${activeName}"]`) || panels[0];
-    targetPanel?.classList.add('active');
-
-    // 同步 URL 参数
-    const nameToParam = { '技术': 'tech', '小说': 'novel' };
-    const tabParam = nameToParam[activeName] || 'tech';
-    const url = new URL(window.location.href);
-    url.searchParams.set('tab', tabParam);
-    history.replaceState(null, '', url.toString());
+    
+    // 统一调用 switchTab，避免重复代码
+    switchTab(activeName, true);
   });
 
-  const navItems = document.querySelectorAll(".nav-item");
-  navItems.forEach((el) => {
-    el.addEventListener("click", switchTab);
+  // 使用事件委托优化性能
+  document.querySelector('.tabs-nav')?.addEventListener('click', (event) => {
+    const target = event.target.closest('.nav-item');
+    if (target) {
+      const tabName = target.getAttribute('data-tab');
+      switchTab(tabName);
+    }
   });
 </script>
