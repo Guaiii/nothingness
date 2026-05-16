@@ -63,7 +63,7 @@ const tabData: Record<string, any[]> = {
               entries.map((entry: any) => (
                 <li class="content-item">
                   <a 
-                    href={entry.data.isNovel ? `/novel/${entry.slug}` : `/${entry.collection}/${entry.slug}`} 
+                    href={entry.data.isNovel ? `${import.meta.env.BASE_URL}/novel/${entry.slug}` : `${import.meta.env.BASE_URL}/${entry.collection}/${entry.slug}`} 
                     class="content-link"
                   >
                     <div class="content-header">
@@ -83,7 +83,7 @@ const tabData: Record<string, any[]> = {
                     {entry.data.tags && (
                       <div class="tags">
                         {entry.data.tags.map((tag: string) => (
-                          <a href={`/tags/${tag}`} class="tag">{tag}</a>
+                          <a href={`${import.meta.env.BASE_URL}/tags/${tag}`} class="tag">{tag}</a>
                         ))}
                       </div>
                     )}

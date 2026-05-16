@@ -28,7 +28,7 @@ const { Content, headings } = await entry.render();
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href={`/favicon.svg`} />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{entry.data.title} - 太虚幻境</title>
     <meta name="description" content={entry.data.title} />
@@ -38,13 +38,13 @@ const { Content, headings } = await entry.render();
       <header class="article-header">
         <!-- <h1>{entry.data.title}</h1> -->
         <nav class="article-nav">
-          <a href="/" class="back-link">← 返回首页</a>
+          <a href={`${import.meta.env.BASE_URL}/`} class="back-link">← 返回首页</a>
           <div>
             {
               entry.data.tags && (
                 <div class="article-tags">
                   {entry.data.tags.map((tag: string) => (
-                    <a href={`/tags/${tag}`} class="tag">
+                    <a href={`${import.meta.env.BASE_URL}/tags/${tag}`} class="tag">
                       {tag}
                     </a>
                   ))}

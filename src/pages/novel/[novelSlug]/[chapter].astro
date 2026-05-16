@@ -41,7 +41,7 @@ export async function getStaticPaths() {
 const { novel, currentChapter, allChapters } = Astro.props;
 
 // 找到当前章节的索引
-const currentIndex = allChapters.findIndex(ch => ch.slug === currentChapter.slug);
+const currentIndex = allChapters.findIndex((ch: { slug: any; }) => ch.slug === currentChapter.slug);
 const prevChapter = currentIndex > 0 ? allChapters[currentIndex - 1] : null;
 const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentIndex + 1] : null;
 ---
@@ -50,7 +50,7 @@ const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentI
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href={`/favicon.svg`} />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{currentChapter.title} - {novel.data.title} - 太虚幻境</title>
     <meta name="description" content={`${novel.data.title} ${currentChapter.title}`} />
@@ -94,7 +94,7 @@ const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentI
             <div class="nav-buttons">
               {prevChapter ? (
                 <a 
-                  href={`/novel/${novel.slug}/${prevChapter.slug}`}
+                  href={`${import.meta.env.BASE_URL}novel/${novel.slug}/${prevChapter.slug}`}
                   class="nav-btn prev-btn"
                 >
                   ← 上一章
@@ -104,7 +104,7 @@ const nextChapter = currentIndex < allChapters.length - 1 ? allChapters[currentI
               )}
               {nextChapter ? (
                 <a 
-                  href={`/novel/${novel.slug}/${nextChapter.slug}`}
+                  href={`${import.meta.env.BASE_URL}/novel/${novel.slug}/${nextChapter.slug}`}
                   class="nav-btn next-btn"
                 >
                   下一章 →
