@@ -23,7 +23,9 @@ const filteredEntries = (await getAllContent()).filter((entry) =>
   entry.data.tags.includes(tag)
 );
 const techEntries = filteredEntries.filter((entry) => entry.collection === "tech");
-const novelEntries = filteredEntries.filter((entry) => entry.collection === "novel");
+const entertainmentEntries = filteredEntries.filter(
+  (entry) => entry.collection === "novel" || entry.collection === "media"
+);
 ---
 
 <SiteLayout
@@ -78,11 +80,11 @@ const novelEntries = filteredEntries.filter((entry) => entry.collection === "nov
         </section>
       )}
 
-      {novelEntries.length > 0 && (
+      {entertainmentEntries.length > 0 && (
         <section class="content-section">
-          <h2 class="section-title">生活随笔</h2>
+          <h2 class="section-title">娱乐</h2>
           <ul class="content-list">
-            {novelEntries.map((entry) => (
+            {entertainmentEntries.map((entry) => (
               <li class="content-item">
                 <a href={entryPath(entry)} class="content-link">
                   <h3>{entry.data.title}</h3>

@@ -412,7 +412,8 @@ const searchableContent = allEntries.map((entry) => ({
 
       const resultsHtml = results
         .map((item) => {
-          const collectionName = item.collection === "tech" ? "技术" : "小说";
+          const collectionName =
+            item.collection === "tech" ? "技术" : item.collection === "media" ? "媒体" : "小说";
           const highlightedTitle = highlightText(item.title, query);
           return `
             <div class="search-result-item">

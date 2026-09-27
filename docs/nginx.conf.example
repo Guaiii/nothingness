@@ -49,6 +49,21 @@ server {
         access_log off;
     }
 
+    # 图片长缓存（带宽保护：正文/封面图可长期缓存）
+    location ~* \.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)$ {
+        expires 30d;
+        add_header Cache-Control "public";
+        access_log off;
+    }
+
+    # 下载附件：中等缓存并提示浏览器下载。仅放小文件（ADR-0005 的 ~10MB 阈值）；
+    # 大文件请放对象存储/CDN，正文里只放外链，避免占满轻量服务器带宽。
+    location /downloads/ {
+        expires 7d;
+        add_header Cache-Control "public";
+        add_header Content-Disposition "attachment";
+    }
+
     # sitemap / robots / RSS / llms 文本不做长缓存
     location ~* \.(xml|txt)$ {
         add_header Cache-Control "no-cache";

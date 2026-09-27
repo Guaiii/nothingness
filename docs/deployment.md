@@ -59,3 +59,10 @@ DEPLOY_DRY_RUN=1 npm run deploy
 - **链接带子路径或 404**：确认 `astro.config.mjs` 的 `base: "/"` 且 Nginx `root` 指向 `DEPLOY_PATH`。
 - **canonical / sitemap 还是 example.com**：忘了改 `SITE_URL`，改完重新部署。
 - **rsync 权限被拒**：检查部署用户对站点目录的写权限与 SSH 免密（建议配置公钥登录）。
+
+## 嵌入媒体与带宽（轻量服务器必读）
+
+- **视频**：不要把 mp4 放进仓库或服务器。正文只用 `<YouTube>` / `<Bilibili>`，默认点击封面才加载 iframe，初始不消耗视频流量（见 `docs/adr/0005-bandwidth-policy-embedded-media.md`）。
+- **图片**：放在仓库（建议 `src/assets/` 或 `public/images/`），组件 `<Figure>` 已懒加载；单图控制在数百 KB，Nginx 已对图片设置 30 天缓存。
+- **下载附件**：约 10MB 以内可放 `public/downloads/`，用 `<Attachment>` 引用；更大的文件放对象存储/CDN（OSS/COS/七牛）或 GitHub Release，正文只放外链（`<Attachment href="https://...">`）。
+- 监控：可用 `vnstat` 观察服务器流量；若某附件/图片流量异常，及时迁到 CDN。

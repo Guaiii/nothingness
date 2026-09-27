@@ -4,6 +4,7 @@ tags: ["MDX", "样式", "测试"]
 ---
 
 import Pinyin from '@/component/pinyin.astro';
+import MarginNote from '@/component/margin-note.astro';
 
 # MDX 语法样式展示
 
@@ -28,11 +29,23 @@ import Pinyin from '@/component/pinyin.astro';
 ##### 五级标题
 ###### 六级标题
 
-## 引用块
+## 引用与页边批注
+
+普通 Markdown 引用会使用细线在正文一侧收束内容：
 
 > 这是一个简单的引用块。
 > 
 > 引用块可以包含多个段落，也可以包含其他格式的文本，比如**粗体**和*斜体*。
+
+需要解释出处、术语或作者判断时，可以把引用和批注组成一个完整的出版式单元：
+
+<MarginNote
+  label="编者按"
+  note="这里不是脱离正文的说明卡片，而是与所引文字一一对应的页边批注。细线明确标出批注所解释的范围。"
+  source="排版示例 · 页边注"
+>
+  技术写作不仅要把事实说清楚，也要让证据、解释和判断之间的关系一眼可辨。
+</MarginNote>
 
 > 这是另一个引用块
 > 

@@ -1,12 +1,16 @@
-// 内容数据的唯一出口：集中集合加载、草稿过滤、作品/章节归类与排序。
+// 内容数据的唯一出口：集中集合加载、草稿过滤、分区归类与排序。
 // 页面与组件不再各自调用 getCollection，路径规则见 src/lib/paths.ts。
-// 见 ADR-0003（草稿在生产构建于此统一过滤）与架构评审候选①。
+// 见 ADR-0003（草稿在生产构建于此统一过滤）、ADR-0004（技术/娱乐分区）与架构评审候选①。
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type TechEntry = CollectionEntry<'tech'>;
 export type NovelEntry = CollectionEntry<'novel'>;
 export type ChapterEntry = CollectionEntry<'chapters'>;
-export type AnyEntry = TechEntry | NovelEntry;
+export type MediaEntry = CollectionEntry<'media'>;
+export type AnyEntry = TechEntry | NovelEntry | MediaEntry;
+
+/** 娱乐分区条目 = 作品（小说/随笔） + 媒体内容 */
+export type EntertainmentEntry = NovelEntry | MediaEntry;
 
 /** 生产构建剔除草稿；本地 dev 保留草稿以便预览 */
 const isVisible = (entry: { data: { draft?: boolean } }): boolean =>
@@ -36,10 +40,26 @@ export async function getEssays(): Promise<NovelEntry[]> {
   return (await getNovelEntries()).filter((entry) => !entry.data.isNovel);
 }
 
-/** 全部可公开内容（技术文 + 作品），用于标签聚合与站点地图 */
+/** 全部媒体内容（已过滤草稿），按日期倒序 */
+export async function getMedia(): Promise<MediaEntry[]> {
+  const entries = await getCollection('media');
+  return entries.filter(isVisible).sort(byDateDesc);
+}
+
+/** 娱乐分区：作品（含此前漏掉的随笔） + 媒体内容，按日期倒序 */
+export async function getEntertainment(): Promise<EntertainmentEntry[]> {
+  const [novelEntries, media] = await Promise.all([getNovelEntries(), getMedia()]);
+  return [...novelEntries, ...media].sort(byDateDesc);
+}
+
+/** 全部可公开内容（技术文 + 作品 + 媒体），用于标签聚合与站点地图 */
 export async function getAllContent(): Promise<AnyEntry[]> {
-  const [tech, novel] = await Promise.all([getCollection('tech'), getCollection('novel')]);
-  return [...tech, ...novel].filter(isVisible);
+  const [tech, novel, media] = await Promise.all([
+    getCollection('tech'),
+    getCollection('novel'),
+    getCollection('media'),
+  ]);
+  return [...tech, ...novel, ...media].filter(isVisible);
 }
 
 /** 某部小说下的真实章节（来自 chapters 集合），按 order 升序 */

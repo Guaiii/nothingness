@@ -54,8 +54,15 @@ const chapterCollection = defineCollection({
   }),
 });
 
+// 娱乐分区中的富媒体单篇条目（第三方视频 / 图片 / 附件），见 ADR-0004
+const mediaCollection = defineCollection({
+  type: 'content',
+  schema: z.object(contentFrontmatter),
+});
+
 export const collections = {
   tech: techCollection,
   novel: novelCollection,
   chapters: chapterCollection,
+  media: mediaCollection,
 };

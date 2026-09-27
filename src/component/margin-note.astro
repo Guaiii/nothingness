@@ -1,0 +1,154 @@
+---
+export interface Props {
+  note: string;
+  label?: string;
+  source?: string;
+  cite?: string;
+}
+
+const {
+  note,
+  label = "旁注",
+  source,
+  cite,
+} = Astro.props;
+---
+
+<figure class="margin-note">
+  <blockquote class="margin-note__quote" cite={cite}>
+    <slot />
+  </blockquote>
+  <aside class="margin-note__annotation" aria-label={label}>
+    <span class="margin-note__label">{label}</span>
+    <p>{note}</p>
+    {source && <cite>{source}</cite>}
+  </aside>
+</figure>
+
+<style>
+  .margin-note {
+    --note-ink: var(--var_pitch-black);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(8.75rem, 0.32fr);
+    gap: 2.4rem;
+    align-items: stretch;
+    margin: 2.8rem 0;
+  }
+
+  .margin-note__quote {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 8rem;
+    margin: 0;
+    padding: 1rem 1.8rem 1rem 0;
+    border: 0;
+    border-right: 1px solid var(--note-ink);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--note-ink);
+    font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+    font-style: normal;
+  }
+
+  .margin-note__quote::before,
+  .margin-note__quote::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    width: 1.25rem;
+    border-top: 1px solid var(--note-ink);
+  }
+
+  .margin-note__quote::before {
+    top: 0;
+  }
+
+  .margin-note__quote::after {
+    bottom: 0;
+  }
+
+  .margin-note__annotation {
+    position: relative;
+    align-self: center;
+    padding-left: 0.9rem;
+    border-left: 1px solid var(--note-ink);
+    color: var(--note-ink);
+    font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+    font-size: var(--step--2);
+    line-height: 1.65;
+  }
+
+  .margin-note__annotation::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    width: 2.4rem;
+    border-top: 1px solid var(--note-ink);
+  }
+
+  .margin-note__label {
+    display: inline-block;
+    margin-bottom: 0.55rem;
+    padding: 0.12rem 0.35rem;
+    border: 1px solid var(--note-ink);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    line-height: 1.4;
+  }
+
+  .margin-note__annotation p,
+  .margin-note__annotation cite {
+    display: block;
+    margin: 0;
+  }
+
+  .margin-note__annotation cite {
+    margin-top: 0.7rem;
+    font-size: 0.68rem;
+    font-style: normal;
+    opacity: 0.72;
+  }
+
+  .margin-note__quote :global(p) {
+    margin: 0;
+  }
+
+  @media (max-width: 720px) {
+    .margin-note {
+      display: block;
+      margin: 2.2rem 0;
+    }
+
+    .margin-note__quote {
+      min-height: 0;
+      padding: 0.8rem 1.15rem 0.8rem 0;
+    }
+
+    .margin-note__annotation {
+      margin: 1rem 0 0 1.4rem;
+      padding: 0.75rem 0 0 0.9rem;
+      border-top: 1px solid var(--note-ink);
+    }
+
+    .margin-note__annotation::before {
+      top: -1rem;
+      right: auto;
+      left: -1.4rem;
+      width: 1.4rem;
+      height: 1rem;
+      border-top: 0;
+      border-right: 1px solid var(--note-ink);
+      border-bottom: 1px solid var(--note-ink);
+    }
+  }
+
+  @media print {
+    .margin-note {
+      break-inside: avoid;
+    }
+  }
+</style>

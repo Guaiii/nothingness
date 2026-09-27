@@ -1,5 +1,5 @@
-// 首页「技术 / 小说」标签切换：纯客户端，作用域限定在传入容器内，不依赖全局查询。
-// 状态写入 URL（?tab=tech|novel）并同步 localStorage，便于分享与回访。
+// 首页「技术 / 娱乐」标签切换：纯客户端，作用域限定在传入容器内，不依赖全局查询。
+// 状态写入 URL（?tab=tech|entertainment）并同步 localStorage，便于分享与回访。
 export interface TabsHandle {
   destroy: () => void;
 }
@@ -8,11 +8,11 @@ export function initTabs(container: HTMLElement): TabsHandle {
   const nav = container.querySelector<HTMLElement>(".tabs-nav");
   const nameToParam: Record<string, string> = {
     技术: "tech",
-    小说: "novel",
+    娱乐: "entertainment",
   };
   const paramToName: Record<string, string> = {
     tech: "技术",
-    novel: "小说",
+    entertainment: "娱乐",
   };
 
   function switchTab(tabName: string, isInit = false): void {

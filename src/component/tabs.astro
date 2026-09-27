@@ -1,7 +1,7 @@
 ---
-// 首页内容标签页（技术 / 小说）：纯展示 + 作用域内客户端切换。
+// 首页内容标签页（技术 / 娱乐）：纯展示 + 作用域内客户端切换。
 // 数据来自 src/content.ts，链接来自 src/lib/paths.ts；切换逻辑见 src/lib/home-tabs.ts。
-import { getTech, getNovels, type AnyEntry } from "../content";
+import { getTech, getEntertainment, type AnyEntry } from "../content";
 import { entryPath, tagPath } from "../lib/paths";
 
 export interface Props {
@@ -10,15 +10,15 @@ export interface Props {
 const { tabs } = Astro.props;
 
 const techEntries = await getTech();
-const novels = await getNovels();
+const entertainmentEntries = await getEntertainment();
 
 const tabData: Record<string, AnyEntry[]> = {
   技术: techEntries,
-  小说: novels,
+  娱乐: entertainmentEntries,
 };
 
 const urlTabParam = Astro.url.searchParams.get("tab");
-const initialTabName = urlTabParam === "novel" ? "小说" : "技术";
+const initialTabName = urlTabParam === "entertainment" ? "娱乐" : "技术";
 ---
 
 <div class="home-tabs">

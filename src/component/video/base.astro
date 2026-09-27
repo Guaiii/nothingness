@@ -1,0 +1,35 @@
+---
+// 16:9 响应式 + 点击才加载的视频外壳。仅由 YouTube/Bilibili 组件复用，不直接在正文使用。
+// poster 为封面图 URL；点击后才创建 iframe，见 src/lib/lazy-video.ts 与 ADR-0005。
+export interface Props {
+  src: string;
+  poster: string;
+  title: string;
+  provider: string;
+}
+const { src, poster, title, provider } = Astro.props;
+---
+
+<figure class="video-embed video-lazy" data-src={src} data-title={title}>
+  <button type="button" class="video-play" aria-label={`在 ${provider} 上观看：${title}`}>
+    <img src={poster} alt="" loading="lazy" decoding="async" class="video-poster" />
+    <span class="video-play-mask">
+      <span class="video-play-icon" aria-hidden="true">
+        <svg viewBox="0 0 68 48" width="68" height="48">
+          <path
+            class="video-play-shape"
+            d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55C3.97 2.33 2.27 4.81 1.49 7.74.06 13.07 0 24 0 24s.06 10.93 1.49 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.93 68 24 68 24s-.06-10.93-1.48-16.26z"
+          />
+          <path class="video-play-triangle" d="M27 34 45 24 27 14z" />
+        </svg>
+      </span>
+      <span class="video-provider">{provider}</span>
+    </span>
+  </button>
+</figure>
+
+<script>
+  import { initLazyVideos } from "../../lib/lazy-video";
+  // 每个含视频的页面只初始化一次（重复调用会跳过已就绪元素）
+  initLazyVideos();
+</script>
