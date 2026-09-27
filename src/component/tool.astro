@@ -24,7 +24,7 @@ const {
       {collapsible && (
         <button
           class="tool-toggle"
-          aria-expanded={defaultOpen}
+          aria-expanded={defaultOpen ? "true" : "false"}
           aria-label={defaultOpen ? "折叠工具" : "展开工具"}
         >
           <span class="toggle-icon">{defaultOpen ? "▼" : "▶"}</span>
@@ -32,8 +32,12 @@ const {
       )}
     </div>
   )}
-  
-  <div class="tool-content" data-collapsible={collapsible} data-open={defaultOpen}>
+
+  <div
+    class="tool-content"
+    data-collapsible={collapsible ? "true" : "false"}
+    data-open={defaultOpen ? "true" : "false"}
+  >
     <slot />
   </div>
 </div>
@@ -58,7 +62,7 @@ const {
     margin: 1.5rem 0;
     border: var(--var_border-width) solid var(--var_border-color);
     background-color: var(--var_off-white);
-    border-radius: 0.5rem;
+    border-radius: 0;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: box-shadow 0.3s ease;
@@ -100,7 +104,7 @@ const {
     color: var(--var_off-white);
     cursor: pointer;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
+    border-radius: 0;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
@@ -172,7 +176,7 @@ const {
   @media (max-width: 480px) {
     .tool-container {
       margin: 1rem 0;
-      border-radius: 0.25rem;
+      border-radius: 0;
     }
 
     .tool-header {

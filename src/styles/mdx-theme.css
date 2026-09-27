@@ -16,6 +16,19 @@ article {
   color: var(--var_pitch-black);
 }
 
+/* 文章直角契约：原生 Markdown 元素及通过 MDX 嵌入的组件统一使用直角。 */
+article *,
+article *::before,
+article *::after {
+  border-radius: 0 !important;
+}
+
+article,
+article * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--var_pitch-black) transparent;
+}
+
 /* 标题样式 */
 article h1,
 article h2,
@@ -97,7 +110,7 @@ article i {
   color: var(--var_pitch-black);
   background-color: rgba(155, 27, 48, 0.1);
   padding: 0.1em 0.2em;
-  border-radius: 3px;
+  border-radius: 0;
 }
 
 /* 删除线和下划线 */
@@ -119,7 +132,7 @@ article mark {
   background-color: rgba(155, 27, 48, 0.2);
   color: var(--var_pitch-black);
   padding: 0.1em 0.3em;
-  border-radius: 3px;
+  border-radius: 0;
   border: 1px solid rgba(155, 27, 48, 0.3);
 }
 
@@ -128,7 +141,7 @@ article code {
   background-color: rgba(155, 27, 48, 0.1);
   color: var(--var_red);
   padding: 0.2em 0.5em;
-  border-radius: 4px;
+  border-radius: 0;
   border: 1px solid rgba(155, 27, 48, 0.2);
   font-size: 0.9em;
   font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -306,7 +319,7 @@ article ul li input[type="checkbox"] {
   width: 1.2rem;
   height: 1.2rem;
   border: 2px solid var(--var_border-color);
-  border-radius: 3px;
+  border-radius: 0;
   background-color: var(--var_off-white);
   margin-right: 0.8rem;
   margin-top: 0.1rem;
@@ -395,7 +408,7 @@ article table {
   margin: 2rem 0;
   background-color: var(--var_off-white);
   border: 2px solid var(--var_border-color);
-  border-radius: 8px;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -432,7 +445,7 @@ article table tr:last-child td {
 article img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 0;
   border: 2px solid var(--var_border-color);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin: 2rem 0;
@@ -463,7 +476,7 @@ article figcaption {
 article kbd {
   background-color: var(--var_off-white);
   border: 2px solid var(--var_border-color);
-  border-radius: 4px;
+  border-radius: 0;
   padding: 0.2em 0.4em;
   font-family: monospace;
   font-size: 0.9em;
@@ -500,7 +513,7 @@ article sub {
 article details {
   background-color: var(--var_off-white);
   border: 2px solid var(--var_border-color);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 1rem;
   margin: 2rem 0;
 }
@@ -511,7 +524,7 @@ article summary {
   cursor: pointer;
   padding: 0.5rem;
   margin: -0.5rem;
-  border-radius: 6px;
+  border-radius: 0;
   transition: background-color 0.3s ease;
 }
 
@@ -524,40 +537,35 @@ article details[open] summary {
   margin-bottom: 1rem;
 }
 
-/* 警告框样式 */
+/* 提示条：统一米白卡片 + 细边框，靠左侧 4px 色条区分语义 */
 article .warning,
 article .note,
 article .tip,
 article .important {
-  padding: 1.5rem;
-  margin: 2rem 0;
-  border-radius: 8px;
-  border-left: 4px solid;
-  position: relative;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0;
+  border: var(--var_border-width) solid var(--var_border-color);
+  border-left-width: 4px;
+  background-color: var(--var_off-white);
+  color: var(--var_pitch-black);
 }
 
 article .warning {
-  background-color: rgba(255, 193, 7, 0.1);
-  border-left-color: #ffc107;
-  color: var(--var_pitch-black);
+  border-left-color: #a67c00;
 }
 
 article .note {
-  background-color: rgba(13, 110, 253, 0.1);
-  border-left-color: #0d6efd;
-  color: var(--var_pitch-black);
+  border-left-color: #6c6c6c;
 }
 
 article .tip {
-  background-color: rgba(25, 135, 84, 0.1);
-  border-left-color: #198754;
-  color: var(--var_pitch-black);
+  border-left-color: var(--var_red);
 }
 
 article .important {
-  background-color: rgba(155, 27, 48, 0.1);
-  border-left-color: var(--var_red);
-  color: var(--var_pitch-black);
+  border-left-color: var(--var_pitch-black);
+  background-color: rgba(155, 27, 48, 0.06);
 }
 
 /* 响应式设计 */
@@ -667,7 +675,7 @@ article a:focus,
 article summary:focus {
   outline: 2px solid var(--var_red);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: 0;
 }
 
 /* 滚动条样式 */
@@ -678,12 +686,12 @@ article *::-webkit-scrollbar {
 
 article *::-webkit-scrollbar-track {
   background: rgba(181, 181, 181, 0.1);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 article *::-webkit-scrollbar-thumb {
   background: var(--var_border-color);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 article *::-webkit-scrollbar-thumb:hover {
@@ -696,7 +704,7 @@ article .video-embed {
   margin: 1.5rem 0;
   padding: 0;
   border: var(--var_border-width) solid var(--var_pitch-black);
-  border-radius: 0.5rem;
+  border-radius: 0;
   overflow: hidden;
   background: #000;
   aspect-ratio: 16 / 9;
@@ -777,7 +785,7 @@ article .video-provider {
   color: rgba(255, 255, 255, 0.85);
   background: rgba(0, 0, 0, 0.45);
   padding: 0.15rem 0.5rem;
-  border-radius: 0.2rem;
+  border-radius: 0;
 }
 
 /* ===== 正文图片 Figure ===== */
@@ -794,7 +802,7 @@ article .md-figure-img {
   max-width: 100%;
   height: auto;
   border: var(--var_border-width) solid var(--var_pitch-black);
-  border-radius: 0.4rem;
+  border-radius: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
@@ -813,7 +821,7 @@ article .attachment {
   margin: 1.2rem 0;
   padding: 0.9rem 1rem;
   border: var(--var_border-width) solid var(--var_pitch-black);
-  border-radius: 0.5rem;
+  border-radius: 0;
   background-color: var(--var_off-white);
   color: var(--var_pitch-black);
   text-decoration: none;
@@ -835,7 +843,7 @@ article .attachment-icon {
   letter-spacing: 0.04em;
   color: var(--var_off-white);
   background-color: var(--var_red);
-  border-radius: 0.3rem;
+  border-radius: 0;
 }
 
 article .attachment-body {
