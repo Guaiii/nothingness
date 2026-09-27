@@ -56,6 +56,15 @@ if (!host || !user || !targetPath) {
   process.exit(1);
 }
 
+// 发版门禁：SITE_URL 仍是占位域名时直接失败，避免 canonical/sitemap/OG 指向 example.com
+const astroConfig = readFileSync(resolve(root, "astro.config.mjs"), "utf8");
+if (/SITE_URL\s*=\s*["']https?:\/\/example\.com/.test(astroConfig)) {
+  console.error(
+    "✖ astro.config.mjs 的 SITE_URL 仍是占位域名 https://example.com。\n  请先改为正式根域名再部署（canonical / sitemap / OG 都依赖它）。"
+  );
+  process.exit(1);
+}
+
 // 1) 本地构建（含 astro check）
 console.log("▶ 本地构建（astro check && astro build）...");
 run("npm", ["run", "build"]);

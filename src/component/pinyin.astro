@@ -114,7 +114,6 @@ function getToneInfo(pinyinText: string): { syllable: string; tone: string; tone
   const hasNumberTone = /[0-4]$/.test(pinyinText);
   if (hasNumberTone) {
     const tone = pinyinText.slice(-1);
-    const syllable = pinyinText.slice(0, -1);
     return {
       syllable: convertTones(pinyinText),
       tone,

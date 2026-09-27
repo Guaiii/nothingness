@@ -34,22 +34,14 @@ const {
 
 const title = `${pageTitle} - 太虚幻境`;
 
-// 目录以 chapters 集合中的真实章节为准（缺省时回落到 frontmatter 元数据）
-const realChapters = await getChaptersOfNovel(novel.slug);
-const tocChapters =
-  realChapters.length > 0
-    ? realChapters.map((chapter) => ({
-        title: chapter.data.title,
-        // URL 用末段 slug；完整 slug（可能含 novel/ 前缀）用于高亮匹配
-        routeSlug: chapterRouteSlug(chapter.slug),
-        fullSlug: chapter.slug,
-        order: chapter.data.order,
-      }))
-    : (novel.data.chapters ?? []).map((chapter) => ({
-        ...chapter,
-        routeSlug: chapter.slug,
-        fullSlug: chapter.slug,
-      }));
+// 章节目录只来自 chapters 集合（唯一事实源）；没有章节文件就不渲染任何章节链接。
+const tocChapters = (await getChaptersOfNovel(novel.slug)).map((chapter) => ({
+  title: chapter.data.title,
+  // URL 用末段 slug；完整 slug（可能含 novel/ 前缀）用于高亮匹配
+  routeSlug: chapterRouteSlug(chapter.slug),
+  fullSlug: chapter.slug,
+  order: chapter.data.order,
+}));
 const tocNovel = { ...novel, data: { ...novel.data, chapters: tocChapters } };
 
 // 当前章节统一转成「路由 slug」做匹配

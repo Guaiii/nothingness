@@ -8,6 +8,8 @@
     "build": "astro check && astro build",
     "preview": "astro preview",
     "deploy": "node scripts/deploy.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "astro": "astro"
   },
   "dependencies": {
@@ -18,5 +20,8 @@
     "@astrojs/sitemap": "^3.2.1",
     "astro": "^4.15.9",
     "typescript": "^5.6.2"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.2"
   }
 }

@@ -13,15 +13,17 @@ export async function getStaticPaths() {
 
   return [...allTags].map((tag) => ({
     params: { tag },
-    props: { tag },
+    // 经 props 传一次，避免页面体再次全量取数
+    props: { tag, allEntries },
   }));
 }
 
-const tag = Astro.props.tag as string;
+const { tag, allEntries } = Astro.props as {
+  tag: string;
+  allEntries: Awaited<ReturnType<typeof getAllContent>>;
+};
 
-const filteredEntries = (await getAllContent()).filter((entry) =>
-  entry.data.tags.includes(tag)
-);
+const filteredEntries = allEntries.filter((entry) => entry.data.tags.includes(tag));
 const techEntries = filteredEntries.filter((entry) => entry.collection === "tech");
 const entertainmentEntries = filteredEntries.filter(
   (entry) => entry.collection === "novel" || entry.collection === "media"

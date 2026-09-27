@@ -1,19 +1,5 @@
----
-import { getAllContent } from "../content";
-import { entryPath } from "../lib/paths";
-
-// 搜索索引在构建期生成；链接经统一路径 module，天然带上正确的 base。
-const allEntries = await getAllContent();
-const searchableContent = allEntries.map((entry) => ({
-  title: entry.data.title,
-  tags: entry.data.tags,
-  collection: entry.collection,
-  url: entryPath(entry),
-}));
----
-
 <div class="search-container">
-  <div class="search-icon" aria-label="打开搜索" aria-expanded="false" role="button" tabindex="0">
+  <button type="button" class="search-icon" aria-label="打开搜索" aria-expanded="false">
     <!-- 满床清梦 -->
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +15,7 @@ const searchableContent = allEntries.map((entry) => ({
       <circle cx="11" cy="11" r="8"></circle>
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
-  </div>
+  </button>
   <div class="search-panel">
     <div class="search-input-container">
       <input type="text" class="search-input" placeholder="搜索内容..." />
@@ -354,115 +340,8 @@ const searchableContent = allEntries.map((entry) => ({
   }
 </style>
 
-<script is:inline define:vars={{ searchableContent }}>
-  document.addEventListener("DOMContentLoaded", () => {
-    // 由打包后的 overlay module 处理开合；这里仅负责检索与渲染
-    const root = document.querySelector(".search-container");
-    if (!root) return;
-    const searchInput = root.querySelector(".search-input");
-    const searchResults = root.querySelector(".search-results");
-    if (!searchInput || !searchResults) return;
-
-    // 防抖函数
-    function debounce(func, wait) {
-      let timeout;
-      return function (...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => func.apply(context, args), wait);
-      };
-    }
-
-    // 转义 HTML 特殊字符，防止 XSS
-    function escapeHtml(string) {
-      const div = document.createElement("div");
-      div.textContent = string;
-      return div.innerHTML;
-    }
-
-    function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
-    // 高亮搜索关键词（安全版本）
-    function highlightText(text, query) {
-      if (!query) return escapeHtml(text);
-      const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
-      return escapeHtml(text).replace(regex, '<mark class="search-highlight">$1</mark>');
-    }
-
-    function displayResults(results, query) {
-      if (results.length === 0) {
-        searchResults.innerHTML = `
-          <div class="no-results">
-            <p>没有找到与 "${query}" 相关的内容</p>
-            <p style="font-size: var(--step--1); margin-top: 1rem; opacity: 0.7;">
-              尝试使用不同的关键词或检查拼写
-            </p>
-          </div>
-        `;
-        return;
-      }
-
-      const headerHtml = `
-        <div class="search-results-header">
-          找到 ${results.length} 个与 "${query}" 相关的结果
-        </div>
-      `;
-
-      const resultsHtml = results
-        .map((item) => {
-          const collectionName =
-            item.collection === "tech" ? "技术" : item.collection === "media" ? "媒体" : "小说";
-          const highlightedTitle = highlightText(item.title, query);
-          return `
-            <div class="search-result-item">
-              <div class="collection" style="padding: 0.5rem 0.4rem;">${collectionName}</div>
-              <a href="${item.url}" style="text-decoration: none; color: inherit;">
-                <h3 style="font-size: 1.1rem; font-weight: 500; margin: 0.5rem 0; line-height: 1.5;">${highlightedTitle}</h3>
-              </a>
-            </div>
-          `;
-        })
-        .join("");
-
-      searchResults.innerHTML = headerHtml + `<div class="search-results-grid">${resultsHtml}</div>`;
-    }
-
-    searchInput.addEventListener(
-      "input",
-      debounce(() => {
-        const query = searchInput.value.toLowerCase().trim();
-        if (query.length < 1) {
-          searchResults.innerHTML = "";
-          return;
-        }
-        const results = searchableContent.filter((item) => {
-          if (item.title.toLowerCase().includes(query)) return true;
-          if (item.tags.some((tag) => tag.toLowerCase().includes(query))) return true;
-          return false;
-        });
-        displayResults(results, query);
-      }, 300)
-    );
-  });
-</script>
 
 <script>
-  import { createOverlayPanel } from "../lib/overlay-panel";
-
-  document.querySelectorAll<HTMLElement>(".search-container").forEach((root) => {
-    const trigger = root.querySelector<HTMLElement>(".search-icon");
-    const panel = root.querySelector<HTMLElement>(".search-panel");
-    const closer = root.querySelector<HTMLElement>(".close-search");
-    const input = root.querySelector<HTMLElement>(".search-input");
-    if (!trigger || !panel) return;
-
-    createOverlayPanel({
-      trigger,
-      panel,
-      closers: closer ? [closer] : [],
-      focusTarget: input ?? null,
-    });
-  });
+  import { initSearch } from "../lib/search-client";
+  document.querySelectorAll<HTMLElement>(".search-container").forEach(initSearch);
 </script>

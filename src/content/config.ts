@@ -1,13 +1,13 @@
-// 内容集合 schema：技术文 / 作品(novel) / 章节(chapter)
+// 内容集合 schema：技术文 / 作品(novel) / 章节(chapter) / 媒体(media)
 // 统一 frontmatter 契约见 docs/adr/0003-unified-content-contract.md
 import { z, defineCollection } from 'astro:content';
 
-/** 技术文与作品共用的核心字段 */
+/** 技术文 / 作品 / 媒体共用的核心字段。date 必填，用于排序、RSS 与结构化数据。 */
 const contentFrontmatter = {
   title: z.string(),
   description: z.string().optional(),
   tags: z.string().array().default([]),
-  date: z.date().optional(),
+  date: z.date(),
   updated: z.date().optional(),
   author: z.string().optional(),
   // 草稿：默认 false。生产构建在 src/content.ts 统一过滤。
@@ -23,24 +23,14 @@ const techCollection = defineCollection({
 
 const novelCollection = defineCollection({
   type: 'content',
-  schema: z
-    .object({
-      ...contentFrontmatter,
-      // 标识是否为连载小说；缺省视为单篇随笔
-      isNovel: z.boolean().default(false),
-      novelSlug: z.string().optional(),
-      status: z.enum(['连载中', '已完结', '暂停']).optional(),
-      // 仅作元数据保留；实际可访问章节以 chapters 集合为准
-      chapters: z
-        .array(
-          z.object({
-            title: z.string(),
-            slug: z.string(),
-            order: z.number(),
-          })
-        )
-        .optional(),
-    }),
+  schema: z.object({
+    ...contentFrontmatter,
+    // 标识是否为连载小说；缺省视为单篇随笔
+    isNovel: z.boolean().default(false),
+    novelSlug: z.string().optional(),
+    status: z.enum(['连载中', '已完结', '暂停']).optional(),
+    // 注意：章节的唯一事实源是 chapters 集合，小说 frontmatter 不再维护 chapters 列表。
+  }),
 });
 
 const chapterCollection = defineCollection({

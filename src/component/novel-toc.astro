@@ -8,13 +8,14 @@ export interface Props {
       author?: string;
       description?: string;
       status?: string;
-      // slug 为 frontmatter 元数据形态；routeSlug/fullSlug 为真实章节集合形态
+      // 章节目录统一由 NovelLayout 从 chapters 集合派生
       chapters?: Array<{
         title: string;
         order: number;
-        slug?: string;
-        routeSlug?: string;
-        fullSlug?: string;
+        /** 用于 URL 的末段 slug */
+        routeSlug: string;
+        /** 可能含 novel/ 前缀的完整 slug，用于高亮匹配 */
+        fullSlug: string;
       }>;
     };
     slug: string;
@@ -60,17 +61,15 @@ const sortedChapters =
 
       {sortedChapters.length > 0 ? (
         <ul class="chapters-list">
-          {sortedChapters.map((chapter: any) => {
-            const routeSlug: string = chapter.routeSlug ?? chapter.slug;
-            const fullSlug: string = chapter.fullSlug ?? chapter.slug;
+          {sortedChapters.map((chapter) => {
             const isActive =
-              currentChapter === routeSlug || currentChapter === fullSlug;
+              currentChapter === chapter.routeSlug || currentChapter === chapter.fullSlug;
             return (
               <li class="chapter-item">
                 <a
-                  href={chapterPath(novel.slug, routeSlug)}
+                  href={chapterPath(novel.slug, chapter.routeSlug)}
                   class:list={["chapter-link", isActive ? "active" : null]}
-                  data-chapter={fullSlug}
+                  data-chapter={chapter.fullSlug}
                 >
                   <span class="chapter-number">{chapter.order.toString().padStart(2, "0")}</span>
                   <span class="chapter-title">{chapter.title}</span>
@@ -81,7 +80,7 @@ const sortedChapters =
         </ul>
       ) : (
         <div class="no-chapters">
-          <p>暂无章节</p>
+          <p>章节陆续更新中</p>
         </div>
       )}
     </nav>
