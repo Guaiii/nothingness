@@ -13,8 +13,8 @@ export interface Props {
   description?: string;
   /** OG/内容类型：website / article / book（小说落地页） */
   type?: "website" | "article" | "book";
-  /** 样式组合：site=首页/标签(index.css)；article=正文(global+code+mdx)；novel=小说(global+mdx) */
-  theme?: "site" | "article" | "novel";
+  /** 样式组合：site=首页/标签(index.css)；article=正文(global+code+mdx)；series=集合(global+mdx) */
+  theme?: "site" | "article" | "series";
   /** ISO 发布时间 / 更新时间，用于 article 元信息与 JSON-LD */
   date?: Date;
   updated?: Date;
@@ -48,7 +48,7 @@ const {
 const themeStyles =
   theme === "article"
     ? [globalCss, codeThemeCss, mdxThemeCss]
-    : theme === "novel"
+    : theme === "series"
       ? [globalCss, mdxThemeCss]
       : [indexCss];
 

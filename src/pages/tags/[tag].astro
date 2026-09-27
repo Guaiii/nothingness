@@ -26,7 +26,7 @@ const { tag, allEntries } = Astro.props as {
 const filteredEntries = allEntries.filter((entry) => entry.data.tags.includes(tag));
 const techEntries = filteredEntries.filter((entry) => entry.collection === "tech");
 const entertainmentEntries = filteredEntries.filter(
-  (entry) => entry.collection === "novel" || entry.collection === "media"
+  (entry) => entry.collection === "series" || entry.collection === "entertainment"
 );
 ---
 

@@ -2,8 +2,8 @@
 
 ## 模块划分
 - `src/pages/`：文件路由与页面模板（首页、技术、小说、标签、404）。
-- `src/component/`：通用组件（Tabs、Quote、Search、TOC、NovelTOC）。
-- `src/content/`：内容集合（`tech` 技术、`novel` 小说及章节）。
+- `src/component/`：通用组件（Tabs、Quote、Search、TOC、SeriesTOC）。
+- `src/content/`：内容集合（`tech` 技术、`series` 集合、`entertainment` 娱乐单篇、`chapters` 集合子项）。
 - `src/styles/`：全局与主题样式，保持中式设计语言。
 
 ## 命名规范
@@ -13,7 +13,7 @@
 ## 复用性优化
 - Tabs 组件：数据映射按集合驱动，客户端仅处理状态切换。
 - Search 组件：聚合两集合，使用根路径链接。
-- NovelTOC：移动端折叠与章节高亮，独立为侧栏组件。
+- SeriesTOC：集合落地页移动端折叠与子项高亮，独立为侧栏组件。
 
 ## 构建与路径
 - `astro.config.mjs` 使用 `base: '/'` 与 `site` 指向 GitHub Pages 用户主页。

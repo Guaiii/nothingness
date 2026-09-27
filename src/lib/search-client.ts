@@ -4,8 +4,8 @@ import { createOverlayPanel } from "./overlay-panel";
 
 const COLLECTION_LABEL: Record<string, string> = {
   tech: "技术",
-  media: "媒体",
-  novel: "小说",
+  series: "集合",
+  entertainment: "娱乐",
 };
 
 interface SearchItem {

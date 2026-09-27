@@ -184,6 +184,41 @@ const tocGroups = tocHeadings.reduce<Array<{
     overflow-x: hidden;
     overflow-y: auto;
     scrollbar-width: thin;
+    scrollbar-color: var(--var_pitch-black) transparent;
+  }
+
+  .toc-list::-webkit-scrollbar {
+    width: 0.3rem;
+    border-radius: 0;
+  }
+
+  .toc-list::-webkit-scrollbar-track,
+  .toc-list::-webkit-scrollbar-track-piece {
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .toc-list::-webkit-scrollbar-thumb {
+    border: 0;
+    border-radius: 0;
+    background: var(--var_pitch-black);
+  }
+
+  .toc-list::-webkit-scrollbar-thumb:hover,
+  .toc-list::-webkit-scrollbar-thumb:active {
+    border-radius: 0;
+    background: var(--var_pitch-black);
+  }
+
+  .toc-list::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .toc-list::-webkit-scrollbar-corner {
+    border-radius: 0;
+    background: transparent;
   }
 
   .toc-group {

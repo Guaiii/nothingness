@@ -2,19 +2,19 @@
 import { chapterPath, homePath } from "../lib/paths";
 
 export interface Props {
-  novel: {
+  series: {
     data: {
       title: string;
       author?: string;
       description?: string;
       status?: string;
-      // 章节目录统一由 NovelLayout 从 chapters 集合派生
+      // 子项目录统一由 SeriesLayout 从 chapters 集合派生
       chapters?: Array<{
         title: string;
         order: number;
         /** 用于 URL 的末段 slug */
         routeSlug: string;
-        /** 可能含 novel/ 前缀的完整 slug，用于高亮匹配 */
+        /** 可能含 series/ 前缀的完整 slug，用于高亮匹配 */
         fullSlug: string;
       }>;
     };
@@ -23,41 +23,41 @@ export interface Props {
   currentChapter?: string;
 }
 
-const { novel, currentChapter } = Astro.props;
+const { series, currentChapter } = Astro.props;
 
 const sortedChapters =
-  novel.data.chapters?.slice().sort((a, b) => a.order - b.order) ?? [];
+  series.data.chapters?.slice().sort((a, b) => a.order - b.order) ?? [];
 ---
 
-<div class="novel-toc-container">
+<div class="series-toc-container">
   <!-- 移动端顶部折叠按钮 -->
-  <button class="novel-toc-toggle" aria-label="切换小说目录" aria-expanded="false">
+  <button class="series-toc-toggle" aria-label="切换集合目录" aria-expanded="false">
     <span class="toc-toggle-icon">📚</span>
     <span class="toc-toggle-text">目录</span>
     <span class="toc-toggle-arrow">▼</span>
   </button>
 
-  <!-- 小说目录内容 -->
-  <nav class="novel-toc-nav" aria-label="小说目录">
+  <!-- 集合目录内容 -->
+  <nav class="series-toc-nav" aria-label="集合目录">
     <!-- 目录头部 -->
-    <div class="novel-toc-header">
-      <h3 class="novel-toc-title">📚 小说目录</h3>
-      <button class="novel-toc-close" aria-label="关闭目录">✕</button>
+    <div class="series-toc-header">
+      <h3 class="series-toc-title">📚 集合目录</h3>
+      <button class="series-toc-close" aria-label="关闭目录">✕</button>
     </div>
 
     <!-- 小说信息 -->
-    <div class="novel-info">
-      <h2 class="novel-title">{novel.data.title}</h2>
-      {novel.data.author && <p class="novel-author">作者：{novel.data.author}</p>}
-      {novel.data.status && (
-        <span class={`novel-status status-${novel.data.status}`}>{novel.data.status}</span>
+    <div class="series-info">
+      <h2 class="series-title">{series.data.title}</h2>
+      {series.data.author && <p class="series-author">作者：{series.data.author}</p>}
+      {series.data.status && (
+        <span class={`series-status status-${series.data.status}`}>{series.data.status}</span>
       )}
-      {novel.data.description && <p class="novel-description">{novel.data.description}</p>}
+      {series.data.description && <p class="series-description">{series.data.description}</p>}
     </div>
 
-    <!-- 章节目录 -->
-    <nav class="novel-chapters" aria-label="小说章节目录">
-      <h3 class="chapters-title">📚 章节目录</h3>
+    <!-- 子项目录 -->
+    <nav class="series-chapters" aria-label="集合子项目录">
+      <h3 class="chapters-title">📚 子项目录</h3>
 
       {sortedChapters.length > 0 ? (
         <ul class="chapters-list">
@@ -67,7 +67,7 @@ const sortedChapters =
             return (
               <li class="chapter-item">
                 <a
-                  href={chapterPath(novel.slug, chapter.routeSlug)}
+                  href={chapterPath(series.slug, chapter.routeSlug)}
                   class:list={["chapter-link", isActive ? "active" : null]}
                   data-chapter={chapter.fullSlug}
                 >
@@ -80,29 +80,29 @@ const sortedChapters =
         </ul>
       ) : (
         <div class="no-chapters">
-          <p>章节陆续更新中</p>
+          <p>子项陆续更新中</p>
         </div>
       )}
     </nav>
 
-    <!-- 返回小说列表 -->
-    <div class="novel-actions">
-      <a href={homePath()} class="back-to-list">← 返回小说列表</a>
+    <!-- 返回首页 -->
+    <div class="series-actions">
+      <a href={homePath()} class="back-to-list">← 返回首页</a>
     </div>
   </nav>
 
   <!-- 遮罩层（移动端） -->
-  <div class="novel-toc-overlay"></div>
+  <div class="series-toc-overlay"></div>
 </div>
 
 <style scoped>
-  .novel-toc-container {
+  .series-toc-container {
     position: relative;
     z-index: 100;
   }
 
   /* 移动端顶部折叠按钮 */
-  .novel-toc-toggle {
+  .series-toc-toggle {
     display: none;
     position: fixed;
     top: 1rem;
@@ -127,7 +127,7 @@ const sortedChapters =
     transform: translateY(0) scale(1);
   }
 
-  .novel-toc-toggle:hover {
+  .series-toc-toggle:hover {
     background-color: var(--var_red);
     color: var(--var_off-white);
     border-color: var(--var_red);
@@ -148,18 +148,18 @@ const sortedChapters =
     transition: transform 0.3s ease;
   }
 
-  .novel-toc-toggle.active .toc-toggle-arrow {
+  .series-toc-toggle.active .toc-toggle-arrow {
     transform: rotate(180deg);
   }
 
-  .novel-toc-toggle.active {
+  .series-toc-toggle.active {
     opacity: 0;
     visibility: hidden;
     transform: translateY(-1px) scale(0.95);
   }
 
-  /* 小说目录导航 */
-  .novel-toc-nav {
+  /* 集合目录导航 */
+  .series-toc-nav {
     width: 100%;
     height: 100vh;
     overflow-y: auto;
@@ -170,7 +170,7 @@ const sortedChapters =
   }
 
   /* 目录头部 */
-  .novel-toc-header {
+  .series-toc-header {
     display: none;
     justify-content: space-between;
     align-items: center;
@@ -179,14 +179,14 @@ const sortedChapters =
     border-bottom: var(--var_border-width) solid var(--var_pitch-black);
   }
 
-  .novel-toc-title {
+  .series-toc-title {
     font-size: var(--step-1);
     font-weight: bold;
     color: var(--var_pitch-black);
     margin: 0;
   }
 
-  .novel-toc-close {
+  .series-toc-close {
     background: none;
     border: none;
     font-size: 1.2rem;
@@ -197,13 +197,13 @@ const sortedChapters =
     transition: all 0.2s ease;
   }
 
-  .novel-toc-close:hover {
+  .series-toc-close:hover {
     background-color: var(--var_red);
     color: var(--var_off-white);
   }
 
   /* 遮罩层 */
-  .novel-toc-overlay {
+  .series-toc-overlay {
     display: none;
     position: fixed;
     top: 0;
@@ -217,31 +217,31 @@ const sortedChapters =
     pointer-events: none; /* 默认不拦截点击事件 */
   }
 
-  .novel-toc-overlay.active {
+  .series-toc-overlay.active {
     opacity: 1;
     pointer-events: auto; /* 激活时才拦截点击事件 */
   }
 
-  .novel-info {
+  .series-info {
     margin-bottom: 2rem;
     padding-bottom: 1.5rem;
     border-bottom: var(--var_border-width) solid var(--var_pitch-black);
   }
 
-  .novel-title {
+  .series-title {
     font-size: var(--step-2);
     font-weight: bold;
     margin-bottom: 0.5rem;
     color: var(--var_pitch-black);
   }
 
-  .novel-author {
+  .series-author {
     font-size: var(--step--1);
     color: var(--var_red);
     margin-bottom: 0.5rem;
   }
 
-  .novel-status {
+  .series-status {
     display: inline-block;
     padding: 0.2rem 0.6rem;
     border-radius: 12px;
@@ -265,7 +265,7 @@ const sortedChapters =
     color: var(--var_pitch-black);
   }
 
-  .novel-description {
+  .series-description {
     font-size: var(--step--1);
     line-height: 1.6;
     color: var(--var_pitch-black);
@@ -334,7 +334,7 @@ const sortedChapters =
     color: #888;
   }
 
-  .novel-actions {
+  .series-actions {
     margin-top: 2rem;
     padding-top: 1.5rem;
     border-top: var(--var_border-width) solid var(--var_pitch-black);
@@ -359,11 +359,11 @@ const sortedChapters =
 
   /* 移动端适配 */
   @media (max-width: 768px) {
-    .novel-toc-toggle {
+    .series-toc-toggle {
       display: flex;
     }
 
-    .novel-toc-nav {
+    .series-toc-nav {
       position: fixed;
       top: 0;
       left: 0;
@@ -377,19 +377,19 @@ const sortedChapters =
       pointer-events: auto; /* 确保目录面板可以接收点击事件 */
     }
 
-    .novel-toc-nav.active {
+    .series-toc-nav.active {
       transform: translateX(0);
     }
 
-    .novel-toc-header {
+    .series-toc-header {
       display: flex;
     }
 
-    .novel-toc-overlay {
+    .series-toc-overlay {
       display: block;
     }
 
-    .novel-title {
+    .series-title {
       font-size: var(--step-1);
     }
 
@@ -401,7 +401,7 @@ const sortedChapters =
       font-size: var(--step--1);
     }
 
-    .novel-info {
+    .series-info {
       margin-bottom: 1.5rem;
       padding-bottom: 1rem;
     }
@@ -413,21 +413,21 @@ const sortedChapters =
 
   /* 桌面端样式 */
   @media (min-width: 769px) {
-    .novel-toc-toggle {
+    .series-toc-toggle {
       display: none;
     }
 
-    .novel-toc-nav {
+    .series-toc-nav {
       position: static;
       transform: none;
       box-shadow: none;
     }
 
-    .novel-toc-header {
+    .series-toc-header {
       display: none;
     }
 
-    .novel-toc-overlay {
+    .series-toc-overlay {
       display: none;
     }
   }
@@ -436,11 +436,11 @@ const sortedChapters =
 <script>
   import { createOverlayPanel } from "../lib/overlay-panel";
 
-  document.querySelectorAll<HTMLElement>(".novel-toc-container").forEach((root) => {
-    const trigger = root.querySelector<HTMLElement>(".novel-toc-toggle");
-    const panel = root.querySelector<HTMLElement>(".novel-toc-nav");
-    const overlay = root.querySelector<HTMLElement>(".novel-toc-overlay");
-    const closer = root.querySelector<HTMLElement>(".novel-toc-close");
+  document.querySelectorAll<HTMLElement>(".series-toc-container").forEach((root) => {
+    const trigger = root.querySelector<HTMLElement>(".series-toc-toggle");
+    const panel = root.querySelector<HTMLElement>(".series-toc-nav");
+    const overlay = root.querySelector<HTMLElement>(".series-toc-overlay");
+    const closer = root.querySelector<HTMLElement>(".series-toc-close");
     if (!trigger || !panel) return;
 
     createOverlayPanel({

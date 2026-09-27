@@ -5,11 +5,9 @@ import { getAllContent } from "../content";
 import type { AnyEntry } from "../content";
 import { entryPath, homePath, tagPath } from "../lib/paths";
 
-// 技术文 + 单篇随笔走此路由；连载小说有独立的 novel/[novelSlug] 落地页，这里排除以免路由冲突。
+// 技术文与娱乐单篇走此路由；集合(series)有独立的 series/[seriesSlug] 落地页，这里排除以免路由冲突。
 export async function getStaticPaths() {
-  const entries = (await getAllContent()).filter(
-    (entry) => !(entry.collection === "novel" && entry.data.isNovel)
-  );
+  const entries = (await getAllContent()).filter((entry) => entry.collection !== "series");
   return entries.map((entry) => ({
     params: { path: `/${entry.collection}/${entry.slug}` },
     props: { entry },

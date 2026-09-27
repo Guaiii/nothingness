@@ -10,19 +10,19 @@ function join(path: string): string {
   return normalized ? `${base}/${normalized}` : `${base}/`;
 }
 
-/** 任一内容条目（技术文 / 作品）的规范链接：/{collection}/{slug} */
+/** 任一内容条目（技术文 / 集合 / 娱乐单篇）的规范链接：/{collection}/{slug} */
 export function entryPath(
   entry: { collection: string; slug: string }
 ): string {
   return join(`${entry.collection}/${entry.slug}`);
 }
 
-/** 小说章节页链接 */
-export function chapterPath(novelSlug: string, chapterSlug: string): string {
-  return join(`novel/${novelSlug}/${chapterSlug}`);
+/** 集合子项（章节）页链接 */
+export function chapterPath(seriesSlug: string, chapterSlug: string): string {
+  return join(`series/${seriesSlug}/${chapterSlug}`);
 }
 
-/** 章节内容条目按 novel/<chapter-slug> 目录组织，URL 只取末段 */
+/** 章节内容条目按 series/<chapter-slug> 目录组织，URL 只取末段 */
 export function chapterRouteSlug(chapterSlug: string): string {
   return chapterSlug.split("/").pop() ?? chapterSlug;
 }

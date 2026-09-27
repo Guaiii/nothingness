@@ -1,49 +1,49 @@
 ---
-import NovelLayout from "../../../layouts/NovelLayout.astro";
-import { getNovels, getChaptersOfNovel, adjacentChapters } from "../../../content";
-import type { NovelEntry, ChapterEntry } from "../../../content";
+import SeriesLayout from "../../../layouts/SeriesLayout.astro";
+import { getSeries, getChaptersOfSeries, adjacentChapters } from "../../../content";
+import type { SeriesEntry, ChapterEntry } from "../../../content";
 import { chapterPath, chapterRouteSlug } from "../../../lib/paths";
 
-// 每个真实章节（chapters 集合）生成一个页面
+// 每个真实子项（chapters 集合）生成一个页面
 export async function getStaticPaths() {
-  const novels = await getNovels();
+  const seriesList = await getSeries();
   const paths: Array<{
-    params: { novelSlug: string; chapter: string };
+    params: { seriesSlug: string; chapter: string };
     props: {
-      novel: NovelEntry;
+      series: SeriesEntry;
       chapter: ChapterEntry;
       chapters: ChapterEntry[];
     };
   }> = [];
 
-  for (const novel of novels) {
-    const chapters = await getChaptersOfNovel(novel.slug);
+  for (const series of seriesList) {
+    const chapters = await getChaptersOfSeries(series.slug);
     for (const chapter of chapters) {
-      // 章节按 novel/<chapter-slug> 目录组织（chapter.slug 形如 novel/chapter-06），
+      // 子项按 series/<chapter-slug> 目录组织（chapter.slug 形如 series/chapter-06），
       // URL 只使用末段；完整 slug 保留在 props 中用于渲染。
       const routeSlug = chapter.slug.split("/").pop() ?? chapter.slug;
       paths.push({
-        params: { novelSlug: novel.slug, chapter: routeSlug },
-        props: { novel, chapter, chapters },
+        params: { seriesSlug: series.slug, chapter: routeSlug },
+        props: { series, chapter, chapters },
       });
     }
   }
   return paths;
 }
 
-const { novel, chapter, chapters } = Astro.props;
+const { series, chapter, chapters } = Astro.props;
 const { Content } = await chapter.render();
 const { prev, next } = adjacentChapters(chapters, chapter.slug);
 const routeSlug = chapterRouteSlug(chapter.slug);
 ---
 
-<NovelLayout
-  novel={novel}
+<SeriesLayout
+  series={series}
   currentChapterSlug={routeSlug}
-  pageTitle={`${chapter.data.title} - ${novel.data.title}`}
-  description={`${novel.data.title} ${chapter.data.title}`}
+  pageTitle={`${chapter.data.title} - ${series.data.title}`}
+  description={`${series.data.title} ${chapter.data.title}`}
   type="article"
-  tags={novel.data.tags}
+  tags={series.data.tags}
   jsonLd={{
     "@context": "https://schema.org",
     "@type": "Chapter",
@@ -51,8 +51,8 @@ const routeSlug = chapterRouteSlug(chapter.slug);
     position: chapter.data.order,
     isPartOf: {
       "@type": "Book",
-      name: novel.data.title,
-      ...(novel.data.author ? { author: { "@type": "Person", name: novel.data.author } } : {}),
+      name: series.data.title,
+      ...(series.data.author ? { author: { "@type": "Person", name: series.data.author } } : {}),
     },
   }}
 >
@@ -63,22 +63,22 @@ const routeSlug = chapterRouteSlug(chapter.slug);
       <Content />
     </div>
 
-    <nav class="chapter-navigation" aria-label="章节导航">
+    <nav class="chapter-navigation" aria-label="子项导航">
       <div class="nav-buttons">
         {prev ? (
-          <a href={chapterPath(novel.slug, chapterRouteSlug(prev.slug))} class="nav-btn prev-btn">← 上一章</a>
+          <a href={chapterPath(series.slug, chapterRouteSlug(prev.slug))} class="nav-btn prev-btn">← 上一项</a>
         ) : (
-          <span class="nav-btn disabled">已是第一章</span>
+          <span class="nav-btn disabled">已是第一项</span>
         )}
         {next ? (
-          <a href={chapterPath(novel.slug, chapterRouteSlug(next.slug))} class="nav-btn next-btn">下一章 →</a>
+          <a href={chapterPath(series.slug, chapterRouteSlug(next.slug))} class="nav-btn next-btn">下一项 →</a>
         ) : (
-          <span class="nav-btn disabled">已是最后一章</span>
+          <span class="nav-btn disabled">已是最后一项</span>
         )}
       </div>
     </nav>
   </article>
-</NovelLayout>
+</SeriesLayout>
 
 <style>
   .chapter-article {

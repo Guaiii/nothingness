@@ -1,14 +1,14 @@
 ---
-// 小说阅读布局：左侧作品目录 + 右侧正文的双栏骨架。
-// 收束两个小说页重复的 layout/sidebar 外壳与响应式；各页只保留自己的文章块样式。
+// 集合阅读布局：左侧集合目录 + 右侧正文的双栏骨架。
+// 收束落地页与子项页重复的 layout/sidebar 外壳与响应式；各页只保留自己的文章块样式。
 import SiteLayout from "./SiteLayout.astro";
-import NovelTOC from "../component/novel-toc.astro";
-import { getChaptersOfNovel } from "../content";
+import SeriesTOC from "../component/series-toc.astro";
+import { getChaptersOfSeries } from "../content";
 import { entryPath, chapterPath, chapterRouteSlug } from "../lib/paths";
-import type { NovelEntry } from "../content";
+import type { SeriesEntry } from "../content";
 
 export interface Props {
-  novel: NovelEntry;
+  series: SeriesEntry;
   currentChapterSlug?: string;
   /** 文章块标题（用于 <title> 与 SEO） */
   pageTitle: string;
@@ -21,7 +21,7 @@ export interface Props {
 }
 
 const {
-  novel,
+  series,
   currentChapterSlug,
   pageTitle,
   description,
@@ -34,56 +34,56 @@ const {
 
 const title = `${pageTitle} - 太虚幻境`;
 
-// 章节目录只来自 chapters 集合（唯一事实源）；没有章节文件就不渲染任何章节链接。
-const tocChapters = (await getChaptersOfNovel(novel.slug)).map((chapter) => ({
+// 子项目录只来自 chapters 集合（唯一事实源）；没有子项文件就不渲染任何链接。
+const tocChapters = (await getChaptersOfSeries(series.slug)).map((chapter) => ({
   title: chapter.data.title,
-  // URL 用末段 slug；完整 slug（可能含 novel/ 前缀）用于高亮匹配
+  // URL 用末段 slug；完整 slug（可能含 series/ 前缀）用于高亮匹配
   routeSlug: chapterRouteSlug(chapter.slug),
   fullSlug: chapter.slug,
   order: chapter.data.order,
 }));
-const tocNovel = { ...novel, data: { ...novel.data, chapters: tocChapters } };
+const tocSeries = { ...series, data: { ...series.data, chapters: tocChapters } };
 
-// 当前章节统一转成「路由 slug」做匹配
+// 当前子项统一转成「路由 slug」做匹配
 const activeChapter = currentChapterSlug ? chapterRouteSlug(currentChapterSlug) : undefined;
 
 const resolvedCanonical =
   canonicalPath ??
   (activeChapter
-    ? chapterPath(novel.slug, activeChapter)
-    : entryPath(novel));
+    ? chapterPath(series.slug, activeChapter)
+    : entryPath(series));
 ---
 
 <SiteLayout
   title={title}
-  description={description ?? novel.data.description}
+  description={description ?? series.data.description}
   type={type}
-  theme="novel"
+  theme="series"
   date={date}
-  author={novel.data.author}
-  tags={tags.length ? tags : novel.data.tags}
+  author={series.data.author}
+  tags={tags.length ? tags : series.data.tags}
   canonicalPath={resolvedCanonical}
   jsonLd={jsonLd}
 >
-  <div class="novel-layout">
-    <aside class="novel-sidebar">
-      <NovelTOC novel={tocNovel} currentChapter={activeChapter} />
+  <div class="series-layout">
+    <aside class="series-sidebar">
+      <SeriesTOC series={tocSeries} currentChapter={activeChapter} />
     </aside>
-    <main class="novel-content">
+    <main class="series-content">
       <slot />
     </main>
   </div>
 </SiteLayout>
 
 <style>
-  .novel-layout {
+  .series-layout {
     display: flex;
     min-height: 100vh;
     background: var(--var_background-color);
     position: relative;
   }
 
-  .novel-sidebar {
+  .series-sidebar {
     width: 300px;
     flex-shrink: 0;
     position: sticky;
@@ -92,7 +92,7 @@ const resolvedCanonical =
     overflow-y: auto;
   }
 
-  .novel-content {
+  .series-content {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -101,18 +101,18 @@ const resolvedCanonical =
   }
 
   @media (max-width: 768px) {
-    .novel-layout {
+    .series-layout {
       flex-direction: column;
     }
 
-    .novel-sidebar {
+    .series-sidebar {
       width: 100%;
       height: auto;
       position: relative;
       order: 2;
     }
 
-    .novel-content {
+    .series-content {
       order: 1;
       padding-top: 4rem;
     }

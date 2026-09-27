@@ -54,7 +54,7 @@ const initialTabName = urlTabParam === "entertainment" ? "娱乐" : "技术";
                     <a href={entryPath(entry)} class="content-link">
                       <div class="content-header">
                         <h3>{entry.data.title}</h3>
-                        {entry.collection === "novel" && entry.data.isNovel && entry.data.status && (
+                        {entry.collection === "series" && entry.data.status && (
                           <span class={`status-badge status-${entry.data.status}`}>
                             {entry.data.status}
                           </span>

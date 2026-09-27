@@ -1,61 +1,61 @@
 ---
-import NovelLayout from "../../../layouts/NovelLayout.astro";
-import { getNovels, getChaptersOfNovel } from "../../../content";
+import SeriesLayout from "../../../layouts/SeriesLayout.astro";
+import { getSeries, getChaptersOfSeries } from "../../../content";
 import { chapterPath, chapterRouteSlug } from "../../../lib/paths";
 
 export async function getStaticPaths() {
-  const novels = await getNovels();
-  return novels.map((novel) => ({
-    params: { novelSlug: novel.slug },
-    props: { novel },
+  const seriesList = await getSeries();
+  return seriesList.map((series) => ({
+    params: { seriesSlug: series.slug },
+    props: { series },
   }));
 }
 
-const novel = Astro.props.novel;
-const { Content } = await novel.render();
-const realChapters = await getChaptersOfNovel(novel.slug);
-const firstChapter = realChapters[0] ?? null;
+const series = Astro.props.series;
+const { Content } = await series.render();
+const chapters = await getChaptersOfSeries(series.slug);
+const firstChapter = chapters[0] ?? null;
 ---
 
-<NovelLayout
-  novel={novel}
-  pageTitle={novel.data.title}
+<SeriesLayout
+  series={series}
+  pageTitle={series.data.title}
   type="book"
   jsonLd={{
     "@context": "https://schema.org",
     "@type": "Book",
-    name: novel.data.title,
-    ...(novel.data.author ? { author: { "@type": "Person", name: novel.data.author } } : {}),
-    ...(novel.data.description ? { description: novel.data.description } : {}),
+    name: series.data.title,
+    ...(series.data.author ? { author: { "@type": "Person", name: series.data.author } } : {}),
+    ...(series.data.description ? { description: series.data.description } : {}),
     inLanguage: "zh-CN",
   }}
 >
-  <article class="novel-article">
-    <div class="novel-meta">
-      <h1 class="novel-title">{novel.data.title}</h1>
-      {novel.data.author && <p class="novel-author">作者：{novel.data.author}</p>}
-      {novel.data.status && (
-        <span class={`novel-status status-${novel.data.status}`}>{novel.data.status}</span>
+  <article class="series-article">
+    <div class="series-meta">
+      <h1 class="series-title">{series.data.title}</h1>
+      {series.data.author && <p class="series-author">作者：{series.data.author}</p>}
+      {series.data.status && (
+        <span class={`series-status status-${series.data.status}`}>{series.data.status}</span>
       )}
     </div>
 
-    <div class="novel-body">
+    <div class="series-body">
       <Content />
     </div>
 
     {firstChapter && (
       <div class="chapter-navigation">
         <h3>开始阅读</h3>
-        <a href={chapterPath(novel.slug, chapterRouteSlug(firstChapter.slug))} class="start-reading-btn">
-          开始阅读第一章
+        <a href={chapterPath(series.slug, chapterRouteSlug(firstChapter.slug))} class="start-reading-btn">
+          从第一个子项开始
         </a>
       </div>
     )}
   </article>
-</NovelLayout>
+</SeriesLayout>
 
 <style>
-  .novel-article {
+  .series-article {
     flex: 1;
     padding: 2rem;
     max-width: 800px;
@@ -63,27 +63,27 @@ const firstChapter = realChapters[0] ?? null;
     width: 100%;
   }
 
-  .novel-meta {
+  .series-meta {
     margin-bottom: 3rem;
     text-align: center;
     border-bottom: var(--var_border-width) solid var(--var_pitch-black);
     padding-bottom: 2rem;
   }
 
-  .novel-title {
+  .series-title {
     font-size: var(--step-4);
     font-weight: bold;
     margin-bottom: 1rem;
     color: var(--var_pitch-black);
   }
 
-  .novel-author {
+  .series-author {
     font-size: var(--step-1);
     color: var(--var_red);
     margin-bottom: 1rem;
   }
 
-  .novel-status {
+  .series-status {
     display: inline-block;
     padding: 0.4rem 1rem;
     border-radius: 20px;
@@ -106,7 +106,7 @@ const firstChapter = realChapters[0] ?? null;
     color: var(--var_pitch-black);
   }
 
-  .novel-body {
+  .series-body {
     line-height: 1.8;
     font-size: var(--step-0);
   }
@@ -147,11 +147,11 @@ const firstChapter = realChapters[0] ?? null;
   }
 
   @media (max-width: 768px) {
-    .novel-article {
+    .series-article {
       padding: 1rem;
     }
 
-    .novel-title {
+    .series-title {
       font-size: var(--step-3);
     }
   }

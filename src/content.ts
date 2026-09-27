@@ -4,13 +4,13 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type TechEntry = CollectionEntry<'tech'>;
-export type NovelEntry = CollectionEntry<'novel'>;
+export type SeriesEntry = CollectionEntry<'series'>;
 export type ChapterEntry = CollectionEntry<'chapters'>;
-export type MediaEntry = CollectionEntry<'media'>;
-export type AnyEntry = TechEntry | NovelEntry | MediaEntry;
+export type EntertainmentEntry = CollectionEntry<'entertainment'>;
+export type AnyEntry = TechEntry | SeriesEntry | EntertainmentEntry;
 
-/** 娱乐分区条目 = 作品（小说/随笔） + 媒体内容 */
-export type EntertainmentEntry = NovelEntry | MediaEntry;
+/** 娱乐分区条目 = 集合（连载等） + 娱乐单篇（视频/图文/随笔） */
+export type EntertainmentSectionEntry = SeriesEntry | EntertainmentEntry;
 
 /** 生产构建剔除草稿；本地 dev 保留草稿以便预览 */
 const isVisible = (entry: { data: { draft?: boolean } }): boolean =>
@@ -22,51 +22,39 @@ export async function getTech(): Promise<TechEntry[]> {
   return entries.filter(isVisible).sort(byDateDesc);
 }
 
-/** novel 集合中的全部条目（含小说与随笔，已过滤草稿） */
-export async function getNovelEntries(): Promise<NovelEntry[]> {
-  const entries = await getCollection('novel');
-  return entries.filter(isVisible);
-}
-
-/** 仅连载小说（isNovel=true），按日期倒序 */
-export async function getNovels(): Promise<NovelEntry[]> {
-  return (await getNovelEntries())
-    .filter((entry) => entry.data.isNovel)
-    .sort(byDateDesc);
-}
-
-/** 单篇随笔（novel 集合中非连载作品） */
-export async function getEssays(): Promise<NovelEntry[]> {
-  return (await getNovelEntries()).filter((entry) => !entry.data.isNovel);
-}
-
-/** 全部媒体内容（已过滤草稿），按日期倒序 */
-export async function getMedia(): Promise<MediaEntry[]> {
-  const entries = await getCollection('media');
+/** 全部集合（外表一张卡、内含子项），按日期倒序 */
+export async function getSeries(): Promise<SeriesEntry[]> {
+  const entries = await getCollection('series');
   return entries.filter(isVisible).sort(byDateDesc);
 }
 
-/** 娱乐分区：作品（含此前漏掉的随笔） + 媒体内容，按日期倒序 */
-export async function getEntertainment(): Promise<EntertainmentEntry[]> {
-  const [novelEntries, media] = await Promise.all([getNovelEntries(), getMedia()]);
-  return [...novelEntries, ...media].sort(byDateDesc);
+/** 全部娱乐单篇（视频/图文/附件/随笔），按日期倒序 */
+export async function getEntertainmentSingles(): Promise<EntertainmentEntry[]> {
+  const entries = await getCollection('entertainment');
+  return entries.filter(isVisible).sort(byDateDesc);
 }
 
-/** 全部可公开内容（技术文 + 作品 + 媒体），用于标签聚合与站点地图 */
+/** 娱乐分区：集合 + 娱乐单篇，按日期倒序 */
+export async function getEntertainment(): Promise<EntertainmentSectionEntry[]> {
+  const [seriesList, singles] = await Promise.all([getSeries(), getEntertainmentSingles()]);
+  return [...seriesList, ...singles].sort(byDateDesc);
+}
+
+/** 全部可公开内容（技术文 + 集合 + 娱乐单篇），用于标签聚合与站点地图 */
 export async function getAllContent(): Promise<AnyEntry[]> {
-  const [tech, novel, media] = await Promise.all([
+  const [tech, seriesList, entertainment] = await Promise.all([
     getCollection('tech'),
-    getCollection('novel'),
-    getCollection('media'),
+    getCollection('series'),
+    getCollection('entertainment'),
   ]);
-  return [...tech, ...novel, ...media].filter(isVisible);
+  return [...tech, ...seriesList, ...entertainment].filter(isVisible);
 }
 
-/** 某部小说下的真实章节（来自 chapters 集合），按 order 升序 */
-export async function getChaptersOfNovel(novelSlug: string): Promise<ChapterEntry[]> {
+/** 某个集合下的真实子项（来自 chapters 集合），按 order 升序 */
+export async function getChaptersOfSeries(seriesSlug: string): Promise<ChapterEntry[]> {
   const chapters = await getCollection('chapters');
   return chapters
-    .filter((chapter) => chapter.data.novel === novelSlug && isVisible(chapter))
+    .filter((chapter) => chapter.data.series === seriesSlug && isVisible(chapter))
     .sort((a, b) => a.data.order - b.data.order);
 }
 
@@ -83,7 +71,7 @@ export function collectTags(entries: Pick<AnyEntry, 'data'>[]): string[] {
     .map(([tag]) => tag);
 }
 
-/** 章节在其所属小说中的相邻章节，不存在时为 null */
+/** 子项在其所属集合中的相邻项，不存在时为 null */
 export function adjacentChapters(
   chapters: ChapterEntry[],
   currentSlug: string

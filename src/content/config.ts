@@ -1,8 +1,8 @@
-// 内容集合 schema：技术文 / 作品(novel) / 章节(chapter) / 媒体(media)
+// 内容集合 schema：技术文(tech) / 集合(series) / 集合子项(chapters) / 娱乐单篇(entertainment)
 // 统一 frontmatter 契约见 docs/adr/0003-unified-content-contract.md
 import { z, defineCollection } from 'astro:content';
 
-/** 技术文 / 作品 / 媒体共用的核心字段。date 必填，用于排序、RSS 与结构化数据。 */
+/** 各内容集合共用的核心字段。date 必填，用于排序、RSS 与结构化数据。 */
 const contentFrontmatter = {
   title: z.string(),
   description: z.string().optional(),
@@ -21,15 +21,13 @@ const techCollection = defineCollection({
   schema: z.object(contentFrontmatter),
 });
 
-const novelCollection = defineCollection({
+// 集合：外表只有一张卡、内部由 chapters 子项组成的内容（如连载小说）。
+const seriesCollection = defineCollection({
   type: 'content',
   schema: z.object({
     ...contentFrontmatter,
-    // 标识是否为连载小说；缺省视为单篇随笔
-    isNovel: z.boolean().default(false),
-    novelSlug: z.string().optional(),
+    // 连载状态，用于卡片与落地页徽标
     status: z.enum(['连载中', '已完结', '暂停']).optional(),
-    // 注意：章节的唯一事实源是 chapters 集合，小说 frontmatter 不再维护 chapters 列表。
   }),
 });
 
@@ -37,22 +35,22 @@ const chapterCollection = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
-    // 所属小说的 slug（CollectionEntry<'novel'>.slug）
-    novel: z.string(),
+    // 所属集合的 slug（CollectionEntry<'series'>.slug）
+    series: z.string(),
     order: z.number(),
     draft: z.boolean().default(false),
   }),
 });
 
-// 娱乐分区中的富媒体单篇条目（第三方视频 / 图片 / 附件），见 ADR-0004
-const mediaCollection = defineCollection({
+// 娱乐分区的单篇内容（第三方视频 / 图片 / 附件 / 随笔），见 ADR-0004
+const entertainmentCollection = defineCollection({
   type: 'content',
   schema: z.object(contentFrontmatter),
 });
 
 export const collections = {
   tech: techCollection,
-  novel: novelCollection,
+  series: seriesCollection,
   chapters: chapterCollection,
-  media: mediaCollection,
+  entertainment: entertainmentCollection,
 };

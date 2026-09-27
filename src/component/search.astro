@@ -53,20 +53,39 @@
   }
 
   .search-icon {
-    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 0;
+    background: transparent;
     color: var(--var_off-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    transition: all 0.2s ease;
-    opacity: 0.8;
+    box-shadow: none;
+    opacity: 0.9;
+    cursor: pointer;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
   }
 
-  .search-icon:hover {
+  .search-icon svg {
+    display: block;
+    width: 1.05rem;
+    height: 1.05rem;
+    pointer-events: none;
+  }
+
+  .search-icon:hover,
+  .search-icon:focus-visible,
+  .search-icon.active {
+    border-color: var(--var_off-white);
+    background: color-mix(in srgb, var(--var_off-white) 12%, transparent);
+    color: var(--var_off-white);
     opacity: 1;
-    transform: scale(1.1);
+    outline: none;
   }
 
   .search-panel {
