@@ -1,106 +1,95 @@
 ---
-import { getCollection } from "astro:content";
+// 首页内容标签页（技术 / 小说）：纯展示 + 作用域内客户端切换。
+// 数据来自 src/content.ts，链接来自 src/lib/paths.ts；切换逻辑见 src/lib/home-tabs.ts。
+import { getTech, getNovels, type AnyEntry } from "../content";
+import { entryPath, tagPath } from "../lib/paths";
 
-interface Tabs {
-  tabs?: Array<string>;
-  onClick?: () => void;
+export interface Props {
+  tabs: string[];
 }
+const { tabs } = Astro.props;
 
-const { tabs = [], onClick } = Astro.props;
+const techEntries = await getTech();
+const novels = await getNovels();
 
-// 标签配置常量 - 消除魔术字符串
-const TAB_CONFIG = {
-  TECH: { name: '技术', param: 'tech' },
-  NOVEL: { name: '小说', param: 'novel' },
-} as const;
-
-// 创建映射对象
-const PARAM_TO_NAME: Record<string, string> = Object.fromEntries(
-  Object.values(TAB_CONFIG).map(({ param, name }) => [param, name])
-);
-const NAME_TO_PARAM: Record<string, string> = Object.fromEntries(
-  Object.values(TAB_CONFIG).map(({ param, name }) => [name, param])
-);
-
-// 初始激活标签：根据 URL 参数或本地缓存恢复
-const urlTabParam = Astro.url.searchParams.get('tab');
-const initialTabName = (urlTabParam && PARAM_TO_NAME[urlTabParam]) || TAB_CONFIG.TECH.name;
-
-// 获取各个集合的内容
-const novelEntries = await getCollection("novel");
-const techEntries = await getCollection("tech");
-
-// 过滤出真正的小说（标记为 isNovel: true 的条目）
-const actualNovels = novelEntries.filter(entry => entry.data.isNovel);
-
-// 创建tab数据映射
-const tabData: Record<string, any[]> = {
-  [TAB_CONFIG.TECH.name]: techEntries,
-  [TAB_CONFIG.NOVEL.name]: actualNovels
+const tabData: Record<string, AnyEntry[]> = {
+  技术: techEntries,
+  小说: novels,
 };
+
+const urlTabParam = Astro.url.searchParams.get("tab");
+const initialTabName = urlTabParam === "novel" ? "小说" : "技术";
 ---
 
-<nav class="tabs-nav">
-  {
-    tabs.map((el: string, index: number) => {
-      return (
-        <a class="nav-item" href="javascript:void(0);" data-tab={el} data-index={index}>
-          {el}
+<div class="home-tabs">
+  <nav class="tabs-nav">
+    {
+      tabs.map((tabName, index) => (
+        <a
+          class:list={["nav-item", tabName === initialTabName ? "active" : null]}
+          href="javascript:void(0);"
+          data-tab={tabName}
+          data-index={index}
+        >
+          {tabName}
         </a>
-      );
-    })
-  }
-</nav>
+      ))
+    }
+  </nav>
 
-<div class="tab-content">
-  {
-    tabs.map((tabName: string, index: number) => {
-      const entries = tabData[tabName] || [];
-      return (
-        <div class={`tab-panel ${tabName === initialTabName ? 'active' : ''}`} data-tab={tabName}>
-          <ul class="content-list">
-            {entries.length > 0 ? (
-              entries.map((entry: any) => (
-                <li class="content-item">
-                  <a 
-                    href={entry.data.isNovel ? `${import.meta.env.BASE_URL}/novel/${entry.slug}` : `${import.meta.env.BASE_URL}/${entry.collection}/${entry.slug}`} 
-                    class="content-link"
-                  >
-                    <div class="content-header">
-                      <h3>{entry.data.title}</h3>
-                      {entry.data.isNovel && entry.data.status && (
-                        <span class={`status-badge status-${entry.data.status}`}>
-                          {entry.data.status}
-                        </span>
-                      )}
-                    </div>
-                    {entry.data.author && (
-                      <p class="content-author">作者：{entry.data.author}</p>
-                    )}
-                    {entry.data.description && (
-                      <p class="content-description">{entry.data.description}</p>
-                    )}
-                    {entry.data.tags && (
-                      <div class="tags">
-                        {entry.data.tags.map((tag: string) => (
-                          <a href={`${import.meta.env.BASE_URL}/tags/${tag}`} class="tag">{tag}</a>
-                        ))}
+  <div class="tab-content">
+    {
+      tabs.map((tabName) => {
+        const entries = tabData[tabName] ?? [];
+        return (
+          <div
+            class:list={["tab-panel", tabName === initialTabName ? "active" : null]}
+            data-tab={tabName}
+          >
+            <ul class="content-list">
+              {entries.length > 0 ? (
+                entries.map((entry) => (
+                  <li class="content-item">
+                    <a href={entryPath(entry)} class="content-link">
+                      <div class="content-header">
+                        <h3>{entry.data.title}</h3>
+                        {entry.collection === "novel" && entry.data.isNovel && entry.data.status && (
+                          <span class={`status-badge status-${entry.data.status}`}>
+                            {entry.data.status}
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </a>
-                </li>
-              ))
-            ) : (
-              <li class="content-item empty">
-                <p>暂无内容</p>
-              </li>
-            )}
-          </ul>
-        </div>
-      );
-    })
-  }
+                      {entry.data.author && <p class="content-author">作者：{entry.data.author}</p>}
+                      {entry.data.description && (
+                        <p class="content-description">{entry.data.description}</p>
+                      )}
+                      {entry.data.tags.length > 0 && (
+                        <div class="tags">
+                          {entry.data.tags.map((tag) => (
+                            <a href={tagPath(tag)} class="tag">{tag}</a>
+                          ))}
+                        </div>
+                      )}
+                    </a>
+                  </li>
+                ))
+              ) : (
+                <li class="content-item empty"><p>暂无内容</p></li>
+              )}
+            </ul>
+          </div>
+        );
+      })
+    }
+  </div>
 </div>
+
+<script>
+  import { initTabs } from "../lib/home-tabs";
+  document
+    .querySelectorAll<HTMLElement>(".home-tabs")
+    .forEach((container) => initTabs(container));
+</script>
 
 <style scoped>
   .tabs-nav {
@@ -268,7 +257,6 @@ const tabData: Record<string, any[]> = {
     background-color: var(--var_background-color);
   }
 
-  /* 响应式设计 */
   @media (width < 1280px) {
     .content-list {
       display: flex;
@@ -300,74 +288,3 @@ const tabData: Record<string, any[]> = {
     }
   }
 </style>
-<script is:inline define:vars={{ onClick, initialTabName, NAME_TO_PARAM: JSON.stringify(NAME_TO_PARAM) }}>
-  /**
-   * 切换标签页并同步状态（URL 参数与本地缓存）
-   * @param {string} tabName - 标签名称
-   * @param {boolean} isInit - 是否为初始化调用
-   */
-  const switchTab = (tabName, isInit = false) => {
-    if (!tabName) return;
-    
-    // 如果不是初始化调用，触发 onClick 回调
-    if (!isInit) {
-      onClick?.();
-    }
-
-    // 移除所有 nav-item 的 active 类
-    const navItems = document.querySelectorAll(".nav-item");
-    navItems.forEach((el) => {
-      el.classList.remove("active");
-    });
-
-    // 添加 active 类到当前点击的 tab
-    const targetNav = Array.from(navItems).find(el => el.getAttribute('data-tab') === tabName);
-    targetNav?.classList.add("active");
-
-    // 隐藏所有 tab 面板
-    const tabPanels = document.querySelectorAll(".tab-panel");
-    tabPanels.forEach((panel) => {
-      panel.classList.remove("active");
-    });
-
-    // 显示对应的 tab 面板
-    const activePanel = document.querySelector(`.tab-panel[data-tab="${tabName}"]`);
-    if (activePanel) {
-      activePanel.classList.add("active");
-    }
-
-    // 状态持久化：localStorage
-    try {
-      localStorage.setItem('homeTab', tabName);
-    } catch {}
-
-    // URL 可分享：tab 参数（tech/novel）
-    const nameToParam = JSON.parse(NAME_TO_PARAM);
-    const tabParam = nameToParam[tabName] || 'tech';
-    const url = new URL(window.location.href);
-    url.searchParams.set('tab', tabParam);
-    history.replaceState(null, '', url.toString());
-  };
-
-  /**
-   * 初始化：根据本地缓存或服务端初始值激活标签
-   */
-  document.addEventListener('DOMContentLoaded', () => {
-    const saved = (() => {
-      try { return localStorage.getItem('homeTab'); } catch { return null; }
-    })();
-    const activeName = saved || initialTabName;
-    
-    // 统一调用 switchTab，避免重复代码
-    switchTab(activeName, true);
-  });
-
-  // 使用事件委托优化性能
-  document.querySelector('.tabs-nav')?.addEventListener('click', (event) => {
-    const target = event.target.closest('.nav-item');
-    if (target) {
-      const tabName = target.getAttribute('data-tab');
-      switchTab(tabName);
-    }
-  });
-</script>

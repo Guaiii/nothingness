@@ -1,0 +1,128 @@
+---
+// 小说阅读布局：左侧作品目录 + 右侧正文的双栏骨架。
+// 收束两个小说页重复的 layout/sidebar 外壳与响应式；各页只保留自己的文章块样式。
+import SiteLayout from "./SiteLayout.astro";
+import NovelTOC from "../component/novel-toc.astro";
+import { getChaptersOfNovel } from "../content";
+import { entryPath, chapterPath, chapterRouteSlug } from "../lib/paths";
+import type { NovelEntry } from "../content";
+
+export interface Props {
+  novel: NovelEntry;
+  currentChapterSlug?: string;
+  /** 文章块标题（用于 <title> 与 SEO） */
+  pageTitle: string;
+  description?: string;
+  type?: "website" | "article" | "book";
+  date?: Date;
+  tags?: string[];
+  canonicalPath?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  novel,
+  currentChapterSlug,
+  pageTitle,
+  description,
+  type = "website",
+  date,
+  tags = [],
+  canonicalPath,
+  jsonLd,
+} = Astro.props;
+
+const title = `${pageTitle} - 太虚幻境`;
+
+// 目录以 chapters 集合中的真实章节为准（缺省时回落到 frontmatter 元数据）
+const realChapters = await getChaptersOfNovel(novel.slug);
+const tocChapters =
+  realChapters.length > 0
+    ? realChapters.map((chapter) => ({
+        title: chapter.data.title,
+        // URL 用末段 slug；完整 slug（可能含 novel/ 前缀）用于高亮匹配
+        routeSlug: chapterRouteSlug(chapter.slug),
+        fullSlug: chapter.slug,
+        order: chapter.data.order,
+      }))
+    : (novel.data.chapters ?? []).map((chapter) => ({
+        ...chapter,
+        routeSlug: chapter.slug,
+        fullSlug: chapter.slug,
+      }));
+const tocNovel = { ...novel, data: { ...novel.data, chapters: tocChapters } };
+
+// 当前章节统一转成「路由 slug」做匹配
+const activeChapter = currentChapterSlug ? chapterRouteSlug(currentChapterSlug) : undefined;
+
+const resolvedCanonical =
+  canonicalPath ??
+  (activeChapter
+    ? chapterPath(novel.slug, activeChapter)
+    : entryPath(novel));
+---
+
+<SiteLayout
+  title={title}
+  description={description ?? novel.data.description}
+  type={type}
+  theme="novel"
+  date={date}
+  author={novel.data.author}
+  tags={tags.length ? tags : novel.data.tags}
+  canonicalPath={resolvedCanonical}
+  jsonLd={jsonLd}
+>
+  <div class="novel-layout">
+    <aside class="novel-sidebar">
+      <NovelTOC novel={tocNovel} currentChapter={activeChapter} />
+    </aside>
+    <main class="novel-content">
+      <slot />
+    </main>
+  </div>
+</SiteLayout>
+
+<style>
+  .novel-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--var_background-color);
+    position: relative;
+  }
+
+  .novel-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .novel-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--var_background-color);
+    color: var(--var_pitch-black);
+  }
+
+  @media (max-width: 768px) {
+    .novel-layout {
+      flex-direction: column;
+    }
+
+    .novel-sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+      order: 2;
+    }
+
+    .novel-content {
+      order: 1;
+      padding-top: 4rem;
+    }
+  }
+</style>

@@ -1,4 +1,6 @@
 ---
+import { chapterPath, homePath } from "../lib/paths";
+
 export interface Props {
   novel: {
     data: {
@@ -6,10 +8,13 @@ export interface Props {
       author?: string;
       description?: string;
       status?: string;
+      // slug 为 frontmatter 元数据形态；routeSlug/fullSlug 为真实章节集合形态
       chapters?: Array<{
         title: string;
-        slug: string;
         order: number;
+        slug?: string;
+        routeSlug?: string;
+        fullSlug?: string;
       }>;
     };
     slug: string;
@@ -18,79 +23,77 @@ export interface Props {
 }
 
 const { novel, currentChapter } = Astro.props;
+
+const sortedChapters =
+  novel.data.chapters?.slice().sort((a, b) => a.order - b.order) ?? [];
 ---
 
 <div class="novel-toc-container">
   <!-- 移动端顶部折叠按钮 -->
-  <button class="novel-toc-toggle" id="novel-toc-toggle" aria-label="切换小说目录">
+  <button class="novel-toc-toggle" aria-label="切换小说目录" aria-expanded="false">
     <span class="toc-toggle-icon">📚</span>
     <span class="toc-toggle-text">目录</span>
     <span class="toc-toggle-arrow">▼</span>
   </button>
 
   <!-- 小说目录内容 -->
-  <nav class="novel-toc-nav" id="novel-toc-nav" aria-label="小说目录">
+  <nav class="novel-toc-nav" aria-label="小说目录">
     <!-- 目录头部 -->
     <div class="novel-toc-header">
       <h3 class="novel-toc-title">📚 小说目录</h3>
-      <button class="novel-toc-close" id="novel-toc-close" aria-label="关闭目录">✕</button>
+      <button class="novel-toc-close" aria-label="关闭目录">✕</button>
     </div>
 
     <!-- 小说信息 -->
     <div class="novel-info">
-    <h2 class="novel-title">{novel.data.title}</h2>
-    {novel.data.author && (
-      <p class="novel-author">作者：{novel.data.author}</p>
-    )}
-    {novel.data.status && (
-      <span class={`novel-status status-${novel.data.status}`}>
-        {novel.data.status}
-      </span>
-    )}
-    {novel.data.description && (
-      <p class="novel-description">{novel.data.description}</p>
-    )}
-  </div>
+      <h2 class="novel-title">{novel.data.title}</h2>
+      {novel.data.author && <p class="novel-author">作者：{novel.data.author}</p>}
+      {novel.data.status && (
+        <span class={`novel-status status-${novel.data.status}`}>{novel.data.status}</span>
+      )}
+      {novel.data.description && <p class="novel-description">{novel.data.description}</p>}
+    </div>
 
-  <!-- 章节目录 -->
-  <nav class="novel-chapters" aria-label="小说章节目录">
-    <h3 class="chapters-title">📚 章节目录</h3>
-    
-    {novel.data.chapters && novel.data.chapters.length > 0 ? (
-      <ul class="chapters-list">
-        {novel.data.chapters
-          .sort((a, b) => a.order - b.order)
-          .map((chapter) => (
-            <li class="chapter-item">
-              <a 
-                href={`${import.meta.env.BASE_URL}/novel/${novel.slug}/${chapter.slug}`}
-                class={`chapter-link ${currentChapter === chapter.slug ? 'active' : ''}`}
-                data-chapter={chapter.slug}
-              >
-                <span class="chapter-number">{chapter.order.toString().padStart(2, '0')}</span>
-                <span class="chapter-title">{chapter.title}</span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-    ) : (
-      <div class="no-chapters">
-        <p>暂无章节</p>
-      </div>
-    )}
-  </nav>
+    <!-- 章节目录 -->
+    <nav class="novel-chapters" aria-label="小说章节目录">
+      <h3 class="chapters-title">📚 章节目录</h3>
+
+      {sortedChapters.length > 0 ? (
+        <ul class="chapters-list">
+          {sortedChapters.map((chapter: any) => {
+            const routeSlug: string = chapter.routeSlug ?? chapter.slug;
+            const fullSlug: string = chapter.fullSlug ?? chapter.slug;
+            const isActive =
+              currentChapter === routeSlug || currentChapter === fullSlug;
+            return (
+              <li class="chapter-item">
+                <a
+                  href={chapterPath(novel.slug, routeSlug)}
+                  class:list={["chapter-link", isActive ? "active" : null]}
+                  data-chapter={fullSlug}
+                >
+                  <span class="chapter-number">{chapter.order.toString().padStart(2, "0")}</span>
+                  <span class="chapter-title">{chapter.title}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <div class="no-chapters">
+          <p>暂无章节</p>
+        </div>
+      )}
+    </nav>
 
     <!-- 返回小说列表 -->
     <div class="novel-actions">
-      <a href={`${import.meta.env.BASE_URL}/`} class="back-to-list">
-        ← 返回小说列表
-      </a>
+      <a href={homePath()} class="back-to-list">← 返回小说列表</a>
     </div>
   </nav>
 
   <!-- 遮罩层（移动端） -->
-  <div class="novel-toc-overlay" id="novel-toc-overlay"></div>
+  <div class="novel-toc-overlay"></div>
 </div>
 
 <style scoped>
@@ -431,86 +434,22 @@ const { novel, currentChapter } = Astro.props;
   }
 </style>
 
-<script is:inline>
-  // 小说目录响应式功能
-  document.addEventListener('DOMContentLoaded', function() {
-    const toggleBtn = document.getElementById('novel-toc-toggle');
-    const closeBtn = document.getElementById('novel-toc-close');
-    const tocNav = document.getElementById('novel-toc-nav');
-    const overlay = document.getElementById('novel-toc-overlay');
-    const chapterLinks = document.querySelectorAll('.chapter-link');
+<script>
+  import { createOverlayPanel } from "../lib/overlay-panel";
 
-    // 切换目录显示/隐藏
-    function toggleToc() {
-      const isActive = tocNav.classList.contains('active');
-      
-      if (isActive) {
-        closeToc();
-      } else {
-        openToc();
-      }
-    }
+  document.querySelectorAll<HTMLElement>(".novel-toc-container").forEach((root) => {
+    const trigger = root.querySelector<HTMLElement>(".novel-toc-toggle");
+    const panel = root.querySelector<HTMLElement>(".novel-toc-nav");
+    const overlay = root.querySelector<HTMLElement>(".novel-toc-overlay");
+    const closer = root.querySelector<HTMLElement>(".novel-toc-close");
+    if (!trigger || !panel) return;
 
-    // 打开目录
-    function openToc() {
-      tocNav.classList.add('active');
-      overlay.classList.add('active');
-      toggleBtn.classList.add('active');
-      document.body.style.overflow = 'hidden'; // 防止背景滚动
-    }
-
-    // 关闭目录
-    function closeToc() {
-      tocNav.classList.remove('active');
-      overlay.classList.remove('active');
-      toggleBtn.classList.remove('active');
-      document.body.style.overflow = ''; // 恢复滚动
-    }
-
-    // 事件监听
-    if (toggleBtn) {
-      toggleBtn.addEventListener('click', toggleToc);
-    }
-
-    if (closeBtn) {
-      closeBtn.addEventListener('click', closeToc);
-    }
-
-    if (overlay) {
-      overlay.addEventListener('click', closeToc);
-    }
-
-    // 章节导航功能
-    chapterLinks.forEach(function(link) {
-      link.addEventListener('click', function() {
-        // 移除其他链接的活跃状态
-        chapterLinks.forEach(function(l) { l.classList.remove('active'); });
-        // 添加当前链接的活跃状态
-        this.classList.add('active');
-        
-        // 在移动端点击章节链接后关闭目录
-        if (window.innerWidth <= 768) {
-          closeToc();
-        }
-      });
-    });
-
-    // 监听窗口大小变化
-    window.addEventListener('resize', function() {
-      if (window.innerWidth > 768) {
-        // 桌面端时确保目录是打开状态且移除移动端样式
-        tocNav.classList.remove('active');
-        overlay.classList.remove('active');
-        toggleBtn.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-    });
-
-    // ESC键关闭目录
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && tocNav.classList.contains('active')) {
-        closeToc();
-      }
+    createOverlayPanel({
+      trigger,
+      panel,
+      overlay,
+      closers: closer ? [closer] : [],
+      closeAbove: 768,
     });
   });
 </script>

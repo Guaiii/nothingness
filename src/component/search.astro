@@ -1,14 +1,19 @@
 ---
-import { getCollection } from "astro:content";
+import { getAllContent } from "../content";
+import { entryPath } from "../lib/paths";
 
-// 获取所有内容集合
-const novelEntries = await getCollection("novel");
-const techEntries = await getCollection("tech");
-const allEntries = [...novelEntries, ...techEntries];
+// 搜索索引在构建期生成；链接经统一路径 module，天然带上正确的 base。
+const allEntries = await getAllContent();
+const searchableContent = allEntries.map((entry) => ({
+  title: entry.data.title,
+  tags: entry.data.tags,
+  collection: entry.collection,
+  url: entryPath(entry),
+}));
 ---
 
 <div class="search-container">
-  <div class="search-icon" id="search-toggle">
+  <div class="search-icon" aria-label="打开搜索" aria-expanded="false" role="button" tabindex="0">
     <!-- 满床清梦 -->
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -25,12 +30,12 @@ const allEntries = [...novelEntries, ...techEntries];
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
   </div>
-  <div class="search-panel" id="search-panel">
+  <div class="search-panel">
     <div class="search-input-container">
-      <input type="text" id="search-input" placeholder="搜索内容..." />
-      <button id="close-search">×</button>
+      <input type="text" class="search-input" placeholder="搜索内容..." />
+      <button class="close-search" aria-label="关闭搜索">×</button>
     </div>
-    <div class="search-results" id="search-results">
+    <div class="search-results">
       <!-- 搜索结果将在这里显示 -->
     </div>
   </div>
@@ -102,7 +107,7 @@ const allEntries = [...novelEntries, ...techEntries];
     margin: 0 auto;
   }
 
-  #search-input {
+  .search-input {
     width: 100%;
     padding: 1rem;
     font-size: var(--step-1);
@@ -113,7 +118,7 @@ const allEntries = [...novelEntries, ...techEntries];
     outline: none;
   }
 
-  #close-search {
+  .close-search {
     position: absolute;
     right: 0;
     top: 0;
@@ -264,7 +269,7 @@ const allEntries = [...novelEntries, ...techEntries];
       padding: 1rem;
     }
 
-    #search-input {
+    .search-input {
       font-size: var(--step-0);
       padding: 0.8rem;
     }
@@ -329,12 +334,12 @@ const allEntries = [...novelEntries, ...techEntries];
       margin: 0;
     }
 
-    #search-input {
+    .search-input {
       padding: 0.6rem;
       font-size: var(--step--1);
     }
 
-    #close-search {
+    .close-search {
       padding: 0.3rem;
       font-size: var(--step-1);
     }
@@ -349,86 +354,43 @@ const allEntries = [...novelEntries, ...techEntries];
   }
 </style>
 
-<script is:inline define:vars={{ allEntries }}>
-  // 搜索功能实现
+<script is:inline define:vars={{ searchableContent }}>
   document.addEventListener("DOMContentLoaded", () => {
-    const searchToggle = document.getElementById("search-toggle");
-    const searchPanel = document.getElementById("search-panel");
-    const searchInput = document.getElementById("search-input");
-    const closeSearch = document.getElementById("close-search");
-    const searchResults = document.getElementById("search-results");
+    // 由打包后的 overlay module 处理开合；这里仅负责检索与渲染
+    const root = document.querySelector(".search-container");
+    if (!root) return;
+    const searchInput = root.querySelector(".search-input");
+    const searchResults = root.querySelector(".search-results");
+    if (!searchInput || !searchResults) return;
 
-    // 将内容数据转换为可搜索的格式
-    const searchableContent = allEntries.map((entry) => ({
-      title: entry.data.title,
-      tags: entry.data.tags || [],
-      collection: entry.collection,
-      slug: entry.slug,
-      url: `/${entry.collection}/${entry.slug}`,
-    }));
-    // 打开搜索面板
-    searchToggle.addEventListener("click", () => {
-      searchPanel.classList.add("active");
-      searchInput.focus();
-      // 防止滚动
-      document.body.style.overflow = "hidden";
-    });
+    // 防抖函数
+    function debounce(func, wait) {
+      let timeout;
+      return function (...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+      };
+    }
 
-    // 关闭搜索面板
-    closeSearch.addEventListener("click", () => {
-      searchPanel.classList.remove("active");
-      // 恢复滚动
-      document.body.style.overflow = "";
-    });
+    // 转义 HTML 特殊字符，防止 XSS
+    function escapeHtml(string) {
+      const div = document.createElement("div");
+      div.textContent = string;
+      return div.innerHTML;
+    }
 
-    // 点击外部区域关闭
-    searchPanel.addEventListener("click", (e) => {
-      if (e.target === searchPanel) {
-        searchPanel.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-    });
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
 
-    // ESC键关闭
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && searchPanel.classList.contains("active")) {
-        searchPanel.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-    });
+    // 高亮搜索关键词（安全版本）
+    function highlightText(text, query) {
+      if (!query) return escapeHtml(text);
+      const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
+      return escapeHtml(text).replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
 
-    // 搜索功能
-    searchInput.addEventListener(
-      "input",
-      debounce(() => {
-        const query = searchInput.value.toLowerCase().trim();
-
-        if (query.length < 1) {
-          searchResults.innerHTML = "";
-          return;
-        }
-
-        // 执行搜索
-        const results = searchableContent.filter((item) => {
-          // 搜索标题
-          if (item.title.toLowerCase().includes(query)) {
-            return true;
-          }
-
-          // 搜索标签
-          if (item.tags.some((tag) => tag.toLowerCase().includes(query))) {
-            return true;
-          }
-
-          return false;
-        });
-
-        // 显示结果
-        displayResults(results, query);
-      }, 300)
-    );
-
-    // 显示搜索结果
     function displayResults(results, query) {
       if (results.length === 0) {
         searchResults.innerHTML = `
@@ -442,7 +404,6 @@ const allEntries = [...novelEntries, ...techEntries];
         return;
       }
 
-      // 添加搜索结果头部
       const headerHtml = `
         <div class="search-results-header">
           找到 ${results.length} 个与 "${query}" 相关的结果
@@ -451,60 +412,56 @@ const allEntries = [...novelEntries, ...techEntries];
 
       const resultsHtml = results
         .map((item) => {
-          // 将集合名称转换为中文显示
           const collectionName = item.collection === "tech" ? "技术" : "小说";
-
-          // 高亮搜索关键词
           const highlightedTitle = highlightText(item.title, query);
-
           return `
-          <div class="search-result-item">
-            <div class="collection" style="padding: 0.5rem 0.4rem;">${collectionName}</div>
-            <a href="${item.url}" style="text-decoration: none; color: #fff; transition: color 0.2s ease-in-out;">
-              <h3 style="font-size: 1.1rem; font-weight: 500; margin: 0.5rem 0; line-height: 1.5; color: inherit;">${highlightedTitle}</h3>
-            </a>
-          </div>
-        `;
+            <div class="search-result-item">
+              <div class="collection" style="padding: 0.5rem 0.4rem;">${collectionName}</div>
+              <a href="${item.url}" style="text-decoration: none; color: inherit;">
+                <h3 style="font-size: 1.1rem; font-weight: 500; margin: 0.5rem 0; line-height: 1.5;">${highlightedTitle}</h3>
+              </a>
+            </div>
+          `;
         })
         .join("");
 
-      searchResults.innerHTML =
-        headerHtml + `<div class="search-results-grid">${resultsHtml}</div>`;
+      searchResults.innerHTML = headerHtml + `<div class="search-results-grid">${resultsHtml}</div>`;
     }
 
-    // 转义 HTML 特殊字符，防止 XSS 攻击
-    function escapeHtml(string) {
-      const div = document.createElement('div');
-      div.textContent = string;
-      return div.innerHTML;
-    }
+    searchInput.addEventListener(
+      "input",
+      debounce(() => {
+        const query = searchInput.value.toLowerCase().trim();
+        if (query.length < 1) {
+          searchResults.innerHTML = "";
+          return;
+        }
+        const results = searchableContent.filter((item) => {
+          if (item.title.toLowerCase().includes(query)) return true;
+          if (item.tags.some((tag) => tag.toLowerCase().includes(query))) return true;
+          return false;
+        });
+        displayResults(results, query);
+      }, 300)
+    );
+  });
+</script>
 
-    // 高亮文本中的搜索关键词（安全版本）
-    function highlightText(text, query) {
-      if (!query) return escapeHtml(text);
-      const escapedQuery = escapeRegExp(query);
-      const regex = new RegExp(`(${escapedQuery})`, "gi");
-      return escapeHtml(text).replace(
-        regex,
-        '<mark class="search-highlight">$1</mark>'
-      );
-    }
+<script>
+  import { createOverlayPanel } from "../lib/overlay-panel";
 
-    // 转义正则表达式特殊字符
-    function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
+  document.querySelectorAll<HTMLElement>(".search-container").forEach((root) => {
+    const trigger = root.querySelector<HTMLElement>(".search-icon");
+    const panel = root.querySelector<HTMLElement>(".search-panel");
+    const closer = root.querySelector<HTMLElement>(".close-search");
+    const input = root.querySelector<HTMLElement>(".search-input");
+    if (!trigger || !panel) return;
 
-    // 防抖函数
-    function debounce(func, wait) {
-      let timeout;
-      return function (...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          func.apply(context, args);
-        }, wait);
-      };
-    }
+    createOverlayPanel({
+      trigger,
+      panel,
+      closers: closer ? [closer] : [],
+      focusTarget: input ?? null,
+    });
   });
 </script>

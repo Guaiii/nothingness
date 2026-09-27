@@ -10,25 +10,25 @@ export interface Props {
 const { headings } = Astro.props;
 
 // 过滤掉深度为1的标题（通常是文章主标题）
-const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.depth <= 4);
+const tocHeadings = headings.filter((heading) => heading.depth > 1 && heading.depth <= 4);
 ---
 
 {tocHeadings.length > 0 && (
   <div class="toc-container">
-    <!-- 移动端顶部折叠按钮 -->
-    <button class="toc-toggle" id="toc-toggle" aria-label="切换目录">
+    {/* 移动端顶部折叠按钮 */}
+    <button class="toc-toggle" aria-label="切换目录" aria-expanded="false" aria-controls="toc-nav">
       <span class="toc-toggle-icon">📋</span>
       <span class="toc-toggle-text">目录</span>
       <span class="toc-toggle-arrow">▼</span>
     </button>
 
-    <!-- 目录内容 -->
+    {/* 目录内容 */}
     <nav class="toc" id="toc-nav" aria-label="文章目录">
       <div class="toc-header">
         <h3 class="toc-title">📖 文章目录</h3>
-        <button class="toc-close" id="toc-close" aria-label="关闭目录">✕</button>
+        <button class="toc-close" aria-label="关闭目录">✕</button>
       </div>
-      
+
       <ul class="toc-list">
         {tocHeadings.map((heading) => (
           <li class={`toc-item toc-level-${heading.depth}`}>
@@ -40,14 +40,14 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
         ))}
       </ul>
 
-      <!-- 进度条 -->
+      {/* 进度条 */}
       <div class="toc-progress">
-        <div class="toc-progress-bar" id="toc-progress-bar"></div>
+        <div class="toc-progress-bar"></div>
       </div>
     </nav>
 
-    <!-- 遮罩层（移动端） -->
-    <div class="toc-overlay" id="toc-overlay"></div>
+    {/* 遮罩层（移动端） */}
+    <div class="toc-overlay"></div>
   </div>
 )}
 
@@ -228,9 +228,9 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
   }
 
   .toc-text {
-  flex: 1;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+    flex: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
   /* 进度条 */
@@ -249,22 +249,22 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
 
   /* 遮罩层 */
   .toc-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
 
   .toc-overlay.active {
-  opacity: 1;
-  pointer-events: auto;
+    opacity: 1;
+    pointer-events: auto;
 }
 
   /* 滚动条样式 */
@@ -371,120 +371,59 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
       display: none;
     }
   }
-
-  /* 超大屏幕样式 - 最小宽度 1600px */
-  @media (min-width: 1600px) {
-    .toc {
-      display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      max-height: 100vh;
-      transform: translateY(0);
-      border-radius: 0;
-    }
-
-    .toc-close {
-      display: block;
-    }
-
-    .toc-overlay {
-      display: block;
-    }
-  }
 </style>
 
 <script>
-  // 目录交互功能
-  document.addEventListener('DOMContentLoaded', function() {
-    const tocToggle = document.getElementById('toc-toggle');
-    const tocNav = document.getElementById('toc-nav');
-    const tocClose = document.getElementById('toc-close');
-    const tocOverlay = document.getElementById('toc-overlay');
-    const tocLinks = document.querySelectorAll('.toc-link');
-    const progressBar = document.getElementById('toc-progress-bar');
+  import { createOverlayPanel } from "../lib/overlay-panel";
 
-    // 切换目录显示
-    function toggleToc() {
-      if (tocNav && tocToggle && tocOverlay) {
-        const isActive = tocNav.classList.contains('active');
-        
-        if (isActive) {
-          tocNav.classList.remove('active');
-          tocToggle.classList.remove('active');
-          tocOverlay.classList.remove('active');
-          document.body.style.overflow = '';
-        } else {
-          tocNav.classList.add('active');
-          tocToggle.classList.add('active');
-          tocOverlay.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        }
-      }
-    }
+  document.querySelectorAll<HTMLElement>(".toc-container").forEach((root) => {
+    const trigger = root.querySelector<HTMLElement>(".toc-toggle");
+    const panel = root.querySelector<HTMLElement>(".toc");
+    const overlay = root.querySelector<HTMLElement>(".toc-overlay");
+    const closer = root.querySelector<HTMLElement>(".toc-close");
+    const progressBar = root.querySelector<HTMLElement>(".toc-progress-bar");
+    const links = Array.from(root.querySelectorAll<HTMLAnchorElement>(".toc-link"));
+    if (!trigger || !panel) return;
 
-    // 关闭目录
-    function closeToc() {
-      if (tocNav && tocToggle && tocOverlay) {
-        tocNav.classList.remove('active');
-        tocToggle.classList.remove('active');
-        tocOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-    }
+    const handle = createOverlayPanel({
+      trigger,
+      panel,
+      overlay,
+      closers: closer ? [closer] : [],
+      closeAbove: 1199,
+    });
 
-    // 绑定事件
-    tocToggle?.addEventListener('click', toggleToc);
-    tocClose?.addEventListener('click', closeToc);
-    tocOverlay?.addEventListener('click', closeToc);
-
-    // 点击目录链接后关闭移动端目录
-    tocLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        if (window.innerWidth <= 1199) {
-          setTimeout(closeToc, 300); // 延迟关闭，让滚动动画完成
-        }
+    // 点击目录链接后，在移动端关闭抽屉（延迟以等待滚动）
+    links.forEach((link) => {
+      link.addEventListener("click", () => {
+        if (window.innerWidth <= 1199) window.setTimeout(() => handle.close(), 300);
       });
     });
 
     // 高亮当前章节
-    function updateActiveLink() {
-      const headings = document.querySelectorAll('h2, h3, h4, h5, h6');
+    function updateActiveLink(): void {
+      const headings = document.querySelectorAll("h2, h3, h4, h5, h6");
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
-      let current = '';
-      headings.forEach(heading => {
-        const rect = heading.getBoundingClientRect();
-        if (rect.top <= 100) {
-          current = heading.id;
-        }
+      let current = "";
+      headings.forEach((heading) => {
+        if (heading.getBoundingClientRect().top <= 100) current = heading.id;
       });
-
-      tocLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('data-target') === current) {
-          link.classList.add('active');
-        }
+      links.forEach((link) => {
+        link.classList.toggle("active", link.getAttribute("data-target") === current);
       });
+      void scrollTop;
     }
 
-    // 更新阅读进度
-    function updateProgress() {
+    function updateProgress(): void {
+      if (!progressBar) return;
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (scrollTop / scrollHeight) * 100;
-      
-      if (progressBar) {
-        progressBar.style.width = Math.min(progress, 100) + '%';
-      }
+      const progress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+      progressBar.style.width = `${Math.min(progress, 100)}%`;
     }
 
-    // 滚动事件监听
     let ticking = false;
-    function onScroll() {
+    function onScroll(): void {
       if (!ticking) {
         requestAnimationFrame(() => {
           updateActiveLink();
@@ -495,26 +434,8 @@ const tocHeadings = headings.filter(heading => heading.depth > 1 && heading.dept
       }
     }
 
-    window.addEventListener('scroll', onScroll);
-    
-    // 初始化
+    window.addEventListener("scroll", onScroll, { passive: true });
     updateActiveLink();
     updateProgress();
-
-    // 响应式处理
-    function handleResize() {
-      if (window.innerWidth > 1600) {
-        closeToc();
-      }
-    }
-
-    window.addEventListener('resize', handleResize);
-
-    // ESC键关闭目录
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeToc();
-      }
-    });
   });
 </script>

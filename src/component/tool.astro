@@ -1,5 +1,5 @@
 ---
-interface ToolProps {
+interface Props {
   title?: string;
   description?: string;
   collapsible?: boolean;
@@ -13,7 +13,7 @@ const {
   collapsible = false,
   defaultOpen = true,
   class: className = "",
-} = Astro.props;
+}: Props = Astro.props;
 ---
 
 <div class:list={["tool-container", className]}>

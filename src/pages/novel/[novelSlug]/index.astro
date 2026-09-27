@@ -1,139 +1,60 @@
 ---
-import { getCollection } from "astro:content";
-import NovelTOC from "@/component/novel-toc.astro";
-import "../../../styles/global.css";
-import "../../../styles/mdx-theme.css";
+import NovelLayout from "../../../layouts/NovelLayout.astro";
+import { getNovels, getChaptersOfNovel } from "../../../content";
+import { chapterPath, chapterRouteSlug } from "../../../lib/paths";
 
-// 生成所有小说的路径
-/**
- * 生成所有小说（isNovel=true）的静态路径
- * @returns 小说 slug 参数与用于页面渲染的 novel 属性
- */
 export async function getStaticPaths() {
-  const novelEntries = await getCollection("novel");
-  
-  // 只获取标记为小说的条目
-  const novels = novelEntries.filter(entry => entry.data.isNovel);
-  
+  const novels = await getNovels();
   return novels.map((novel) => ({
     params: { novelSlug: novel.slug },
     props: { novel },
   }));
 }
 
-const { novel } = Astro.props;
+const novel = Astro.props.novel;
 const { Content } = await novel.render();
+const realChapters = await getChaptersOfNovel(novel.slug);
+const firstChapter = realChapters[0] ?? null;
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{novel.data.title} - 太虚幻境</title>
-    <meta name="description" content={novel.data.description || novel.data.title} />
-  </head>
-  <body>
-    <div class="novel-layout">
-      <!-- 左侧小说目录 -->
-      <aside class="novel-sidebar">
-        <NovelTOC novel={novel} />
-      </aside>
-
-      <!-- 右侧小说内容 -->
-      <main class="novel-content">
-
-        <article class="novel-article">
-          <div class="novel-meta">
-            <h1 class="novel-title">{novel.data.title}</h1>
-            {novel.data.author && (
-              <p class="novel-author">作者：{novel.data.author}</p>
-            )}
-            {novel.data.status && (
-              <span class={`novel-status status-${novel.data.status}`}>
-                {novel.data.status}
-              </span>
-            )}
-          </div>
-
-          <div class="novel-body">
-            <Content />
-          </div>
-
-          {novel.data.chapters && novel.data.chapters.length > 0 && (
-            <div class="chapter-navigation">
-              <h3>开始阅读</h3>
-              <a 
-                href={`${import.meta.env.BASE_URL}/novel/${novel.slug}/${novel.data.chapters[0].slug}`}
-                class="start-reading-btn"
-              >
-                开始阅读第一章
-              </a>
-            </div>
-          )}
-        </article>
-      </main>
+<NovelLayout
+  novel={novel}
+  pageTitle={novel.data.title}
+  type="book"
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "Book",
+    name: novel.data.title,
+    ...(novel.data.author ? { author: { "@type": "Person", name: novel.data.author } } : {}),
+    ...(novel.data.description ? { description: novel.data.description } : {}),
+    inLanguage: "zh-CN",
+  }}
+>
+  <article class="novel-article">
+    <div class="novel-meta">
+      <h1 class="novel-title">{novel.data.title}</h1>
+      {novel.data.author && <p class="novel-author">作者：{novel.data.author}</p>}
+      {novel.data.status && (
+        <span class={`novel-status status-${novel.data.status}`}>{novel.data.status}</span>
+      )}
     </div>
-  </body>
-</html>
+
+    <div class="novel-body">
+      <Content />
+    </div>
+
+    {firstChapter && (
+      <div class="chapter-navigation">
+        <h3>开始阅读</h3>
+        <a href={chapterPath(novel.slug, chapterRouteSlug(firstChapter.slug))} class="start-reading-btn">
+          开始阅读第一章
+        </a>
+      </div>
+    )}
+  </article>
+</NovelLayout>
 
 <style>
-  .novel-layout {
-    display: flex;
-    min-height: 100vh;
-    background: var(--var_background-color);
-    position: relative;
-  }
-
-  .novel-sidebar {
-    width: 300px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-  }
-
-  .novel-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: var(--var_background-color);
-    color: var(--var_pitch-black);
-  }
-
-  .novel-header {
-    padding: 1rem 2rem;
-    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
-    background: var(--var_background-color);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    pointer-events: auto; /* 确保头部导航可以接收点击事件 */
-  }
-
-  .novel-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .back-link {
-    color: var(--var_pitch-black);
-    text-decoration: none;
-    padding: 0.5rem 1rem;
-    border: var(--var_border-width) solid var(--var_pitch-black);
-    border-radius: 4px;
-    transition: all 0.2s ease;
-  }
-
-  .back-link:hover {
-    background: var(--var_red);
-    color: var(--var_off-white);
-    border-color: var(--var_red);
-  }
-
   .novel-article {
     flex: 1;
     padding: 2rem;
@@ -199,7 +120,6 @@ const { Content } = await novel.render();
     background: var(--var_off-white);
     position: relative;
     z-index: 10;
-    pointer-events: auto; /* 确保章节导航可以接收点击事件 */
   }
 
   .chapter-navigation h3 {
@@ -226,45 +146,13 @@ const { Content } = await novel.render();
     transform: translateY(-2px);
   }
 
-  /* 移动端适配 */
   @media (max-width: 768px) {
-    .novel-layout {
-      flex-direction: column;
-    }
-
-    .novel-sidebar {
-      width: 100%;
-      height: auto;
-      position: relative;
-      order: 2;
-    }
-
-    .novel-content {
-      order: 1;
-      padding-top: 4rem; /* 为顶部目录按钮留出空间 */
-    }
-
     .novel-article {
       padding: 1rem;
     }
 
     .novel-title {
       font-size: var(--step-3);
-    }
-
-    .novel-header {
-      padding: 1rem;
-      padding-top: 4.5rem; /* 避免与目录按钮重叠 */
-    }
-
-    .novel-nav {
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .back-link {
-      font-size: var(--step--1);
-      padding: 0.4rem 0.8rem;
     }
   }
 </style>

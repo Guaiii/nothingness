@@ -1,148 +1,114 @@
 ---
-import { getCollection } from "astro:content";
+import SiteLayout from "../../layouts/SiteLayout.astro";
 import Quote from "@component/quote.astro";
-// import "../../styles/global.css";
-import "../../styles/index.css";
+import { getAllContent } from "../../content";
+import { entryPath, homePath, tagPath } from "../../lib/paths";
 
-/**
- * 为所有标签生成静态路径
- * @returns 标签参数与用于页面渲染的全部条目集合
- */
 export async function getStaticPaths() {
-  const novelEntries = await getCollection("novel");
-  const techEntries = await getCollection("tech");
-  const allEntries = [...novelEntries, ...techEntries];
-  
-  // 收集所有标签
-  const allTags = new Set();
-  allEntries.forEach(entry => {
-    if (entry.data.tags) {
-      entry.data.tags.forEach((tag: unknown) => allTags.add(tag));
-    }
+  const allEntries = await getAllContent();
+  const allTags = new Set<string>();
+  allEntries.forEach((entry) => {
+    entry.data.tags.forEach((tag) => allTags.add(tag));
   });
-  
-  // 为每个标签生成路径
-  return Array.from(allTags).map(tag => ({
+
+  return [...allTags].map((tag) => ({
     params: { tag },
-    props: { tag, allEntries }
+    props: { tag },
   }));
 }
 
-const { tag, allEntries } = Astro.props;
-const tagString = tag as string;
+const tag = Astro.props.tag as string;
 
-// 过滤包含当前标签的文章
-const filteredEntries = allEntries.filter((entry: any) => 
-  entry.data.tags && entry.data.tags.includes(tagString)
+const filteredEntries = (await getAllContent()).filter((entry) =>
+  entry.data.tags.includes(tag)
 );
-
-// 按集合分组
-const techEntries = filteredEntries.filter((entry: { collection: string; }) => entry.collection === 'tech');
-const novelEntries = filteredEntries.filter((entry: { collection: string; }) => entry.collection === 'novel');
+const techEntries = filteredEntries.filter((entry) => entry.collection === "tech");
+const novelEntries = filteredEntries.filter((entry) => entry.collection === "novel");
 ---
 
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>标签: {tagString} - 太虚幻境</title>
-    <meta name="description" content={`包含标签 "${tagString}" 的所有文章`} />
-  </head>
-  <body>
-    <header>
-      <div class="announcement">
-        <div class="tag-header">
-          <h1>标签: <span class="tag-name">{tagString}</span></h1>
-          <p>共找到 {filteredEntries.length} 篇文章</p>
+<SiteLayout
+  title={`标签: ${tag} - 太虚幻境`}
+  description={`包含标签 "${tag}" 的所有文章`}
+  canonicalPath={tagPath(tag)}
+>
+  <header>
+    <div class="announcement">
+      <div class="tag-header">
+        <h1>标签: <span class="tag-name">{tag}</span></h1>
+        <p>共找到 {filteredEntries.length} 篇文章</p>
+      </div>
+    </div>
+    <div class="title">
+      <div class="title-content">
+        <h1>太虚幻境</h1>
+        <div>
+          <p>世人都晓神仙好，惟有功名忘不了！</p>
+          <p>古今将相在何方？荒冢一堆草没了。</p>
         </div>
       </div>
-      <div class="title">
-        <div class="title-content">
-          <h1>太虚幻境</h1>
-          <div>
-            <p>世人都晓神仙好，惟有功名忘不了！</p>
-            <p>古今将相在何方？荒冢一堆草没了。</p>
-          </div>
-        </div>
-        <div class="auth-info">
-          <span>满床清梦</span>
-          <span>吾疾贫富不均，今为汝辈均之。​附者益众，遂攻陷青城县，掠彭山，杀其令</span>
-        </div>
+      <div class="auth-info">
+        <span>满床清梦</span>
+        <span>吾疾贫富不均，今为汝辈均之。​附者益众，遂攻陷青城县，掠彭山，杀其令</span>
       </div>
-    </header>
-    <main>
-      <nav class="breadcrumb">
-        <a href={`${import.meta.env.BASE_URL}/`} class="back-link">← 返回首页</a>
-        <!-- <div class="tag-search">
-          <Search />
-        </div> -->
-      </nav>
-      
-      <div class="filtered-content">
-        {techEntries.length > 0 && (
-          <section class="content-section">
-            <h2 class="section-title">技术文章</h2>
-            <ul class="content-list">
-              {techEntries.map((entry: any) => (
-                <li class="content-item">
-                  <a href={`${import.meta.env.BASE_URL}/${entry.collection}/${entry.slug}`} class="content-link">
-                    <h3>{entry.data.title}</h3>
-                    {entry.data.tags && (
-                      <div class="tags">
-                        {entry.data.tags.map((entryTag: string) => (
-                          <span class={`tag ${entryTag === tagString ? 'active' : ''}`}>
-                            {entryTag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+    </div>
+  </header>
+  <main>
+    <nav class="breadcrumb">
+      <a href={homePath()} class="back-link">← 返回首页</a>
+    </nav>
 
-        {novelEntries.length > 0 && (
-          <section class="content-section">
-            <h2 class="section-title">生活随笔</h2>
-            <ul class="content-list">
-              {novelEntries.map((entry: any) => (
-                <li class="content-item">
-                  <a href={`${import.meta.env.BASE_URL}/${entry.collection}/${entry.slug}`} class="content-link">
-                    <h3>{entry.data.title}</h3>
-                    {entry.data.tags && (
-                      <div class="tags">
-                        {entry.data.tags.map((entryTag: string) => (
-                          <span class={`tag ${entryTag === tagString ? 'active' : ''}`}>
-                            {entryTag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-        
-        {filteredEntries.length === 0 && (
-          <div class="empty-state">
-            <p>没有找到包含标签 "{tagString}" 的文章</p>
-          </div>
-        )}
-      </div>
-    </main>
-    <footer>
-      <Quote center>
-        "醉后不知天在水，满船清梦压星河"。我没有船，只有床。
-      </Quote>
-    </footer>
-  </body>
-</html>
+    <div class="filtered-content">
+      {techEntries.length > 0 && (
+        <section class="content-section">
+          <h2 class="section-title">技术文章</h2>
+          <ul class="content-list">
+            {techEntries.map((entry) => (
+              <li class="content-item">
+                <a href={entryPath(entry)} class="content-link">
+                  <h3>{entry.data.title}</h3>
+                  <div class="tags">
+                    {entry.data.tags.map((entryTag) => (
+                      <span class={`tag ${entryTag === tag ? "active" : ""}`}>{entryTag}</span>
+                    ))}
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {novelEntries.length > 0 && (
+        <section class="content-section">
+          <h2 class="section-title">生活随笔</h2>
+          <ul class="content-list">
+            {novelEntries.map((entry) => (
+              <li class="content-item">
+                <a href={entryPath(entry)} class="content-link">
+                  <h3>{entry.data.title}</h3>
+                  <div class="tags">
+                    {entry.data.tags.map((entryTag) => (
+                      <span class={`tag ${entryTag === tag ? "active" : ""}`}>{entryTag}</span>
+                    ))}
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {filteredEntries.length === 0 && (
+        <div class="empty-state">
+          <p>没有找到包含标签 "{tag}" 的文章</p>
+        </div>
+      )}
+    </div>
+  </main>
+  <footer>
+    <Quote center>"醉后不知天在水，满船清梦压星河"。我没有船，只有床。</Quote>
+  </footer>
+</SiteLayout>
 
 <style>
   body {
@@ -200,10 +166,6 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
     display: flex;
     justify-content: space-between;
     align-items: center;
-  }
-  
-  .tag-search {
-    z-index: 10;
   }
 
   .back-link {
@@ -309,15 +271,6 @@ const novelEntries = filteredEntries.filter((entry: { collection: string; }) => 
     opacity: 0.6;
   }
 
-  .footer-quote {
-    text-align: center;
-    padding: var(--step-0);
-    font-style: italic;
-    color: var(--var_pitch-black);
-    opacity: 0.8;
-  }
-
-  /* 响应式设计 */
   @media (width < 1280px) {
     .content-list {
       grid-template-columns: 1fr;
