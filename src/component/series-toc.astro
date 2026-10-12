@@ -1,0 +1,454 @@
+---
+import { chapterPath, homePath } from "../lib/paths";
+
+export interface Props {
+  series: {
+    data: {
+      title: string;
+      author?: string;
+      description?: string;
+      status?: string;
+      // 子项目录统一由 SeriesLayout 从 chapters 集合派生
+      chapters?: Array<{
+        title: string;
+        order: number;
+        /** 用于 URL 的末段 slug */
+        routeSlug: string;
+        /** 可能含 series/ 前缀的完整 slug，用于高亮匹配 */
+        fullSlug: string;
+      }>;
+    };
+    slug: string;
+  };
+  currentChapter?: string;
+}
+
+const { series, currentChapter } = Astro.props;
+
+const sortedChapters =
+  series.data.chapters?.slice().sort((a, b) => a.order - b.order) ?? [];
+---
+
+<div class="series-toc-container">
+  <!-- 移动端顶部折叠按钮 -->
+  <button class="series-toc-toggle" aria-label="切换集合目录" aria-expanded="false">
+    <span class="toc-toggle-icon">📚</span>
+    <span class="toc-toggle-text">目录</span>
+    <span class="toc-toggle-arrow">▼</span>
+  </button>
+
+  <!-- 集合目录内容 -->
+  <nav class="series-toc-nav" aria-label="集合目录">
+    <!-- 目录头部 -->
+    <div class="series-toc-header">
+      <h3 class="series-toc-title">📚 集合目录</h3>
+      <button class="series-toc-close" aria-label="关闭目录">✕</button>
+    </div>
+
+    <!-- 小说信息 -->
+    <div class="series-info">
+      <h2 class="series-title">{series.data.title}</h2>
+      {series.data.author && <p class="series-author">作者：{series.data.author}</p>}
+      {series.data.status && (
+        <span class={`series-status status-${series.data.status}`}>{series.data.status}</span>
+      )}
+      {series.data.description && <p class="series-description">{series.data.description}</p>}
+    </div>
+
+    <!-- 子项目录 -->
+    <nav class="series-chapters" aria-label="集合子项目录">
+      <h3 class="chapters-title">📚 子项目录</h3>
+
+      {sortedChapters.length > 0 ? (
+        <ul class="chapters-list">
+          {sortedChapters.map((chapter) => {
+            const isActive =
+              currentChapter === chapter.routeSlug || currentChapter === chapter.fullSlug;
+            return (
+              <li class="chapter-item">
+                <a
+                  href={chapterPath(series.slug, chapter.routeSlug)}
+                  class:list={["chapter-link", isActive ? "active" : null]}
+                  data-chapter={chapter.fullSlug}
+                >
+                  <span class="chapter-number">{chapter.order.toString().padStart(2, "0")}</span>
+                  <span class="chapter-title">{chapter.title}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <div class="no-chapters">
+          <p>子项陆续更新中</p>
+        </div>
+      )}
+    </nav>
+
+    <!-- 返回首页 -->
+    <div class="series-actions">
+      <a href={homePath()} class="back-to-list">← 返回首页</a>
+    </div>
+  </nav>
+
+  <!-- 遮罩层（移动端） -->
+  <div class="series-toc-overlay"></div>
+</div>
+
+<style scoped>
+  .series-toc-container {
+    position: relative;
+    z-index: 100;
+  }
+
+  /* 移动端顶部折叠按钮 */
+  .series-toc-toggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background-color: rgba(235, 230, 218, 0.95);
+    color: var(--var_pitch-black);
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 0;
+    padding: 0.4rem 0.8rem;
+    font-size: var(--step--1);
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    z-index: 1002; /* 确保按钮在遮罩层之上 */
+    align-items: center;
+    gap: 0.4rem;
+    backdrop-filter: blur(8px);
+    pointer-events: auto; /* 确保按钮可以接收点击事件 */
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .series-toc-toggle:hover {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .toc-toggle-icon {
+    font-size: 1rem;
+  }
+
+  .toc-toggle-text {
+    font-weight: 600;
+  }
+
+  .toc-toggle-arrow {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+  }
+
+  .series-toc-toggle.active .toc-toggle-arrow {
+    transform: rotate(180deg);
+  }
+
+  .series-toc-toggle.active {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-1px) scale(0.95);
+  }
+
+  /* 集合目录导航 */
+  .series-toc-nav {
+    width: 100%;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: var(--var_background-color);
+    border-right: var(--var_border-width) solid var(--var_pitch-black);
+    color: var(--var_pitch-black);
+  }
+
+  /* 目录头部 */
+  .series-toc-header {
+    display: none;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+  }
+
+  .series-toc-title {
+    font-size: var(--step-1);
+    font-weight: bold;
+    color: var(--var_pitch-black);
+    margin: 0;
+  }
+
+  .series-toc-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--var_pitch-black);
+    padding: 0.2rem;
+    border-radius: 0;
+    transition: all 0.2s ease;
+  }
+
+  .series-toc-close:hover {
+    background-color: var(--var_red);
+    color: var(--var_off-white);
+  }
+
+  /* 遮罩层 */
+  .series-toc-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* 默认不拦截点击事件 */
+  }
+
+  .series-toc-overlay.active {
+    opacity: 1;
+    pointer-events: auto; /* 激活时才拦截点击事件 */
+  }
+
+  .series-info {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+  }
+
+  .series-title {
+    font-size: var(--step-2);
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--var_pitch-black);
+  }
+
+  .series-author {
+    font-size: var(--step--1);
+    color: var(--var_red);
+    margin-bottom: 0.5rem;
+  }
+
+  .series-status {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .status-连载中 {
+    background: var(--var_red);
+    color: var(--var_off-white);
+  }
+
+  .status-已完结 {
+    background: var(--var_pitch-black);
+    color: var(--var_off-white);
+  }
+
+  .status-暂停 {
+    background: var(--var_border-color);
+    color: var(--var_pitch-black);
+  }
+
+  .series-description {
+    font-size: var(--step--1);
+    line-height: 1.6;
+    color: var(--var_pitch-black);
+    opacity: 0.8;
+  }
+
+  .chapters-title {
+    font-size: var(--step-1);
+    margin-bottom: 1rem;
+    color: var(--var_pitch-black);
+  }
+
+  .chapters-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .chapter-item {
+    margin-bottom: 0.5rem;
+  }
+
+  .chapter-link {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem;
+    text-decoration: none;
+    color: var(--var_pitch-black);
+    border-radius: 0;
+    transition: all 0.2s ease;
+    border: var(--var_border-width) solid transparent;
+  }
+
+  .chapter-link:hover {
+    background: var(--var_off-white);
+    color: var(--var_pitch-black);
+    border-color: var(--var_pitch-black);
+  }
+
+  .chapter-link.active {
+    background: var(--var_red);
+    color: var(--var_off-white);
+    font-weight: bold;
+    border-color: var(--var_red);
+  }
+
+  .chapter-number {
+    display: inline-block;
+    width: 2rem;
+    text-align: center;
+    font-family: monospace;
+    font-size: 0.8rem;
+    margin-right: 0.8rem;
+    opacity: 0.7;
+  }
+
+  .chapter-title {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .no-chapters {
+    text-align: center;
+    padding: 2rem;
+    color: #888;
+  }
+
+  .series-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: var(--var_border-width) solid var(--var_pitch-black);
+  }
+
+  .back-to-list {
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    color: var(--var_pitch-black);
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 0;
+    transition: all 0.2s ease;
+    font-size: var(--step--1);
+  }
+
+  .back-to-list:hover {
+    background: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+  }
+
+  /* 移动端适配 */
+  @media (max-width: 768px) {
+    .series-toc-toggle {
+      display: flex;
+    }
+
+    .series-toc-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 85%;
+      max-width: 320px;
+      height: 100vh;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      pointer-events: auto; /* 确保目录面板可以接收点击事件 */
+    }
+
+    .series-toc-nav.active {
+      transform: translateX(0);
+    }
+
+    .series-toc-header {
+      display: flex;
+    }
+
+    .series-toc-overlay {
+      display: block;
+    }
+
+    .series-title {
+      font-size: var(--step-1);
+    }
+
+    .chapter-link {
+      padding: 0.6rem;
+    }
+
+    .chapter-title {
+      font-size: var(--step--1);
+    }
+
+    .series-info {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+    }
+
+    .chapters-title {
+      font-size: var(--step-0);
+    }
+  }
+
+  /* 桌面端样式 */
+  @media (min-width: 769px) {
+    .series-toc-toggle {
+      display: none;
+    }
+
+    .series-toc-nav {
+      position: static;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .series-toc-header {
+      display: none;
+    }
+
+    .series-toc-overlay {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { createOverlayPanel } from "../lib/overlay-panel";
+
+  document.querySelectorAll<HTMLElement>(".series-toc-container").forEach((root) => {
+    const trigger = root.querySelector<HTMLElement>(".series-toc-toggle");
+    const panel = root.querySelector<HTMLElement>(".series-toc-nav");
+    const overlay = root.querySelector<HTMLElement>(".series-toc-overlay");
+    const closer = root.querySelector<HTMLElement>(".series-toc-close");
+    if (!trigger || !panel) return;
+
+    createOverlayPanel({
+      trigger,
+      panel,
+      overlay,
+      closers: closer ? [closer] : [],
+      closeAbove: 768,
+    });
+  });
+</script>

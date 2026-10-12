@@ -1,76 +1,65 @@
 ---
-import { getCollection } from "astro:content";
-import TOCResponsive from "@/component/toc-responsive.astro";
-import "../styles/global.css";
-import "../styles/code-theme.css";
-import "../styles/mdx-theme.css";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import TOCResponsive from "../component/toc-responsive.astro";
+import { getAllContent } from "../content";
+import type { AnyEntry } from "../content";
+import { entryPath, homePath, tagPath } from "../lib/paths";
 
-// 1. 为每个集合条目生成一个新路径
-/**
- * 生成技术与小说集合的静态路径
- * @returns 每个条目的动态路由参数与渲染所需的 entry 属性
- */
+// 技术文与娱乐单篇走此路由；集合(series)有独立的 series/[seriesSlug] 落地页，这里排除以免路由冲突。
 export async function getStaticPaths() {
-  const novelEntries = await getCollection("novel");
-  const techEntries = await getCollection("tech");
-  const allEntries = [...novelEntries, ...techEntries];
-  return allEntries.map((entry) => ({
+  const entries = (await getAllContent()).filter((entry) => entry.collection !== "series");
+  return entries.map((entry) => ({
     params: { path: `/${entry.collection}/${entry.slug}` },
     props: { entry },
   }));
 }
-// 2. 当渲染的时候，你可以直接从属性中得到条目
-const { entry } = Astro.props;
+
+const entry = Astro.props.entry as AnyEntry;
 const { Content, headings } = await entry.render();
+
+const tags = entry.data.tags ?? [];
 ---
 
-<!doctype html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{entry.data.title} - 太虚幻境</title>
-    <meta name="description" content={entry.data.title} />
-  </head>
-  <body>
-    <main class="page-container">
-      <header class="article-header">
-        <!-- <h1>{entry.data.title}</h1> -->
-        <nav class="article-nav">
-          <a href={`${import.meta.env.BASE_URL}/`} class="back-link">← 返回首页</a>
-          <div>
-            {
-              entry.data.tags && (
-                <div class="article-tags">
-                  {entry.data.tags.map((tag: string) => (
-                    <a href={`${import.meta.env.BASE_URL}/tags/${tag}`} class="tag">
-                      {tag}
-                    </a>
-                  ))}
-                </div>
-              )
-            }
-          </div>
-          <!-- <div class="article-search">
-            <Search />
-          </div> -->
-        </nav>
-      </header>
-
-      <div class="content-layout">
-        <aside class="toc-sidebar">
-          <TOCResponsive headings={headings} />
-        </aside>
-        <div class="article-content">
-          <article>
-            <Content />
-          </article>
+<SiteLayout
+  title={`${entry.data.title} - 太虚幻境`}
+  description={entry.data.description}
+  type="article"
+  theme="article"
+  date={entry.data.date}
+  updated={entry.data.updated}
+  author={entry.data.author}
+  cover={entry.data.cover}
+  tags={tags}
+  canonicalPath={entryPath(entry)}
+>
+  <main class="page-container">
+    <header class="article-header">
+      <nav class="article-nav">
+        <a href={homePath()} class="back-link">← 返回首页</a>
+        <div>
+          {tags.length > 0 && (
+            <div class="article-tags">
+              {tags.map((tag) => (
+                <a href={tagPath(tag)} class="tag">{tag}</a>
+              ))}
+            </div>
+          )}
         </div>
+      </nav>
+    </header>
+
+    <div class="content-layout">
+      <aside class="toc-sidebar">
+        <TOCResponsive headings={headings} />
+      </aside>
+      <div class="article-content">
+        <article>
+          <Content />
+        </article>
       </div>
-    </main>
-  </body>
-</html>
+    </div>
+  </main>
+</SiteLayout>
 
 <style>
   body {
@@ -92,15 +81,15 @@ const { Content, headings } = await entry.render();
   .content-layout {
     display: flex;
     gap: 2rem;
-    /* align-items: flex-start; */
   }
 
   .toc-sidebar {
-    flex: 0 0 280px;
+    flex: 0 0 300px;
     position: sticky;
     top: 2rem;
+    height: calc(100vh - 4rem);
     max-height: calc(100vh - 4rem);
-    overflow-y: auto;
+    overflow: hidden;
   }
 
   .article-content {
@@ -119,24 +108,17 @@ const { Content, headings } = await entry.render();
     margin-bottom: 2rem;
   }
 
-  .article-header h1 {
-    font-size: var(--step-3);
-    margin: 0 0 1rem 0;
-    color: var(--var_pitch-black);
-  }
-
   .article-tags {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
-    /* margin-bottom: 1rem; */
   }
 
   .tag {
     background-color: var(--var_red);
     color: var(--var_off-white);
     padding: 0.2rem 0.5rem;
-    border-radius: 0.2rem;
+    border-radius: 0;
     font-size: var(--step--1);
     text-decoration: none;
     display: inline-block;
@@ -155,10 +137,6 @@ const { Content, headings } = await entry.render();
     align-items: center;
   }
 
-  .article-search {
-    z-index: 10;
-  }
-
   .back-link {
     color: var(--var_red);
     text-decoration: none;
@@ -169,8 +147,6 @@ const { Content, headings } = await entry.render();
     text-decoration: underline;
   }
 
-  /* 文章样式已移至 mdx-theme.css */
-
   /* 响应式布局 */
   @media (max-width: 1199px) {
     .content-layout {
@@ -180,7 +156,9 @@ const { Content, headings } = await entry.render();
     .toc-sidebar {
       flex: none;
       position: static;
+      height: auto;
       max-height: none;
+      overflow: visible;
       order: -1;
     }
 
@@ -204,10 +182,6 @@ const { Content, headings } = await entry.render();
 
     .article-content {
       padding: 1rem;
-    }
-
-    .article-header h1 {
-      font-size: var(--step-2);
     }
   }
 </style>

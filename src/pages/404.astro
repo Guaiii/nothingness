@@ -1,6 +1,7 @@
 ---
-import Quote from "@/component/quote.astro";
-import "../styles/index.css";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import Quote from "../component/quote.astro";
+import { homePath } from "../lib/paths";
 
 const mapping = [
   "世人都晓神仙好，只有功名忘不了",
@@ -18,58 +19,42 @@ function getRandomItem() {
 }
 
 const randomVerse = getRandomItem();
-const baseUrl = import.meta.env.BASE_URL;
 ---
 
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href={`${baseUrl}favicon.svg`} />
-    <meta name="viewport" content="width=device-width" />
-    <meta
-      name="generator"
-      content="虚无、小说、技术(css、js、javascript、typescript、nodejs)、生活。这是一个虚无的世界，你应该能找到自己所追求的"
-    />
-    <title>迷失幻境 - 太虚幻境</title>
-  </head>
-  <body>
-    <header>
-      <!-- <div class="announcement"></div> -->
-      <div class="title">
-        <div class="title-content">
-          <h1>迷失幻境</h1>
-          <div class="title-desc">
-            <p style="text-align: center;">此页已入太虚幻境，无迹可寻</p>
-            <p>或许是缘分未到，或许是路径已断</p>
-          </div>
+<SiteLayout title="迷失幻境 - 太虚幻境" robots="noindex" canonicalPath="/404">
+  <header>
+    <div class="title">
+      <div class="title-content">
+        <h1>迷失幻境</h1>
+        <div class="title-desc">
+          <p style="text-align: center;">此页已入太虚幻境，无迹可寻</p>
+          <p>或许是缘分未到，或许是路径已断</p>
         </div>
       </div>
-      <Quote center> {randomVerse} </Quote>
-    </header>
-    <main>
-      <div class="error-content">
-        <div class="error-message">
-          <h2>页面走失在虚无中</h2>
-          <ul>
-            <li>被时间的洪流冲走</li>
-            <li>隐匿在太虚幻境深处</li>
-            <li>从未在此世界存在过</li>
-            <li>正在另一个平行宇宙中等待</li>
-          </ul>
-        </div>
+    </div>
+    <Quote center>{randomVerse}</Quote>
+  </header>
+  <main>
+    <div class="error-content">
+      <div class="error-message">
+        <h2>页面走失在虚无中</h2>
+        <ul>
+          <li>被时间的洪流冲走</li>
+          <li>隐匿在太虚幻境深处</li>
+          <li>从未在此世界存在过</li>
+          <li>正在另一个平行宇宙中等待</li>
+        </ul>
+      </div>
 
-        <div class="navigation-options">
-          <div class="nav-buttons">
-            <a href={baseUrl} class="nav-button primary"> 返回太虚幻境 </a>
-            <button onclick="history.back()" class="nav-button secondary">
-              回到来路
-            </button>
-          </div>
+      <div class="navigation-options">
+        <div class="nav-buttons">
+          <a href={homePath()} class="nav-button primary"> 返回太虚幻境 </a>
+          <button onclick="history.back()" class="nav-button secondary">回到来路</button>
         </div>
       </div>
-    </main>
-  </body>
-</html>
+    </div>
+  </main>
+</SiteLayout>
 
 <style>
   header {
@@ -117,7 +102,7 @@ const baseUrl = import.meta.env.BASE_URL;
     padding: 0.5rem;
     background-color: rgba(181, 181, 181, 0.1);
     border-left: 3px solid var(--var_red);
-    border-radius: 0.2rem;
+    border-radius: 0;
     opacity: 0.8;
   }
 
@@ -137,7 +122,7 @@ const baseUrl = import.meta.env.BASE_URL;
   .nav-button {
     padding: 0.8rem 1.5rem;
     border: var(--var_border-width) solid var(--var_pitch-black);
-    border-radius: 0.3rem;
+    border-radius: 0;
     font-size: var(--step--1);
     font-weight: 600;
     text-decoration: none;

@@ -1,0 +1,171 @@
+---
+import SeriesLayout from "../../../layouts/SeriesLayout.astro";
+import { getSeries, getChaptersOfSeries, adjacentChapters } from "../../../content";
+import type { SeriesEntry, ChapterEntry } from "../../../content";
+import { chapterPath, chapterRouteSlug } from "../../../lib/paths";
+
+// 每个真实子项（chapters 集合）生成一个页面
+export async function getStaticPaths() {
+  const seriesList = await getSeries();
+  const paths: Array<{
+    params: { seriesSlug: string; chapter: string };
+    props: {
+      series: SeriesEntry;
+      chapter: ChapterEntry;
+      chapters: ChapterEntry[];
+    };
+  }> = [];
+
+  for (const series of seriesList) {
+    const chapters = await getChaptersOfSeries(series.slug);
+    for (const chapter of chapters) {
+      // 子项按 series/<chapter-slug> 目录组织（chapter.slug 形如 series/chapter-06），
+      // URL 只使用末段；完整 slug 保留在 props 中用于渲染。
+      const routeSlug = chapter.slug.split("/").pop() ?? chapter.slug;
+      paths.push({
+        params: { seriesSlug: series.slug, chapter: routeSlug },
+        props: { series, chapter, chapters },
+      });
+    }
+  }
+  return paths;
+}
+
+const { series, chapter, chapters } = Astro.props;
+const { Content } = await chapter.render();
+const { prev, next } = adjacentChapters(chapters, chapter.slug);
+const routeSlug = chapterRouteSlug(chapter.slug);
+---
+
+<SeriesLayout
+  series={series}
+  currentChapterSlug={routeSlug}
+  pageTitle={`${chapter.data.title} - ${series.data.title}`}
+  description={`${series.data.title} ${chapter.data.title}`}
+  type="article"
+  tags={series.data.tags}
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "Chapter",
+    name: chapter.data.title,
+    position: chapter.data.order,
+    isPartOf: {
+      "@type": "Book",
+      name: series.data.title,
+      ...(series.data.author ? { author: { "@type": "Person", name: series.data.author } } : {}),
+    },
+  }}
+>
+  <article class="chapter-article">
+    <h1 class="chapter-title">{chapter.data.title}</h1>
+
+    <div class="chapter-content">
+      <Content />
+    </div>
+
+    <nav class="chapter-navigation" aria-label="子项导航">
+      <div class="nav-buttons">
+        {prev ? (
+          <a href={chapterPath(series.slug, chapterRouteSlug(prev.slug))} class="nav-btn prev-btn">← 上一项</a>
+        ) : (
+          <span class="nav-btn disabled">已是第一项</span>
+        )}
+        {next ? (
+          <a href={chapterPath(series.slug, chapterRouteSlug(next.slug))} class="nav-btn next-btn">下一项 →</a>
+        ) : (
+          <span class="nav-btn disabled">已是最后一项</span>
+        )}
+      </div>
+    </nav>
+  </article>
+</SeriesLayout>
+
+<style>
+  .chapter-article {
+    flex: 1;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .chapter-title {
+    font-size: var(--step-3);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--var_pitch-black);
+  }
+
+  .chapter-content {
+    line-height: 1.8;
+    font-size: var(--step-0);
+    margin-bottom: 3rem;
+  }
+
+  .chapter-navigation {
+    border-top: var(--var_border-width) solid var(--var_pitch-black);
+    padding-top: 2rem;
+    position: relative;
+    z-index: 10;
+  }
+
+  .nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .nav-btn {
+    padding: 1rem;
+    text-decoration: none;
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 0;
+    transition: all 0.2s ease;
+    text-align: center;
+    display: block;
+  }
+
+  .prev-btn {
+    color: var(--var_pitch-black);
+    flex: 1;
+    text-align: left;
+  }
+
+  .next-btn {
+    color: var(--var_pitch-black);
+    flex: 1;
+    text-align: right;
+  }
+
+  .nav-btn:hover:not(.disabled) {
+    background: var(--var_red);
+    color: var(--var_off-white);
+    border-color: var(--var_red);
+  }
+
+  .nav-btn.disabled {
+    color: var(--var_border-color);
+    border-color: var(--var_border-color);
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    .chapter-article {
+      padding: 1rem;
+    }
+
+    .chapter-title {
+      font-size: var(--step-2);
+    }
+
+    .nav-buttons {
+      gap: 0.5rem;
+    }
+
+    .nav-btn {
+      padding: 0.8rem;
+      font-size: var(--step--1);
+    }
+  }
+</style>

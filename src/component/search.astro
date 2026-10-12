@@ -1,14 +1,5 @@
----
-import { getCollection } from "astro:content";
-
-// 获取所有内容集合
-const novelEntries = await getCollection("novel");
-const techEntries = await getCollection("tech");
-const allEntries = [...novelEntries, ...techEntries];
----
-
 <div class="search-container">
-  <div class="search-icon" id="search-toggle">
+  <button type="button" class="search-icon" aria-label="打开搜索" aria-expanded="false">
     <!-- 满床清梦 -->
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -24,13 +15,13 @@ const allEntries = [...novelEntries, ...techEntries];
       <circle cx="11" cy="11" r="8"></circle>
       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
     </svg>
-  </div>
-  <div class="search-panel" id="search-panel">
+  </button>
+  <div class="search-panel">
     <div class="search-input-container">
-      <input type="text" id="search-input" placeholder="搜索内容..." />
-      <button id="close-search">×</button>
+      <input type="text" class="search-input" placeholder="搜索内容..." />
+      <button class="close-search" aria-label="关闭搜索">×</button>
     </div>
-    <div class="search-results" id="search-results">
+    <div class="search-results">
       <!-- 搜索结果将在这里显示 -->
     </div>
   </div>
@@ -62,20 +53,39 @@ const allEntries = [...novelEntries, ...techEntries];
   }
 
   .search-icon {
-    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    min-width: 2.25rem;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 0;
+    background: transparent;
     color: var(--var_off-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    transition: all 0.2s ease;
-    opacity: 0.8;
+    box-shadow: none;
+    opacity: 0.9;
+    cursor: pointer;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
   }
 
-  .search-icon:hover {
+  .search-icon svg {
+    display: block;
+    width: 1.05rem;
+    height: 1.05rem;
+    pointer-events: none;
+  }
+
+  .search-icon:hover,
+  .search-icon:focus-visible,
+  .search-icon.active {
+    border-color: var(--var_off-white);
+    background: color-mix(in srgb, var(--var_off-white) 12%, transparent);
+    color: var(--var_off-white);
     opacity: 1;
-    transform: scale(1.1);
+    outline: none;
   }
 
   .search-panel {
@@ -102,7 +112,7 @@ const allEntries = [...novelEntries, ...techEntries];
     margin: 0 auto;
   }
 
-  #search-input {
+  .search-input {
     width: 100%;
     padding: 1rem;
     font-size: var(--step-1);
@@ -113,7 +123,7 @@ const allEntries = [...novelEntries, ...techEntries];
     outline: none;
   }
 
-  #close-search {
+  .close-search {
     position: absolute;
     right: 0;
     top: 0;
@@ -182,7 +192,7 @@ const allEntries = [...novelEntries, ...techEntries];
     color: var(--var_off-white);
     background-color: var(--var_pitch-black);
     padding: 0.1rem 0.3rem;
-    border-radius: 0.1rem;
+    border-radius: 0;
     margin-bottom: 0.3rem;
     font-weight: bold;
     text-transform: uppercase;
@@ -200,7 +210,7 @@ const allEntries = [...novelEntries, ...techEntries];
     background-color: var(--var_red);
     color: var(--var_off-white);
     padding: 0.1rem 0.3rem;
-    border-radius: 0.1rem;
+    border-radius: 0;
     font-size: var(--step--2);
     line-height: 1;
     text-decoration: none;
@@ -227,7 +237,7 @@ const allEntries = [...novelEntries, ...techEntries];
     padding: 3rem 2rem;
     font-size: var(--step-0);
     background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 0.5rem;
+    border-radius: 0;
     border: 1px dashed rgba(255, 255, 255, 0.3);
   }
 
@@ -246,12 +256,12 @@ const allEntries = [...novelEntries, ...techEntries];
 
   .search-results::-webkit-scrollbar-track {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 0.2rem;
+    border-radius: 0;
   }
 
   .search-results::-webkit-scrollbar-thumb {
     background: var(--var_red);
-    border-radius: 0.2rem;
+    border-radius: 0;
   }
 
   .search-results::-webkit-scrollbar-thumb:hover {
@@ -264,7 +274,7 @@ const allEntries = [...novelEntries, ...techEntries];
       padding: 1rem;
     }
 
-    #search-input {
+    .search-input {
       font-size: var(--step-0);
       padding: 0.8rem;
     }
@@ -329,12 +339,12 @@ const allEntries = [...novelEntries, ...techEntries];
       margin: 0;
     }
 
-    #search-input {
+    .search-input {
       padding: 0.6rem;
       font-size: var(--step--1);
     }
 
-    #close-search {
+    .close-search {
       padding: 0.3rem;
       font-size: var(--step-1);
     }
@@ -349,162 +359,8 @@ const allEntries = [...novelEntries, ...techEntries];
   }
 </style>
 
-<script is:inline define:vars={{ allEntries }}>
-  // 搜索功能实现
-  document.addEventListener("DOMContentLoaded", () => {
-    const searchToggle = document.getElementById("search-toggle");
-    const searchPanel = document.getElementById("search-panel");
-    const searchInput = document.getElementById("search-input");
-    const closeSearch = document.getElementById("close-search");
-    const searchResults = document.getElementById("search-results");
 
-    // 将内容数据转换为可搜索的格式
-    const searchableContent = allEntries.map((entry) => ({
-      title: entry.data.title,
-      tags: entry.data.tags || [],
-      collection: entry.collection,
-      slug: entry.slug,
-      url: `/${entry.collection}/${entry.slug}`,
-    }));
-    // 打开搜索面板
-    searchToggle.addEventListener("click", () => {
-      searchPanel.classList.add("active");
-      searchInput.focus();
-      // 防止滚动
-      document.body.style.overflow = "hidden";
-    });
-
-    // 关闭搜索面板
-    closeSearch.addEventListener("click", () => {
-      searchPanel.classList.remove("active");
-      // 恢复滚动
-      document.body.style.overflow = "";
-    });
-
-    // 点击外部区域关闭
-    searchPanel.addEventListener("click", (e) => {
-      if (e.target === searchPanel) {
-        searchPanel.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-    });
-
-    // ESC键关闭
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && searchPanel.classList.contains("active")) {
-        searchPanel.classList.remove("active");
-        document.body.style.overflow = "";
-      }
-    });
-
-    // 搜索功能
-    searchInput.addEventListener(
-      "input",
-      debounce(() => {
-        const query = searchInput.value.toLowerCase().trim();
-
-        if (query.length < 1) {
-          searchResults.innerHTML = "";
-          return;
-        }
-
-        // 执行搜索
-        const results = searchableContent.filter((item) => {
-          // 搜索标题
-          if (item.title.toLowerCase().includes(query)) {
-            return true;
-          }
-
-          // 搜索标签
-          if (item.tags.some((tag) => tag.toLowerCase().includes(query))) {
-            return true;
-          }
-
-          return false;
-        });
-
-        // 显示结果
-        displayResults(results, query);
-      }, 300)
-    );
-
-    // 显示搜索结果
-    function displayResults(results, query) {
-      if (results.length === 0) {
-        searchResults.innerHTML = `
-          <div class="no-results">
-            <p>没有找到与 "${query}" 相关的内容</p>
-            <p style="font-size: var(--step--1); margin-top: 1rem; opacity: 0.7;">
-              尝试使用不同的关键词或检查拼写
-            </p>
-          </div>
-        `;
-        return;
-      }
-
-      // 添加搜索结果头部
-      const headerHtml = `
-        <div class="search-results-header">
-          找到 ${results.length} 个与 "${query}" 相关的结果
-        </div>
-      `;
-
-      const resultsHtml = results
-        .map((item) => {
-          // 将集合名称转换为中文显示
-          const collectionName = item.collection === "tech" ? "技术" : "小说";
-
-          // 高亮搜索关键词
-          const highlightedTitle = highlightText(item.title, query);
-
-          return `
-          <div class="search-result-item">
-            <div class="collection" style="padding: 0.5rem 0.4rem;">${collectionName}</div>
-            <a href="${item.url}" style="text-decoration: none; color: #fff; transition: color 0.2s ease-in-out;">
-              <h3 style="font-size: 1.1rem; font-weight: 500; margin: 0.5rem 0; line-height: 1.5; color: inherit;">${highlightedTitle}</h3>
-            </a>
-          </div>
-        `;
-        })
-        .join("");
-
-      searchResults.innerHTML =
-        headerHtml + `<div class="search-results-grid">${resultsHtml}</div>`;
-    }
-
-    // 转义 HTML 特殊字符，防止 XSS 攻击
-    function escapeHtml(string) {
-      const div = document.createElement('div');
-      div.textContent = string;
-      return div.innerHTML;
-    }
-
-    // 高亮文本中的搜索关键词（安全版本）
-    function highlightText(text, query) {
-      if (!query) return escapeHtml(text);
-      const escapedQuery = escapeRegExp(query);
-      const regex = new RegExp(`(${escapedQuery})`, "gi");
-      return escapeHtml(text).replace(
-        regex,
-        '<mark class="search-highlight">$1</mark>'
-      );
-    }
-
-    // 转义正则表达式特殊字符
-    function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    }
-
-    // 防抖函数
-    function debounce(func, wait) {
-      let timeout;
-      return function (...args) {
-        const context = this;
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          func.apply(context, args);
-        }, wait);
-      };
-    }
-  });
+<script>
+  import { initSearch } from "../lib/search-client";
+  document.querySelectorAll<HTMLElement>(".search-container").forEach(initSearch);
 </script>

@@ -1,0 +1,120 @@
+---
+// 集合阅读布局：左侧集合目录 + 右侧正文的双栏骨架。
+// 收束落地页与子项页重复的 layout/sidebar 外壳与响应式；各页只保留自己的文章块样式。
+import SiteLayout from "./SiteLayout.astro";
+import SeriesTOC from "../component/series-toc.astro";
+import { getChaptersOfSeries } from "../content";
+import { entryPath, chapterPath, chapterRouteSlug } from "../lib/paths";
+import type { SeriesEntry } from "../content";
+
+export interface Props {
+  series: SeriesEntry;
+  currentChapterSlug?: string;
+  /** 文章块标题（用于 <title> 与 SEO） */
+  pageTitle: string;
+  description?: string;
+  type?: "website" | "article" | "book";
+  date?: Date;
+  tags?: string[];
+  canonicalPath?: string;
+  jsonLd?: Record<string, unknown>;
+}
+
+const {
+  series,
+  currentChapterSlug,
+  pageTitle,
+  description,
+  type = "website",
+  date,
+  tags = [],
+  canonicalPath,
+  jsonLd,
+} = Astro.props;
+
+const title = `${pageTitle} - 太虚幻境`;
+
+// 子项目录只来自 chapters 集合（唯一事实源）；没有子项文件就不渲染任何链接。
+const tocChapters = (await getChaptersOfSeries(series.slug)).map((chapter) => ({
+  title: chapter.data.title,
+  // URL 用末段 slug；完整 slug（可能含 series/ 前缀）用于高亮匹配
+  routeSlug: chapterRouteSlug(chapter.slug),
+  fullSlug: chapter.slug,
+  order: chapter.data.order,
+}));
+const tocSeries = { ...series, data: { ...series.data, chapters: tocChapters } };
+
+// 当前子项统一转成「路由 slug」做匹配
+const activeChapter = currentChapterSlug ? chapterRouteSlug(currentChapterSlug) : undefined;
+
+const resolvedCanonical =
+  canonicalPath ??
+  (activeChapter
+    ? chapterPath(series.slug, activeChapter)
+    : entryPath(series));
+---
+
+<SiteLayout
+  title={title}
+  description={description ?? series.data.description}
+  type={type}
+  theme="series"
+  date={date}
+  author={series.data.author}
+  tags={tags.length ? tags : series.data.tags}
+  canonicalPath={resolvedCanonical}
+  jsonLd={jsonLd}
+>
+  <div class="series-layout">
+    <aside class="series-sidebar">
+      <SeriesTOC series={tocSeries} currentChapter={activeChapter} />
+    </aside>
+    <main class="series-content">
+      <slot />
+    </main>
+  </div>
+</SiteLayout>
+
+<style>
+  .series-layout {
+    display: flex;
+    min-height: 100vh;
+    background: var(--var_background-color);
+    position: relative;
+  }
+
+  .series-sidebar {
+    width: 300px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .series-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--var_background-color);
+    color: var(--var_pitch-black);
+  }
+
+  @media (max-width: 768px) {
+    .series-layout {
+      flex-direction: column;
+    }
+
+    .series-sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+      order: 2;
+    }
+
+    .series-content {
+      order: 1;
+      padding-top: 4rem;
+    }
+  }
+</style>

@@ -1,0 +1,20 @@
+---
+// YouTube 嵌入：<YouTube id="dQw4w9WgXcQ" />。仅接受 11 位视频 ID，点击后才加载（ADR-0005）。
+import Base from "./base.astro";
+
+export interface Props {
+  id: string;
+  title?: string;
+}
+const { id, title = "YouTube 视频" } = Astro.props;
+
+// 白名单：只允许常规视频 ID（字母数字、_、-），杜绝任意域名/协议注入
+if (!/^[A-Za-z0-9_-]{6,20}$/.test(id)) {
+  throw new Error(`YouTube: 非法的视频 id: ${id}`);
+}
+
+const src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`;
+const poster = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+---
+
+<Base src={src} poster={poster} title={title} provider="YouTube" />

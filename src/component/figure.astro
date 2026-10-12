@@ -1,0 +1,17 @@
+---
+// 正文图片块：懒加载、可放大宽度并带说明文字。
+// 用法：<Figure src="..." alt="..." caption="..." />。src 建议指向仓库内图片以走内容管线。
+export interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  /** 撑满文章宽度（默认 true）；为 false 时图片按自身尺寸显示 */
+  full?: boolean;
+}
+const { src, alt, caption, full = true } = Astro.props;
+---
+
+<figure class:list={["md-figure", full ? "is-full" : null]}>
+  <img src={src} alt={alt} loading="lazy" decoding="async" class="md-figure-img" />
+  {caption && <figcaption class="md-figure-caption">{caption}</figcaption>}
+</figure>

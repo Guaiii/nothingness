@@ -5,12 +5,11 @@
 
 <div class="calculator-tool">
   <div class="calculator-display">
-    <input 
-      type="text" 
-      class="calculator-input" 
-      id="calc-display" 
-      value="0" 
-      readonly 
+    <input
+      type="text"
+      class="calculator-input"
+      value="0"
+      readonly
       aria-label="计算器显示"
     />
   </div>
@@ -43,144 +42,74 @@
 </div>
 
 <script>
-  class Calculator {
-    private display: HTMLInputElement;
-    private currentValue: string = '0';
-    private previousValue: string = '';
-    private operator: string = '';
-    private waitingForOperand: boolean = false;
+  import { reducer, initialState, type Action, type CalcState, type Operator } from "../../lib/calculator-engine";
 
-    constructor() {
-      this.display = document.getElementById('calc-display') as HTMLInputElement;
-      this.init();
+  // 每个计算器实例独立作用域：事件只绑定在自身容器，键盘仅在容器聚焦时响应。
+  function initCalculator(root: HTMLElement): void {
+    const displayEl = root.querySelector<HTMLInputElement>(".calculator-input");
+    if (!displayEl) return;
+    const display: HTMLInputElement = displayEl;
+    let state: CalcState = initialState();
+
+    function render(): void {
+      display.value = state.current;
     }
 
-    init() {
-      document.querySelectorAll('.calc-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const target = e.target as HTMLElement;
-          
-          if (target.classList.contains('number')) {
-            const value = target.getAttribute('data-value') || '';
-            this.inputNumber(value);
-          } else if (target.classList.contains('operator')) {
-            const action = target.getAttribute('data-action') || '';
-            this.handleOperator(action);
-          } else if (target.classList.contains('equals')) {
-            this.calculate();
-          }
-          
-          this.updateDisplay();
-        });
-      });
+    function dispatch(action: Action): void {
+      state = reducer(state, action);
+      render();
+    }
 
-      // 键盘支持
-      document.addEventListener('keydown', (e) => {
-        const key = e.key;
-        
-        if (/[0-9.]/.test(key)) {
-          this.inputNumber(key);
-        } else if (['+', '-', '*', '/'].includes(key)) {
-          this.handleOperator(this.getOperatorAction(key));
-        } else if (key === 'Enter' || key === '=') {
-          this.calculate();
-        } else if (key === 'Escape') {
-          this.handleOperator('clear');
-        } else if (key === 'Backspace') {
-          this.handleOperator('backspace');
+    const simpleActions = new Set(["clear", "backspace", "percentage"]);
+
+    root.querySelectorAll<HTMLButtonElement>(".calc-btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = button.getAttribute("data-value");
+        const actionName = button.getAttribute("data-action");
+        if (value !== null) {
+          dispatch({ type: "digit", value });
+        } else if (actionName === "equals") {
+          dispatch({ type: "equals" });
+        } else if (actionName) {
+          if (simpleActions.has(actionName)) {
+            dispatch({ type: actionName as "clear" | "backspace" | "percentage" });
+          } else {
+            dispatch({ type: "operator", operator: actionName as Operator });
+          }
         }
-        
-        this.updateDisplay();
       });
-    }
+    });
 
-    inputNumber(num: string) {
-      if (this.waitingForOperand) {
-        this.currentValue = num;
-        this.waitingForOperand = false;
-      } else {
-        this.currentValue = this.currentValue === '0' ? num : this.currentValue + num;
+    // 键盘：容器（含内部按钮/输入框）聚焦时才接管，避免劫持整页
+    const keyMap: Record<string, Operator> = {
+      "+": "add",
+      "-": "subtract",
+      "*": "multiply",
+      "/": "divide",
+    };
+    root.addEventListener("keydown", (event: KeyboardEvent) => {
+      if (/^[0-9.]$/.test(event.key)) {
+        event.preventDefault();
+        dispatch({ type: "digit", value: event.key });
+      } else if (keyMap[event.key]) {
+        event.preventDefault();
+        dispatch({ type: "operator", operator: keyMap[event.key] });
+      } else if (event.key === "Enter" || event.key === "=") {
+        event.preventDefault();
+        dispatch({ type: "equals" });
+      } else if (event.key === "Escape") {
+        dispatch({ type: "clear" });
+      } else if (event.key === "Backspace") {
+        event.preventDefault();
+        dispatch({ type: "backspace" });
       }
-    }
+    });
 
-    handleOperator(action: string) {
-      switch (action) {
-        case 'clear':
-          this.currentValue = '0';
-          this.previousValue = '';
-          this.operator = '';
-          this.waitingForOperand = false;
-          break;
-        
-        case 'backspace':
-          this.currentValue = this.currentValue.slice(0, -1) || '0';
-          break;
-        
-        case 'percentage':
-          this.currentValue = (parseFloat(this.currentValue) / 100).toString();
-          break;
-        
-        case 'add':
-        case 'subtract':
-        case 'multiply':
-        case 'divide':
-          if (this.previousValue && this.operator && !this.waitingForOperand) {
-            this.calculate();
-          }
-          this.previousValue = this.currentValue;
-          this.operator = action;
-          this.waitingForOperand = true;
-          break;
-      }
-    }
-
-    calculate() {
-      if (!this.operator || !this.previousValue) return;
-      
-      const prev = parseFloat(this.previousValue);
-      const current = parseFloat(this.currentValue);
-      let result: number;
-
-      switch (this.operator) {
-        case 'add':
-          result = prev + current;
-          break;
-        case 'subtract':
-          result = prev - current;
-          break;
-        case 'multiply':
-          result = prev * current;
-          break;
-        case 'divide':
-          result = current !== 0 ? prev / current : 0;
-          break;
-        default:
-          return;
-      }
-
-      this.currentValue = result.toString();
-      this.previousValue = '';
-      this.operator = '';
-      this.waitingForOperand = true;
-    }
-
-    getOperatorAction(key: string): string {
-      const map: Record<string, string> = {
-        '+': 'add',
-        '-': 'subtract',
-        '*': 'multiply',
-        '/': 'divide'
-      };
-      return map[key] || '';
-    }
-
-    updateDisplay() {
-      this.display.value = this.currentValue;
-    }
+    root.tabIndex = 0;
+    render();
   }
 
-  // 初始化计算器
-  new Calculator();
+  document.querySelectorAll<HTMLElement>(".calculator-tool").forEach(initCalculator);
 </script>
 
 <style scoped>
@@ -189,7 +118,7 @@
     margin: 0 auto;
     padding: 1rem;
     background-color: var(--var_pitch-black);
-    border-radius: 0.5rem;
+    border-radius: 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 
@@ -203,7 +132,7 @@
     font-size: var(--step-2);
     text-align: right;
     border: var(--var_border-width) solid var(--var_border-color);
-    border-radius: 0.25rem;
+    border-radius: 0;
     background-color: var(--var_off-white);
     color: var(--var_pitch-black);
     font-family: 'Courier New', monospace;
@@ -226,7 +155,7 @@
     font-size: var(--step-0);
     font-weight: 600;
     border: var(--var_border-width) solid var(--var_border-color);
-    border-radius: 0.25rem;
+    border-radius: 0;
     cursor: pointer;
     transition: all 0.15s ease;
     background-color: var(--var_background-color);

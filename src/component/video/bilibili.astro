@@ -1,0 +1,39 @@
+---
+// 哔哩哔哩嵌入。两种用法：
+//   <Bilibili bvid="BV1xx411c7mD" />
+//   <Bilibili aid="170001" cid="1000" />
+// 仅允许官方 player.bilibili.com 地址，点击后才加载（ADR-0005）。
+import Base from "./base.astro";
+
+export interface Props {
+  bvid?: string;
+  aid?: string | number;
+  cid?: string | number;
+  title?: string;
+  // 可选封面（B站不提供稳定的开放封面地址，建议传入站点内图片）
+  poster?: string;
+}
+const { bvid, aid, cid, title = "哔哩哔哩视频", poster = "" } = Astro.props;
+
+let src = "";
+if (bvid) {
+  if (!/^BV[A-Za-z0-9]{6,}$/.test(bvid)) {
+    throw new Error(`Bilibili: 非法的 bvid: ${bvid}`);
+  }
+  src = `https://player.bilibili.com/player.html?bvid=${bvid}&autoplay=1&high_quality=1&danmaku=0`;
+} else if (aid && cid) {
+  if (!/^\d+$/.test(String(aid)) || !/^\d+$/.test(String(cid))) {
+    throw new Error("Bilibili: aid/cid 必须为数字");
+  }
+  src = `https://player.bilibili.com/player.html?aid=${aid}&cid=${cid}&autoplay=1&high_quality=1&danmaku=0`;
+} else {
+  throw new Error("Bilibili: 需要提供 bvid，或同时提供 aid 与 cid");
+}
+---
+
+<Base
+  src={src}
+  poster={poster || "/images/video-placeholder.svg"}
+  title={title}
+  provider="哔哩哔哩"
+/>

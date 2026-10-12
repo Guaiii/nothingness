@@ -133,6 +133,14 @@ table {
   box-sizing: border-box;
 }
 
+
+/* 全站直角设计契约：所有页面、按钮、标签、卡片与嵌入组件均不使用圆角。 */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
+}
+
 /* @link https://utopia.fyi/type/calculator?c=320,18,1.2,1240,20,1.25,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
 
 :root {
@@ -173,22 +181,48 @@ html {
   font-size: var(--step-0);
   background-color: var(--var_background-color);
 
-  /* 自定义整个滚动条 */
-  ::-webkit-scrollbar {
-    width: 0.3rem;
-    /* 滚动条宽度 */
+  /* 全站按钮与标签统一使用直角视觉。 */
+  button,
+  [role="button"],
+  .tag,
+  .status-badge,
+  .collection {
+    border-radius: 0 !important;
   }
 
-  /* 自定义滚动条轨道 */
-  /* 轨道颜色 */
-  /* ::-webkit-scrollbar-track {
-    background: #f1f1f1; 
-  } */
+  /* 全站滚动条统一为直角。 */
+  ::-webkit-scrollbar {
+    width: 0.3rem;
+    height: 0.3rem;
+    border-radius: 0;
+  }
 
-  /* 自定义滚动条的滑块（thumb） */
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-track-piece {
+    border-radius: 0;
+    background: transparent;
+  }
 
   ::-webkit-scrollbar-thumb {
+    border: 0;
+    border-radius: 0;
     background: var(--var_pitch-black);
-    /* 滑块颜色 */
+  }
+
+  ::-webkit-scrollbar-thumb:hover,
+  ::-webkit-scrollbar-thumb:active {
+    border-radius: 0;
+    background: var(--var_pitch-black);
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  ::-webkit-scrollbar-corner {
+    border-radius: 0;
+    background: transparent;
   }
 }

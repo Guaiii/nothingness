@@ -2,9 +2,31 @@
 
 /* 基础文章容器 */
 article {
+  /* 文章使用独立的固定字号体系，避免跟随站点流式根字号整体放大。 */
+  --step--2: 12px;
+  --step--1: 14px;
+  --step-0: 16px;
+  --step-1: 19px;
+  --step-2: 24px;
+  --step-3: 32px;
+  --step-4: 38px;
+  --step-5: 44px;
   font-size: var(--step-0);
-  line-height: 1.8;
+  line-height: 1.625;
   color: var(--var_pitch-black);
+}
+
+/* 文章直角契约：原生 Markdown 元素及通过 MDX 嵌入的组件统一使用直角。 */
+article *,
+article *::before,
+article *::after {
+  border-radius: 0 !important;
+}
+
+article,
+article * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--var_pitch-black) transparent;
 }
 
 /* 标题样式 */
@@ -14,7 +36,7 @@ article h3,
 article h4,
 article h5,
 article h6 {
-  margin: 2.5rem 0 1.5rem 0;
+  margin: 2rem 0 1rem;
   color: var(--var_pitch-black);
   font-weight: 700;
   line-height: 1.3;
@@ -70,7 +92,7 @@ article h6 {
 
 /* 段落样式 */
 article p {
-  margin: 1.5rem 0;
+  margin: 0.875rem 0;
   text-align: justify;
   text-justify: inter-ideograph;
 }
@@ -88,7 +110,7 @@ article i {
   color: var(--var_pitch-black);
   background-color: rgba(155, 27, 48, 0.1);
   padding: 0.1em 0.2em;
-  border-radius: 3px;
+  border-radius: 0;
 }
 
 /* 删除线和下划线 */
@@ -110,7 +132,7 @@ article mark {
   background-color: rgba(155, 27, 48, 0.2);
   color: var(--var_pitch-black);
   padding: 0.1em 0.3em;
-  border-radius: 3px;
+  border-radius: 0;
   border: 1px solid rgba(155, 27, 48, 0.3);
 }
 
@@ -119,7 +141,7 @@ article code {
   background-color: rgba(155, 27, 48, 0.1);
   color: var(--var_red);
   padding: 0.2em 0.5em;
-  border-radius: 4px;
+  border-radius: 0;
   border: 1px solid rgba(155, 27, 48, 0.2);
   font-size: 0.9em;
   font-family: 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
@@ -161,28 +183,36 @@ article a[href^="http"]:not([href*="localhost"]):not([href*="127.0.0.1"])::after
   opacity: 0.7;
 }
 
-/* 引用块样式 */
+/* 引用块样式：正文括线，避免常见的卡片化引用框 */
 article blockquote {
-  border-left: 4px solid var(--var_red);
-  background-color: var(--var_off-white);
-  padding: 1.5rem 2rem;
-  margin: 2rem 0;
-  font-style: italic;
-  color: var(--var_pitch-black);
-  border-radius: 0 8px 8px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   position: relative;
+  margin: 1.5rem 0;
+  padding: 0.7rem 1.5rem 0.7rem 1.25rem;
+  border: 0;
+  border-right: 1px solid var(--var_pitch-black);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--var_pitch-black);
+  font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+  font-style: normal;
+}
+
+article blockquote::before,
+article blockquote::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 1.2rem;
+  border-top: 1px solid var(--var_pitch-black);
 }
 
 article blockquote::before {
-  content: '"';
-  font-size: 3rem;
-  color: var(--var_red);
-  position: absolute;
-  top: -0.5rem;
-  left: 1rem;
-  opacity: 0.3;
-  font-family: serif;
+  top: 0;
+}
+
+article blockquote::after {
+  bottom: 0;
 }
 
 article blockquote p {
@@ -197,17 +227,32 @@ article blockquote p:last-child {
   margin-bottom: 0;
 }
 
-/* 嵌套引用 */
+/* 嵌套引用：左右对称括线包裹内容 */
 article blockquote blockquote {
-  border-left-color: var(--var_border-color);
-  background-color: rgba(245, 245, 220, 0.5);
-  margin: 1rem 0;
+  position: relative;
+  margin: 0.85rem 1.1rem 0.45rem;
+  padding: 0.55rem 1.25rem;
+  border-right: 1px solid var(--var_border-color);
+  border-left: 1px solid var(--var_border-color);
+  background: transparent;
+  font-size: 0.92em;
+}
+
+article blockquote blockquote::before,
+article blockquote blockquote::after {
+  right: 0;
+  left: 0;
+  width: auto;
+  height: 1px;
+  border-top: 0;
+  background:
+    linear-gradient(to right, var(--var_border-color) 0 1.15rem, transparent 1.15rem calc(100% - 1.15rem), var(--var_border-color) calc(100% - 1.15rem));
 }
 
 /* 列表样式 */
 article ul,
 article ol {
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   padding-left: 2rem;
 }
 
@@ -217,7 +262,7 @@ article ul {
 
 article ul li {
   position: relative;
-  margin: 0.8rem 0;
+  margin: 0.5rem 0;
   padding-left: 1rem;
 }
 
@@ -236,7 +281,7 @@ article ol {
 
 article ol li {
   position: relative;
-  margin: 0.8rem 0;
+  margin: 0.5rem 0;
   padding-left: 1.5rem;
   counter-increment: ordered-list;
 }
@@ -274,7 +319,7 @@ article ul li input[type="checkbox"] {
   width: 1.2rem;
   height: 1.2rem;
   border: 2px solid var(--var_border-color);
-  border-radius: 3px;
+  border-radius: 0;
   background-color: var(--var_off-white);
   margin-right: 0.8rem;
   margin-top: 0.1rem;
@@ -363,7 +408,7 @@ article table {
   margin: 2rem 0;
   background-color: var(--var_off-white);
   border: 2px solid var(--var_border-color);
-  border-radius: 8px;
+  border-radius: 0;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -400,7 +445,7 @@ article table tr:last-child td {
 article img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
+  border-radius: 0;
   border: 2px solid var(--var_border-color);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin: 2rem 0;
@@ -431,7 +476,7 @@ article figcaption {
 article kbd {
   background-color: var(--var_off-white);
   border: 2px solid var(--var_border-color);
-  border-radius: 4px;
+  border-radius: 0;
   padding: 0.2em 0.4em;
   font-family: monospace;
   font-size: 0.9em;
@@ -468,7 +513,7 @@ article sub {
 article details {
   background-color: var(--var_off-white);
   border: 2px solid var(--var_border-color);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 1rem;
   margin: 2rem 0;
 }
@@ -479,7 +524,7 @@ article summary {
   cursor: pointer;
   padding: 0.5rem;
   margin: -0.5rem;
-  border-radius: 6px;
+  border-radius: 0;
   transition: background-color 0.3s ease;
 }
 
@@ -492,63 +537,58 @@ article details[open] summary {
   margin-bottom: 1rem;
 }
 
-/* 警告框样式 */
+/* 提示条：统一米白卡片 + 细边框，靠左侧 4px 色条区分语义 */
 article .warning,
 article .note,
 article .tip,
 article .important {
-  padding: 1.5rem;
-  margin: 2rem 0;
-  border-radius: 8px;
-  border-left: 4px solid;
-  position: relative;
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0;
+  border: var(--var_border-width) solid var(--var_border-color);
+  border-left-width: 4px;
+  background-color: var(--var_off-white);
+  color: var(--var_pitch-black);
 }
 
 article .warning {
-  background-color: rgba(255, 193, 7, 0.1);
-  border-left-color: #ffc107;
-  color: var(--var_pitch-black);
+  border-left-color: #a67c00;
 }
 
 article .note {
-  background-color: rgba(13, 110, 253, 0.1);
-  border-left-color: #0d6efd;
-  color: var(--var_pitch-black);
+  border-left-color: #6c6c6c;
 }
 
 article .tip {
-  background-color: rgba(25, 135, 84, 0.1);
-  border-left-color: #198754;
-  color: var(--var_pitch-black);
+  border-left-color: var(--var_red);
 }
 
 article .important {
-  background-color: rgba(155, 27, 48, 0.1);
-  border-left-color: var(--var_red);
-  color: var(--var_pitch-black);
+  border-left-color: var(--var_pitch-black);
+  background-color: rgba(155, 27, 48, 0.06);
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
   article {
-    font-size: var(--step--1);
-  }
-
-  article h1 {
-    font-size: var(--step-2);
-  }
-
-  article h2 {
-    font-size: var(--step-1);
-  }
-
-  article h3 {
     font-size: var(--step-0);
   }
 
+  article h1 {
+    font-size: 28px;
+  }
+
+  article h2 {
+    font-size: 22px;
+  }
+
+  article h3 {
+    font-size: 18px;
+  }
+
   article blockquote {
-    padding: 1rem 1.5rem;
-    margin: 1.5rem 0;
+    padding: 0.65rem 1.1rem 0.65rem 0;
+    margin: 1.25rem 0;
   }
 
   article ul,
@@ -610,8 +650,8 @@ article .important {
   }
 
   article blockquote {
-    background: #f5f5f5;
-    border-left: 4px solid #333;
+    background: transparent;
+    border-right: 1px solid #333;
   }
 
   article table {
@@ -635,7 +675,7 @@ article a:focus,
 article summary:focus {
   outline: 2px solid var(--var_red);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: 0;
 }
 
 /* 滚动条样式 */
@@ -646,14 +686,186 @@ article *::-webkit-scrollbar {
 
 article *::-webkit-scrollbar-track {
   background: rgba(181, 181, 181, 0.1);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 article *::-webkit-scrollbar-thumb {
   background: var(--var_border-color);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 article *::-webkit-scrollbar-thumb:hover {
   background: var(--var_pitch-black);
+}
+/* ===== 嵌入视频（YouTube / Bilibili）：16:9、点击才加载 ===== */
+article .video-embed {
+  position: relative;
+  width: 100%;
+  margin: 1.5rem 0;
+  padding: 0;
+  border: var(--var_border-width) solid var(--var_pitch-black);
+  border-radius: 0;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 16 / 9;
+}
+
+article .video-embed iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+article .video-play {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: #000;
+  cursor: pointer;
+  display: block;
+}
+
+article .video-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+article .video-play:hover .video-poster,
+article .video-play:focus-visible .video-poster {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+article .video-play-mask {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+article .video-play-icon {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+  transition: transform 0.2s ease;
+}
+
+article .video-play:hover .video-play-icon,
+article .video-play:focus-visible .video-play-icon {
+  transform: scale(1.1);
+}
+
+article .video-play-shape {
+  fill: rgba(28, 28, 28, 0.8);
+  fill-opacity: 1;
+}
+
+article .video-play-triangle {
+  fill: #fff;
+}
+
+article .video-provider {
+  position: absolute;
+  bottom: 0.6rem;
+  right: 0.8rem;
+  font-size: var(--step--2);
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 0.15rem 0.5rem;
+  border-radius: 0;
+}
+
+/* ===== 正文图片 Figure ===== */
+article .md-figure {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+article .md-figure.is-full {
+  width: 100%;
+}
+
+article .md-figure-img {
+  max-width: 100%;
+  height: auto;
+  border: var(--var_border-width) solid var(--var_pitch-black);
+  border-radius: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+article .md-figure-caption {
+  margin-top: 0.5rem;
+  font-size: var(--step--1);
+  color: var(--var_border-color);
+  line-height: 1.5;
+}
+
+/* ===== 下载附件 Attachment ===== */
+article .attachment {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 1.2rem 0;
+  padding: 0.9rem 1rem;
+  border: var(--var_border-width) solid var(--var_pitch-black);
+  border-radius: 0;
+  background-color: var(--var_off-white);
+  color: var(--var_pitch-black);
+  text-decoration: none;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+article .attachment:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
+}
+
+article .attachment-icon {
+  flex: 0 0 auto;
+  min-width: 3.2rem;
+  padding: 0.5rem 0.6rem;
+  text-align: center;
+  font-size: var(--step--2);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--var_off-white);
+  background-color: var(--var_red);
+  border-radius: 0;
+}
+
+article .attachment-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+article .attachment-name {
+  font-size: var(--step-0);
+  font-weight: 600;
+}
+
+article .attachment-meta {
+  font-size: var(--step--2);
+  color: var(--var_border-color);
+}
+
+article .attachment-arrow {
+  flex: 0 0 auto;
+  font-size: var(--step-1);
+  color: var(--var_red);
 }

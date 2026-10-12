@@ -1,0 +1,48 @@
+---
+title: "媒体嵌入适配测试：YouTube、B站、图片与下载"
+description: "草稿：验证娱乐分区下第三方视频点击加载、响应式图片与附件下载卡片的适配。"
+tags: ["测试"]
+date: 2026-09-27
+draft: true
+---
+
+import YouTube from '../../component/video/youtube.astro';
+import Bilibili from '../../component/video/bilibili.astro';
+import Figure from '../../component/figure.astro';
+import Attachment from '../../component/attachment.astro';
+
+# 媒体嵌入适配测试
+
+本篇是**草稿**，仅用于本地 `npm run dev` 验收，生产构建不会出现。逐项检查下方组件的桌面与移动端适配。
+
+## 1. YouTube 视频
+
+下方初始只显示封面与播放按钮，**点击后才加载** YouTube iframe（不在本站消耗视频流量）。
+
+<YouTube id="aqz-KE-bpKQ" title="Big Buck Bunny（YouTube 官方开放样片）" />
+
+## 2. 哔哩哔哩视频
+
+B站不提供稳定开放封面，默认用本地占位图；实际使用时可传 `poster` 指定站点内封面。同样点击才加载。
+
+<Bilibili bvid="BV1GJ411x7h7" title="哔哩哔哩嵌入测试（占位 bvid，发布前请替换）" />
+
+## 3. 正文图片
+
+图片懒加载、自适应宽度，并可带说明文字。
+
+<Figure src="/bg.svg" alt="站点背景纹理占位图" caption="图 1：使用仓库内静态资源的图片块（这里临时用站点背景占位）。" />
+
+## 4. 附件下载
+
+小文件随站点托管，显示为下载卡片；大文件应改为对象存储/外链（下方第二张卡片演示外链样式）。
+
+<Attachment href="/downloads/media-test-sample.txt" name="媒体测试样例.txt" size="约 0.2 KB" ext="TXT" note="小文件·随站托管" />
+
+<Attachment href="https://github.com/withastro/astro/releases" name="Astro Releases（外链示例）" ext="LINK" note="大文件请走对象存储/CDN" />
+
+## 验收清单
+
+- 视频默认是 16:9，不点击不出现 iframe；点击后自动播放、可全屏。
+- 窄屏下视频与图片不溢出正文，附件卡片可正常换行。
+- 图片懒加载、附件可点击下载或新开外链。

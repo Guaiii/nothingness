@@ -1,0 +1,158 @@
+---
+import SeriesLayout from "../../../layouts/SeriesLayout.astro";
+import { getSeries, getChaptersOfSeries } from "../../../content";
+import { chapterPath, chapterRouteSlug } from "../../../lib/paths";
+
+export async function getStaticPaths() {
+  const seriesList = await getSeries();
+  return seriesList.map((series) => ({
+    params: { seriesSlug: series.slug },
+    props: { series },
+  }));
+}
+
+const series = Astro.props.series;
+const { Content } = await series.render();
+const chapters = await getChaptersOfSeries(series.slug);
+const firstChapter = chapters[0] ?? null;
+---
+
+<SeriesLayout
+  series={series}
+  pageTitle={series.data.title}
+  type="book"
+  jsonLd={{
+    "@context": "https://schema.org",
+    "@type": "Book",
+    name: series.data.title,
+    ...(series.data.author ? { author: { "@type": "Person", name: series.data.author } } : {}),
+    ...(series.data.description ? { description: series.data.description } : {}),
+    inLanguage: "zh-CN",
+  }}
+>
+  <article class="series-article">
+    <div class="series-meta">
+      <h1 class="series-title">{series.data.title}</h1>
+      {series.data.author && <p class="series-author">作者：{series.data.author}</p>}
+      {series.data.status && (
+        <span class={`series-status status-${series.data.status}`}>{series.data.status}</span>
+      )}
+    </div>
+
+    <div class="series-body">
+      <Content />
+    </div>
+
+    {firstChapter && (
+      <div class="chapter-navigation">
+        <h3>开始阅读</h3>
+        <a href={chapterPath(series.slug, chapterRouteSlug(firstChapter.slug))} class="start-reading-btn">
+          从第一个子项开始
+        </a>
+      </div>
+    )}
+  </article>
+</SeriesLayout>
+
+<style>
+  .series-article {
+    flex: 1;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .series-meta {
+    margin-bottom: 3rem;
+    text-align: center;
+    border-bottom: var(--var_border-width) solid var(--var_pitch-black);
+    padding-bottom: 2rem;
+  }
+
+  .series-title {
+    font-size: var(--step-4);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: var(--var_pitch-black);
+  }
+
+  .series-author {
+    font-size: var(--step-1);
+    color: var(--var_red);
+    margin-bottom: 1rem;
+  }
+
+  .series-status {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 0;
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .status-连载中 {
+    background: var(--var_red);
+    color: var(--var_off-white);
+  }
+
+  .status-已完结 {
+    background: var(--var_pitch-black);
+    color: var(--var_off-white);
+  }
+
+  .status-暂停 {
+    background: var(--var_border-color);
+    color: var(--var_pitch-black);
+  }
+
+  .series-body {
+    line-height: 1.8;
+    font-size: var(--step-0);
+  }
+
+  .chapter-navigation {
+    margin-top: 3rem;
+    padding: 2rem;
+    border: var(--var_border-width) solid var(--var_pitch-black);
+    border-radius: 0;
+    text-align: center;
+    background: var(--var_off-white);
+    position: relative;
+    z-index: 10;
+  }
+
+  .chapter-navigation h3 {
+    margin-bottom: 1rem;
+    color: var(--var_pitch-black);
+    font-size: var(--step-1);
+  }
+
+  .start-reading-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: var(--var_red);
+    color: var(--var_off-white);
+    text-decoration: none;
+    border-radius: 0;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    border: var(--var_border-width) solid var(--var_red);
+  }
+
+  .start-reading-btn:hover {
+    background: var(--var_pitch-black);
+    border-color: var(--var_pitch-black);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .series-article {
+      padding: 1rem;
+    }
+
+    .series-title {
+      font-size: var(--step-3);
+    }
+  }
+</style>

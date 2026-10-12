@@ -1,0 +1,172 @@
+---
+export interface Props {
+  note: string;
+  label?: string;
+  source?: string;
+  cite?: string;
+}
+
+const {
+  note,
+  label = "编者按",
+  source,
+  cite,
+} = Astro.props;
+---
+
+<figure class="margin-note">
+  <blockquote class="margin-note__quote" cite={cite}>
+    <slot />
+  </blockquote>
+  <aside class="margin-note__annotation" aria-label={label}>
+    <span class="margin-note__label">{label}</span>
+    <p>{note}</p>
+    {source && <cite>{source}</cite>}
+  </aside>
+</figure>
+
+<style>
+  .margin-note {
+    --note-ink: var(--var_pitch-black);
+    position: relative;
+    display: block;
+    margin: 1rem 0;
+    overflow: visible;
+    text-align: left;
+  }
+
+  .margin-note__quote {
+    position: relative;
+    display: block;
+    min-height: 0;
+    margin: 0;
+    padding: 0.55rem 1.15rem;
+    border: 0;
+    border-radius: 0;
+    background: color-mix(in srgb, var(--note-ink) 3%, transparent);
+    box-shadow: none;
+    color: var(--note-ink);
+    font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+    font-style: normal;
+  }
+
+  .margin-note__quote::before {
+    content: "“";
+    position: absolute;
+    top: -0.18rem;
+    left: 0.22rem;
+    border: 0;
+    color: color-mix(in srgb, var(--note-ink) 45%, transparent);
+    font-family: Georgia, serif;
+    font-size: 1.65rem;
+    line-height: 1;
+  }
+
+  .margin-note__quote::after {
+    content: none;
+  }
+
+  .margin-note__annotation {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 3.25rem);
+    z-index: 4;
+    width: clamp(13rem, 18vw, 16rem);
+    transform: translateY(-50%);
+    padding: 0.85rem 0.95rem;
+    border: 1px solid var(--note-ink);
+    background: var(--var_background-color);
+    box-shadow: 0.3rem 0.3rem 0 color-mix(in srgb, var(--note-ink) 14%, transparent);
+    color: var(--note-ink);
+    font-family: "Songti SC", "STSong", "Noto Serif CJK SC", serif;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+
+  .margin-note__annotation::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    width: 3.25rem;
+    border-top: 1px solid var(--note-ink);
+  }
+
+  .margin-note__label {
+    display: inline-block;
+    margin-bottom: 0.55rem;
+    padding: 0.12rem 0.35rem;
+    border: 1px solid var(--note-ink);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    line-height: 1.4;
+  }
+
+  .margin-note__annotation p,
+  .margin-note__annotation cite {
+    display: block;
+    margin: 0;
+  }
+
+  .margin-note__annotation cite {
+    margin-top: 0.65rem;
+    font-size: 11px;
+    font-style: normal;
+    opacity: 0.68;
+  }
+
+  .margin-note__quote :global(p) {
+    margin: 0;
+  }
+
+  @media (max-width: 1499px) {
+    .margin-note__annotation {
+      position: relative;
+      top: auto;
+      left: auto;
+      width: min(22rem, calc(100% - 1.5rem));
+      margin: 0.65rem 0 0 auto;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .margin-note__annotation::before {
+      top: auto;
+      right: 1.25rem;
+      bottom: 100%;
+      width: 1px;
+      height: 0.65rem;
+      border-top: 0;
+      border-right: 1px solid var(--note-ink);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .margin-note {
+      margin: 1.1rem 0;
+    }
+
+    .margin-note__quote {
+      padding: 0.5rem 1rem;
+    }
+
+    .margin-note__annotation {
+      width: calc(100% - 1rem);
+    }
+  }
+
+  @media print {
+    .margin-note {
+      break-inside: avoid;
+    }
+
+    .margin-note__annotation {
+      position: static;
+      width: auto;
+      margin-top: 0.5rem;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+</style>

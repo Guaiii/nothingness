@@ -1,31 +1,68 @@
-# GitHub Pages 部署配置
+# 部署到自有服务器（Nginx + HTTPS）
 
-## 部署路径要求
-- 当前配置使用 `base: '/'`，构建产物不会自动添加 `nothingness` 子路径。
-- 部署到用户主页（`https://<username>.github.io/`）或自定义域名时，请保持 `base: '/'`。
+站点为纯静态 Astro SSG：本地构建，`rsync` 同步产物，服务器只跑 Nginx。决策背景见 `docs/adr/0002-local-build-rsync-to-nginx.md`。
 
-## 项目主页与子路径的区别
-- 用户主页或自定义域：`base: '/'`（推荐，链接形如 `/tech/xxx`）。
-- 项目主页（`https://<username>.github.io/<repo>/`）：需改为 `base: '/<repo>/'`。
-  - 示例：`base: '/nothingness/'`
+## 一次性准备
 
-## 修改位置
-- 文件：`astro.config.mjs`
-  - `site: 'https://guaiii.github.io'`
-  - `base: '/'`
+1. 服务器（Ubuntu）安装 Nginx：
+   ```bash
+   sudo apt update && sudo apt install -y nginx rsync
+   ```
+2. 准备站点目录与部署用户（确保该用户对目录有写权限）：
+   ```bash
+   sudo mkdir -p /var/www/your-domain.com
+   sudo chown -R deploy:www-data /var/www/your-domain.com
+   ```
+3. 域名解析：将 `your-domain.com` 与 `www.your-domain.com` 的 A 记录指向服务器 IP，放行 80/443。
+4. 本机配置：
+   ```bash
+   cp .env.example .env   # 填写 DEPLOY_HOST / DEPLOY_USER / DEPLOY_PATH
+   ```
+   并把 `astro.config.mjs` 中的 `SITE_URL` 改成正式域名（canonical / sitemap / OG 依赖它）。
 
-## 部署步骤
-- 本地构建：`npm run build`
-- 预览验证：`npm run preview`
-- GitHub Pages：
-  - 打开仓库 Settings → Pages → 选择构建源（`gh-pages` 分支或 GitHub Actions）。
-  - 推荐使用默认的 Astro 构建输出目录 `dist/` 并通过 Actions 部署。
+## 配置 Nginx 与 HTTPS
 
-## 链接与资源
-- 所有内部链接已统一为根路径（`/tech/...`, `/novel/...`, `/tags/...`）。
-- 站点图标使用根路径：`/favicon.svg`。
+```bash
+sudo cp docs/nginx.conf.example /etc/nginx/sites-available/your-domain.com
+# 编辑该文件，把 your-domain.com 全部替换为正式域名、root 路径改为 DEPLOY_PATH
+sudo ln -s /etc/nginx/sites-available/your-domain.com /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+签发 Let's Encrypt 证书（自动改写配置并强制 HTTPS）：
+
+```bash
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d your-domain.com -d www.your-domain.com
+```
+
+## 日常发布
+
+```bash
+npm run deploy
+```
+
+该命令先执行 `npm run build`（含 `astro check`），再用 `rsync -az --delete` 把 `dist/` 同步到服务器。先演练可运行：
+
+```bash
+DEPLOY_DRY_RUN=1 npm run deploy
+```
+
+## 写作与草稿
+
+- 内容是仓库内的 MDX，本地 `npm run dev` 实时预览（含 Tool / Calculator / Pinyin 等嵌套组件）。
+- 草稿在 frontmatter 写 `draft: true`：仅本地可见，生产构建自动排除（不进页面、sitemap、RSS、搜索）。
+- 发表：去掉 `draft` 后 `npm run deploy`。删除内容走 git。
 
 ## 常见问题
-- 404：确保 Pages 配置为 `GitHub Actions` 或正确的构建目录。
-- 子路径部署链接错乱：将 `base` 改为仓库名子路径并重新构建。
 
+- **链接带子路径或 404**：确认 `astro.config.mjs` 的 `base: "/"` 且 Nginx `root` 指向 `DEPLOY_PATH`。
+- **canonical / sitemap 还是 example.com**：忘了改 `SITE_URL`，改完重新部署。
+- **rsync 权限被拒**：检查部署用户对站点目录的写权限与 SSH 免密（建议配置公钥登录）。
+
+## 嵌入媒体与带宽（轻量服务器必读）
+
+- **视频**：不要把 mp4 放进仓库或服务器。正文只用 `<YouTube>` / `<Bilibili>`，默认点击封面才加载 iframe，初始不消耗视频流量（见 `docs/adr/0005-bandwidth-policy-embedded-media.md`）。
+- **图片**：放在仓库（建议 `src/assets/` 或 `public/images/`），组件 `<Figure>` 已懒加载；单图控制在数百 KB，Nginx 已对图片设置 30 天缓存。
+- **下载附件**：约 10MB 以内可放 `public/downloads/`，用 `<Attachment>` 引用；更大的文件放对象存储/CDN（OSS/COS/七牛）或 GitHub Release，正文只放外链（`<Attachment href="https://...">`）。
+- 监控：可用 `vnstat` 观察服务器流量；若某附件/图片流量异常，及时迁到 CDN。
